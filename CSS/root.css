@@ -1,0 +1,28 @@
+/* root.css */
+
+/* 1. Schriftarten definieren */
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 2. Als CSS-Variable hinterlegen (Optional & Empfohlen) */
+:root {
+    --font-main: 'Inter', sans-serif;
+}
+
+/* 3. Global anwenden */
+body {
+    font-family: var(--font-main);
+}
