@@ -10,17 +10,14 @@ a {
 
 .header-login {
     display: flex;
-}
-
-.logo {
-
-    display: flex;
     justify-content: space-between;
-
+    align-items: flex-start;
+    width: 100%;
 }
 
 .signup {
     display: flex;
     align-items: baseline;
     gap: 10px;
+    margin: 24px 24px 0 0;
 }
