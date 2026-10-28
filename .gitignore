@@ -1,0 +1,11 @@
+# VS Code-Einstellungen
+.vscode/
+# Systemdateien
+.DS_Store
+Thumbs.db
+
+# Lokale Umgebungsvariablen (falls du sie nutzt)
+.env
+
+# Abhängigkeiten (falls du mal npm nutzt)
+node_modules/
