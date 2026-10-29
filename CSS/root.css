@@ -1,5 +1,3 @@
-/* root.css */
-
 /* 1. Schriftarten definieren */
 @font-face {
     font-family: 'Inter';
@@ -20,9 +18,16 @@
 /* 2. Als CSS-Variable hinterlegen (Optional & Empfohlen) */
 :root {
     --font-main: 'Inter', sans-serif;
+
 }
 
 /* 3. Global anwenden */
 body {
     font-family: var(--font-main);
+}
+
+h1 {
+    font-family: var(--font-main);
+    font-weight: 700;
+    font: size 61px;
 }
