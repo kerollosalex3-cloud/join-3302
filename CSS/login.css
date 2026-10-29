@@ -32,8 +32,52 @@ button {
 }
 
 .login-logo {
-    width: 100px;
+    --logo-size: 100px;
+    --logo-position-x: max(5vw, 24px);
+    --logo-position-y: 48px;
+    --logo-half-width: 50px;
+    --logo-half-height: 60.4px;
+    width: var(--logo-size);
     height: auto;
+    animation: logo-intro 3s ease-in-out;
+}
+
+.register-prompt,
+.login-main,
+.login-footer,
+.toast {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    animation: page-reveal 400ms ease 3s forwards;
+}
+
+@keyframes logo-intro {
+    0%,
+    20% {
+        transform: translate(
+            calc(50vw - var(--logo-position-x) - var(--logo-half-width)),
+            calc(50vh - var(--logo-position-y) - var(--logo-half-height))
+        ) scale(2.5);
+    }
+
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
+@keyframes page-reveal {
+    from {
+        visibility: visible;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    to {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
 
 .register-prompt {
@@ -184,7 +228,11 @@ button {
     }
 
     .login-logo {
-        width: 64px;
+        --logo-size: 64px;
+        --logo-position-x: 24px;
+        --logo-position-y: 24px;
+        --logo-half-width: 32px;
+        --logo-half-height: 38.65px;
     }
 
     .register-prompt {
@@ -199,5 +247,21 @@ button {
 
     .login-box {
         padding: 32px 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login-logo {
+        animation: none;
+    }
+
+    .register-prompt,
+    .login-main,
+    .login-footer,
+    .toast {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+        animation: none;
     }
 }
