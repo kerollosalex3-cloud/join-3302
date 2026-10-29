@@ -1,39 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join</title>
+    <title>Join – Anmelden</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg">
     <link rel="stylesheet" href="CSS/root.css">
     <link rel="stylesheet" href="CSS/login.css">
-    <link rel="stylesheet" href="../style.css">
 </head>
 
-<body>
-    <header class="header-login">
+<body class="login-page">
+    <header class="login-header">
         <img class="login-logo" src="assets/icons/logo.svg" alt="Join">
-        <section class="signup">
-            <p>Not a Join user?</p>
-            <a href="./html/signup.html">Sign up</a>
-        </section>
+        <div class="register-prompt">
+            <span class="register-prompt-text">Noch kein Konto?</span>
+            <button class="register-link" type="button" aria-expanded="false">Registrieren</button>
+        </div>
     </header>
+
     <main class="login-main">
-        <section>
-            <div class="login-section">
-                <h1>Login</h1>
-                <form action="" method="post" class="login-form">
-                    <label for="email" required></label>
-                    <input type="email" name="email" id="email" placeholder="Enter your email" required>
-                    <label for="password" required></label>
-                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
-                    <button type="submit" class="login-button">Login</button>
-                    <button type="submit" class="guest-login">Guest Login</button>
-                </form>
-            </div>
+        <section class="login-box">
+            <h1 class="auth-title">Anmelden</h1>
+            <p class="sr-only">Melde dich mit deinem Konto an oder nutze den Gastzugang.</p>
+
+            <form class="auth-form login-form">
+                <label class="input-with-icon">
+                    E-Mail
+                    <input type="email" name="email" placeholder="E-Mail" autocomplete="username" required>
+                    <img class="input-icon" src="assets/icons/mail.svg" alt="">
+                </label>
+                <label class="input-with-icon">
+                    Passwort
+                    <input type="password" name="password" placeholder="Passwort" autocomplete="current-password" required>
+                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
+                </label>
+                <div class="login-actions">
+                    <button class="btn login-submit" type="submit">Anmelden</button>
+                    <button class="btn secondary-btn guest-login" type="button">Als Gast anmelden</button>
+                </div>
+            </form>
+
+            <form class="auth-form register-form" hidden>
+                <label>
+                    Name
+                    <input type="text" name="name" maxlength="40" placeholder="Name" autocomplete="name" required>
+                </label>
+                <label class="input-with-icon">
+                    E-Mail
+                    <input type="email" name="email" placeholder="E-Mail" autocomplete="email" required>
+                    <img class="input-icon" src="assets/icons/mail.svg" alt="">
+                </label>
+                <label class="input-with-icon">
+                    Passwort (mindestens 6 Zeichen)
+                    <input type="password" name="password" minlength="6" placeholder="Passwort" autocomplete="new-password" required>
+                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
+                </label>
+                <button class="btn register-submit" type="submit">Konto erstellen</button>
+            </form>
         </section>
     </main>
+
+    <footer class="login-footer">
+        <span>Datenschutz</span>
+        <span>Impressum</span>
+    </footer>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="scripts/login.js"></script>
 </body>
 
 </html>
