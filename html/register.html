@@ -5,54 +5,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join – Registrieren</title>
-    <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg">
-    <link rel="stylesheet" href="CSS/root.css">
-    <link rel="stylesheet" href="CSS/register.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../CSS/register.css">
 </head>
 
 <body class="login-page register-page">
     <header class="login-header">
-        <a href="index.html" aria-label="Zur Anmeldung">
-            <img class="login-logo" src="assets/icons/logo.svg" alt="Join">
+        <a href="../index.html" aria-label="Zur Anmeldung">
+            <img class="login-logo" src="../assets/icons/logo.svg" alt="Join">
         </a>
         <div class="register-prompt">
-            <span class="register-prompt-text">not a Join User?</span>
-            <a class="register-link" href="index.html">Anmelden</a>
+            <span class="register-prompt-text">Not a Join User?</span>
+            <a class="register-link" href="../index.html">Anmelden</a>
         </div>
     </header>
 
     <main class="login-main">
         <section class="login-box">
-            <h1 class="auth-title">Registrieren</h1>
+            <div class="register-title-row">
+                <a class="register-back-link" href="../index.html?skipIntro=1" aria-label="Zur Login-Seite">
+                    <img src="../assets/icons/arrow-back.svg" alt="">
+                </a>
+                <h1 class="auth-title">Sign up</h1>
+            </div>
             <p class="sr-only">Erstelle ein neues Join-Konto.</p>
 
-            <form class="auth-form">
+            <form class="auth-form" novalidate>
                 <label>
                     Name
-                    <input type="text" name="name" maxlength="40" placeholder="Name" autocomplete="name" required>
+                    <input type="text" name="name" placeholder="Name" autocomplete="name">
+                    <small class="field-error" aria-live="polite"></small>
                 </label>
                 <label class="input-with-icon">
                     E-Mail
-                    <input type="email" name="email" placeholder="E-Mail" autocomplete="email" required>
-                    <img class="input-icon" src="assets/icons/mail.svg" alt="">
+                    <input type="email" name="email" placeholder="E-Mail" autocomplete="email">
+                    <img class="input-icon" src="../assets/icons/mail.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
                 </label>
                 <label class="input-with-icon">
-                    Passwort (mindestens 6 Zeichen)
-                    <input type="password" name="password" minlength="6" placeholder="Passwort"
-                        autocomplete="new-password" required>
-                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
+                    Passwort
+                    <input type="password" name="password" placeholder="Passwort" autocomplete="new-password">
+                    <img class="input-icon" src="../assets/icons/lock.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
                 </label>
                 <label class="input-with-icon">
                     Passwort wiederholen
-                    <input type="password" name="password-confirmation" minlength="6" placeholder="Passwort wiederholen"
-                        autocomplete="new-password" required>
-                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
+                    <input type="password" name="password-confirmation" placeholder="Passwort wiederholen"
+                        autocomplete="new-password">
+                    <img class="input-icon" src="../assets/icons/lock.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
                 </label>
                 <label class="privacy-consent">
-                    <input type="checkbox" name="privacy-consent" required>
+                    <input type="checkbox" name="privacy-consent">
                     <span>Ich akzeptiere die Datenschutzerklärung.</span>
+                    <small class="field-error" aria-live="polite"></small>
                 </label>
-                <button class="btn" type="submit">Konto erstellen</button>
+                <button class="btn" type="submit" disabled>Konto erstellen</button>
             </form>
         </section>
     </main>
@@ -62,7 +71,7 @@
         <span>Impressum</span>
     </footer>
     <div class="toast" role="status" aria-live="polite"></div>
-    <script type="module" src="scripts/register.js"></script>
+    <script type="module" src="../scripts/register.js"></script>
 </body>
 
 </html>

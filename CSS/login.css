@@ -43,6 +43,21 @@ body {
     animation: page-reveal 400ms ease 3s both;
 }
 
+html.skip-logo-intro .login-logo {
+    animation: none;
+    transform: none;
+}
+
+html.skip-logo-intro .register-prompt,
+html.skip-logo-intro .login-main,
+html.skip-logo-intro .login-footer,
+html.skip-logo-intro .toast {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    animation: none;
+}
+
 @keyframes logo-intro {
 
     0%,
@@ -140,10 +155,25 @@ body {
     border-color: #29abe2;
 }
 
+.auth-form input[aria-invalid="true"] {
+    border-color: #e60026;
+}
+
+.field-error {
+    display: block;
+    color: #e60026;
+    font-size: 13px;
+    text-align: left;
+}
+
+.field-error:empty {
+    display: none;
+}
+
 .input-with-icon .input-icon {
     position: absolute;
+    top: 40px;
     right: 16px;
-    bottom: 13px;
     width: 20px;
     height: 20px;
     pointer-events: none;
@@ -166,6 +196,21 @@ body {
     padding: 24px;
     color: #a8a8a8;
     font-size: 14px;
+}
+
+.toast:not(:empty) {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+    width: fit-content;
+    max-width: calc(100% - 48px);
+    margin: 0 auto;
+    padding: 14px 20px;
+    border-radius: 8px;
+    color: #fff;
+    background: #2a3647;
+    text-align: center;
 }
 
 .sr-only {

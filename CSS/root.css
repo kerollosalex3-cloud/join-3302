@@ -18,7 +18,8 @@
 /* 2. Als CSS-Variable hinterlegen (Optional & Empfohlen) */
 :root {
     --font-main: 'Inter', sans-serif;
-    --color-primary: #2a3647;
+    --color-primary: rgba(42, 54, 71, 1);
+    ;
     --color-accent: #29abe2;
 }
 
@@ -55,6 +56,11 @@ button {
 .btn:hover,
 .btn:focus-visible {
     background: var(--color-accent);
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 .secondary-btn {

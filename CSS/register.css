@@ -5,6 +5,39 @@
     transform: none;
 }
 
+.register-title-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.register-title-row .auth-title {
+    margin-bottom: 0;
+}
+
+.register-back-link {
+    position: absolute;
+    left: -40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+
+}
+
+.register-back-link img {
+    width: 32px;
+    height: 32px;
+}
+
+.register-back-link:hover,
+.register-back-link:focus-visible {
+    background: #e7e7e7;
+}
+
 .register-page .register-prompt,
 .register-page .login-main,
 .register-page .login-footer,
@@ -35,4 +68,9 @@
 
 .privacy-consent {
     justify-content: center;
+}
+
+.privacy-consent .field-error {
+    flex-basis: 100%;
+    text-align: center;
 }
