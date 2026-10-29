@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -14,17 +14,15 @@
     <header class="login-header">
         <img class="login-logo" src="assets/icons/logo.svg" alt="Join">
         <div class="register-prompt">
-            <span class="register-prompt-text">Noch kein Konto?</span>
-            <button class="register-link" type="button" aria-expanded="false">Registrieren</button>
+            <span class="register-prompt-text">Not a Join User?</span>
+            <a class="register-link" href="register.html">Registrieren</a>
         </div>
     </header>
 
     <main class="login-main">
         <section class="login-box">
             <h1 class="auth-title">Anmelden</h1>
-            <p class="sr-only">Melde dich mit deinem Konto an oder nutze den Gastzugang.</p>
-
-            <form class="auth-form login-form">
+            <form class="auth-form">
                 <label class="input-with-icon">
                     E-Mail
                     <input type="email" name="email" placeholder="E-Mail" autocomplete="username" required>
@@ -42,24 +40,6 @@
                 </div>
             </form>
 
-            <form class="auth-form register-form" hidden>
-                <label>
-                    Name
-                    <input type="text" name="name" maxlength="40" placeholder="Name" autocomplete="name" required>
-                </label>
-                <label class="input-with-icon">
-                    E-Mail
-                    <input type="email" name="email" placeholder="E-Mail" autocomplete="email" required>
-                    <img class="input-icon" src="assets/icons/mail.svg" alt="">
-                </label>
-                <label class="input-with-icon">
-                    Passwort (mindestens 6 Zeichen)
-                    <input type="password" name="password" minlength="6" placeholder="Passwort"
-                        autocomplete="new-password" required>
-                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
-                </label>
-                <button class="btn register-submit" type="submit">Konto erstellen</button>
-            </form>
         </section>
     </main>
 

@@ -1,0 +1,38 @@
+@import url("./login.css");
+
+.register-page .login-logo {
+    animation: none;
+    transform: none;
+}
+
+.register-page .register-prompt,
+.register-page .login-main,
+.register-page .login-footer,
+.register-page .toast {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    animation: none;
+}
+
+.register-page .auth-form .privacy-consent {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    color: #a8a8a8;
+    font-size: 14px;
+}
+
+.register-page .auth-form .privacy-consent input {
+    width: 18px;
+    min-height: 18px;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+    accent-color: #2a3647;
+}
+
+.privacy-consent {
+    justify-content: center;
+}

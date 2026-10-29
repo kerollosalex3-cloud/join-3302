@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join – Registrieren</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg">
+    <link rel="stylesheet" href="CSS/root.css">
+    <link rel="stylesheet" href="CSS/register.css">
+</head>
+
+<body class="login-page register-page">
+    <header class="login-header">
+        <a href="index.html" aria-label="Zur Anmeldung">
+            <img class="login-logo" src="assets/icons/logo.svg" alt="Join">
+        </a>
+        <div class="register-prompt">
+            <span class="register-prompt-text">not a Join User?</span>
+            <a class="register-link" href="index.html">Anmelden</a>
+        </div>
+    </header>
+
+    <main class="login-main">
+        <section class="login-box">
+            <h1 class="auth-title">Registrieren</h1>
+            <p class="sr-only">Erstelle ein neues Join-Konto.</p>
+
+            <form class="auth-form">
+                <label>
+                    Name
+                    <input type="text" name="name" maxlength="40" placeholder="Name" autocomplete="name" required>
+                </label>
+                <label class="input-with-icon">
+                    E-Mail
+                    <input type="email" name="email" placeholder="E-Mail" autocomplete="email" required>
+                    <img class="input-icon" src="assets/icons/mail.svg" alt="">
+                </label>
+                <label class="input-with-icon">
+                    Passwort (mindestens 6 Zeichen)
+                    <input type="password" name="password" minlength="6" placeholder="Passwort"
+                        autocomplete="new-password" required>
+                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
+                </label>
+                <label class="input-with-icon">
+                    Passwort wiederholen
+                    <input type="password" name="password-confirmation" minlength="6" placeholder="Passwort wiederholen"
+                        autocomplete="new-password" required>
+                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
+                </label>
+                <label class="privacy-consent">
+                    <input type="checkbox" name="privacy-consent" required>
+                    <span>Ich akzeptiere die Datenschutzerklärung.</span>
+                </label>
+                <button class="btn" type="submit">Konto erstellen</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="login-footer">
+        <span>Datenschutz</span>
+        <span>Impressum</span>
+    </footer>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="scripts/register.js"></script>
+</body>
+
+</html>
