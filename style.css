@@ -1,7 +1,7 @@
 body {
     font-family: 'Inter', sans-serif;
-    background: rgba(246, 247, 248, 1);
-    color: rgba(0, 0, 0, 1);
+    background: var(--color-background);
+    color: var(--color-text);
     margin: 0;
 }
 
@@ -20,7 +20,7 @@ body {
     min-height: 100vh;
     padding: 64px 0;
     box-sizing: border-box;
-    background: #2a3647;
+    background: var(--color-primary);
     opacity: 1;
 }
 
@@ -46,7 +46,7 @@ body {
     gap: 8px;
     min-height: 56px;
     padding: 0 40px;
-    color: #cdcdcd;
+    color: var(--color-sidebar-text);
     font-size: 16px;
     text-decoration: none;
     transition: background-color 100ms ease;
@@ -61,7 +61,7 @@ body {
 .sidebar-link:hover,
 .sidebar-link:focus-visible,
 .sidebar-link.active {
-    background: #091931;
+    background: var(--color-sidebar-active);
 }
 
 .sidebar-legal {
@@ -72,14 +72,14 @@ body {
 }
 
 .sidebar-legal a {
-    color: #a8a8a8;
+    color: var(--color-muted);
     font-size: 14px;
     text-decoration: none;
 }
 
 .sidebar-legal a:hover,
 .sidebar-legal a:focus-visible {
-    color: #29abe2;
+    color: var(--color-accent);
 }
 
 .app-content {
@@ -92,7 +92,7 @@ body {
     align-items: center;
     width: 100%;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 1);
+    background: var(--color-surface);
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
     height: 96px;
     padding: 20px 40px 20px 96px;
