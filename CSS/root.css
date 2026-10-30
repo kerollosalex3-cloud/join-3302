@@ -33,6 +33,12 @@ h1 {
     font-size: 61px;
 }
 
+p {
+    font-family: var(--font-main);
+    font-weight: 400;
+    font-size: 20px;
+}
+
 /* 3. Globale Styles für Buttons, Inputs und Links */
 button,
 input {
