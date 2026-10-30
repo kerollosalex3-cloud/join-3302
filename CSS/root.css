@@ -33,6 +33,7 @@ h1 {
     font-size: 61px;
 }
 
+/* 3. Globale Styles für Buttons, Inputs und Links */
 button,
 input {
     font: inherit;
