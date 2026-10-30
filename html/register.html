@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join – Registrieren</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../CSS/register.css">
+</head>
+
+<body class="login-page register-page">
+    <header class="login-header">
+        <a href="../index.html" aria-label="Zur Anmeldung">
+            <img class="login-logo" src="../assets/icons/logo.svg" alt="Join">
+        </a>
+
+    </header>
+
+    <main class="login-main">
+        <section class="login-box">
+            <div class="register-title-row">
+                <a class="register-back-link" href="../index.html?skipIntro=1" aria-label="Zur Login-Seite">
+                    <img src="../assets/icons/arrow-back.svg" alt="">
+                </a>
+                <h1 class="auth-title">Sign up</h1>
+            </div>
+            <p class="sr-only">Erstelle ein neues Join-Konto.</p>
+
+            <form class="auth-form" novalidate>
+                <label class="input-with-icon">
+
+                    <input type="text" name="name" placeholder="Name" autocomplete="name">
+                    <img class="input-icon" src="../assets/icons/person-signup.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
+                </label>
+                <label class="input-with-icon">
+
+                    <input type="email" name="email" placeholder="E-Mail" autocomplete="email">
+                    <img class="input-icon" src="../assets/icons/mail.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
+                </label>
+                <label class="input-with-icon">
+
+                    <input type="password" name="password" placeholder="Password" autocomplete="new-password">
+                    <img class="input-icon" src="../assets/icons/lock.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
+                </label>
+                <label class="input-with-icon">
+
+                    <input type="password" name="password-confirmation" placeholder="Confirm Password"
+                        autocomplete="new-password">
+                    <img class="input-icon" src="../assets/icons/lock.svg" alt="">
+                    <small class="field-error" aria-live="polite"></small>
+                </label>
+                <label class="privacy-consent">
+                    <input type="checkbox" name="privacy-consent">
+                    <span>I accept the Privacy Policy</span>
+                    <small class="field-error" aria-live="polite"></small>
+                </label>
+                <button class="btn" type="submit" disabled>Sign up</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="login-footer">
+        <span>Privacy Policy</span>
+        <span>Legal notice</span>
+    </footer>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="../scripts/register.js"></script>
+</body>
+
+</html>

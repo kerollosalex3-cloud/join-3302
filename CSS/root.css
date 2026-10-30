@@ -1,9 +1,7 @@
-/* root.css */
-
 /* 1. Schriftarten definieren */
 @font-face {
     font-family: 'Inter';
-    src: url('../fonts/inter-regular.woff2') format('woff2');
+    src: url('../assets/fonts/inter-v20-latin-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -11,18 +9,69 @@
 
 @font-face {
     font-family: 'Inter';
-    src: url('../fonts/inter-bold.woff2') format('woff2');
+    src: url('../assets/fonts/inter-v20-latin-700.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
 
-/* 2. Als CSS-Variable hinterlegen (Optional & Empfohlen) */
+/* 2. Als CSS-Variable hinterlegen  */
 :root {
     --font-main: 'Inter', sans-serif;
+    --color-primary: rgba(42, 54, 71, 1);
+    --color-accent: #29abe2;
 }
 
-/* 3. Global anwenden */
 body {
     font-family: var(--font-main);
+    color: var(--color-primary);
+}
+
+h1 {
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 61px;
+}
+
+/* 3. Globale Styles für Buttons, Inputs und Links */
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.btn {
+    min-height: 48px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--color-primary);
+    font-weight: 700;
+}
+
+.btn:hover,
+.btn:focus-visible {
+    background: var(--color-accent);
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.secondary-btn {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    background: #fff;
+}
+
+.secondary-btn:hover,
+.secondary-btn:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: #fff;
 }
