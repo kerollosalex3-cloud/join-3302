@@ -15,7 +15,7 @@
     font-display: swap;
 }
 
-/* 2. Als CSS-Variable hinterlegen (Optional & Empfohlen) */
+/* 2. Als CSS-Variable hinterlegen  */
 :root {
     --font-main: 'Inter', sans-serif;
     --color-primary: rgba(42, 54, 71, 1);
