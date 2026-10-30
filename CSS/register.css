@@ -5,10 +5,6 @@
     transform: none;
 }
 
-.register-page .input-with-icon .input-icon {
-    top: 14px;
-}
-
 .register-title-row {
     position: relative;
     display: flex;
