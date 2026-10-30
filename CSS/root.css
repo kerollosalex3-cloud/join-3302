@@ -18,8 +18,17 @@
 /* 2. Als CSS-Variable hinterlegen  */
 :root {
     --font-main: 'Inter', sans-serif;
-    --color-primary: rgba(42, 54, 71, 1);
+    --color-primary: #2a3647;
     --color-accent: #29abe2;
+    --color-background: #f6f7f8;
+    --color-surface: #fff;
+    --color-text: #000;
+    --color-muted: #a8a8a8;
+    --color-border: #d1d1d1;
+    --color-sidebar-active: #091931;
+    --color-sidebar-text: #cdcdcd;
+    --color-urgent: #ff3d00;
+    --color-greeting: #124658;
 }
 
 body {
@@ -31,6 +40,12 @@ h1 {
     font-family: var(--font-main);
     font-weight: 700;
     font-size: 61px;
+}
+
+p {
+    font-family: var(--font-main);
+    font-weight: 400;
+    font-size: 20px;
 }
 
 /* 3. Globale Styles für Buttons, Inputs und Links */
@@ -48,7 +63,7 @@ button {
     padding: 12px 20px;
     border: 0;
     border-radius: 8px;
-    color: #fff;
+    color: var(--color-surface);
     background: var(--color-primary);
     font-weight: 700;
 }
@@ -66,12 +81,12 @@ button {
 .secondary-btn {
     border: 1px solid var(--color-primary);
     color: var(--color-primary);
-    background: #fff;
+    background: var(--color-surface);
 }
 
 .secondary-btn:hover,
 .secondary-btn:focus-visible {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    background: #fff;
+    background: var(--color-surface);
 }
