@@ -16,8 +16,8 @@ body {
     flex-direction: column;
     justify-content: space-between;
     width: 232px;
-    height: 1024px;
-    min-height: 1024px;
+    height: auto;
+    min-height: 100vh;
     padding: 64px 0;
     box-sizing: border-box;
     background: #2a3647;
