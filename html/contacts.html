@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts – Join</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../CSS/contacts.css">
+</head>
+
+<body class="contacts-page">
+    <div class="app-layout">
+        <!-- start sidebar -->
+        <aside class="sidebar">
+            <a class="sidebar-logo" href="../index.html" aria-label="Join home">
+                <img src="../assets/icons/join-logo-white.svg" alt="Join">
+            </a>
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <a class="sidebar-link" href="summary.html"><img src="../assets/icons/summary.svg" alt=""><span>Summary</span></a>
+                <a class="sidebar-link" href="addTask.html"><img src="../assets/icons/addTask.svg" alt=""><span>Add Task</span></a>
+                <a class="sidebar-link" href="board.html"><img src="../assets/icons/board.svg" alt=""><span>Board</span></a>
+                <a class="sidebar-link active" href="contacts.html" aria-current="page"><img src="../assets/icons/contact.svg" alt=""><span>Contacts</span></a>
+            </nav>
+            <div class="sidebar-legal">
+                <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="legal-notice.html">Legal notice</a>
+            </div>
+        </aside>
+        <!-- end sidebar -->
+
+        <div class="app-content">
+            <!-- start header -->
+            <header class="header">
+                <img class="mobile-logo" src="../assets/icons/logo.svg" alt="Join">
+                <p>Kanban Project Management Tool</p>
+                <span class="header-avatar" aria-label="Profile preview">G</span>
+            </header>
+            <!-- end header -->
+
+            <!-- start contacts -->
+            <main class="contacts-main">
+                <section class="contacts-list" aria-label="Contact list">
+                    <button id="add-contact" class="btn add-contact-button" type="button" disabled>Add new contact <span aria-hidden="true">+</span></button>
+                    <div class="contacts-empty"><p>No contacts loaded.</p><p class="preview-note">Preview only. Contacts are not saved yet.</p></div>
+                    <ul id="contact-list" aria-label="Contacts"></ul>
+                </section>
+                <section class="contacts-content" aria-labelledby="contacts-title">
+                    <div class="contacts-heading"><h1 id="contacts-title">Contacts</h1><p>Better with a team</p></div>
+                    <p class="contacts-intro">Add a contact to preview the form.</p>
+                </section>
+            </main>
+            <!-- end contacts -->
+        </div>
+    </div>
+</body>
+
+</html>
