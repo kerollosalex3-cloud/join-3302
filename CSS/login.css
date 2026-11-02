@@ -5,13 +5,13 @@
 
 body {
     min-height: 100vh;
-    color: #2a3647;
-    background: #f6f7f8;
+    color: var(--color-primary);
+    background: var(--color-background);
 }
 
 .login-page {
     display: flex;
-    min-height: 100vh;
+    min-height: 100dvh;
     flex-direction: column;
 }
 
@@ -117,7 +117,7 @@ html.skip-logo-intro .toast {
     width: min(100%, 652px);
     padding: 40px clamp(24px, 8vw, 115px);
     border-radius: 30px;
-    background: rgba(255, 255, 255, 1);
+    background: var(--color-login-register-bg);
     box-shadow: 0px 0px 14px 3px rgba(0, 0, 0, 0.14);
     text-align: center;
 }
