@@ -1,5 +1,5 @@
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-main);
     background: var(--color-background);
     color: var(--color-text);
     margin: 0;
