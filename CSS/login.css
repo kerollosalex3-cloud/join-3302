@@ -97,7 +97,7 @@ html.skip-logo-intro .toast {
     border-radius: 8px;
     color: #fff;
     background: #2a3647;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-decoration: none;
 }
 
