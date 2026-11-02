@@ -12,6 +12,7 @@ contactDialog.addEventListener('click', event => {
     if (event.target === contactDialog) closeContactForm();
 });
 contactDialog.addEventListener('close', () => document.body.classList.remove('contact-dialog-open'));
+contactDialog.addEventListener('keydown', keepContactFormFocus);
 contactForm.addEventListener('input', clearContactFieldError);
 
 /** Opens the form with empty or previously previewed values.
@@ -32,6 +33,23 @@ function openContactForm(edit) {
 /** Closes the contact form without saving data. */
 function closeContactForm() {
     contactDialog.close();
+}
+
+/** Keeps Tab navigation inside the open contact form.
+ * @param {KeyboardEvent} event - Dialog keyboard event.
+ */
+function keepContactFormFocus(event) {
+    if (event.key !== 'Tab') return;
+    const controls = contactDialog.querySelectorAll('button, input');
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    }
 }
 
 /** Reads trimmed contact input values.
