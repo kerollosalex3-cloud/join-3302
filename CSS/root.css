@@ -27,7 +27,9 @@
     --color-border: #d1d1d1;
     --color-sidebar-active: #091931;
     --color-sidebar-text: #cdcdcd;
-    --color-urgent: #ff3d00;
+    --color-urgent: rgba(255, 61, 0, 1);
+    --color-medium: rgba(255, 168, 0, 1);
+    --color-low: rgba(122, 226, 41, 1);
     --color-greeting: #124658;
 }
 
