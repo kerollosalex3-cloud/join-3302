@@ -105,3 +105,14 @@ body {
     width: 32px;
     height: 32px;
 }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header .header-avatar {
+    width: 56px;
+    height: 56px;
+}

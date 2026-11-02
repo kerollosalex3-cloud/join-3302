@@ -43,7 +43,10 @@
         <div class="app-content">
             <header class="header">
                 <p>Kanban Project Management Tool</p>
-                <img src="../assets/icons/help.svg" alt="Help">
+                <div class="header-actions">
+                    <img src="../assets/icons/help.svg" alt="Help">
+                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
+                </div>
             </header>
             <main class="summary-main">
                 <section class="summary-dashboard" aria-labelledby="summary-title">
@@ -81,9 +84,7 @@
                         <article class="summary-card urgent-card">
                             <div class="urgent-metric">
                                 <span class="metric-icon urgent-icon">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="m5 14 7-6 7 6M5 20l7-6 7 6"></path>
-                                    </svg>
+                                    <img src="../assets/icons/board-prio-low.svg" alt="">
                                 </span>
                                 <span class="summary-card-copy">
                                     <strong>1</strong>
