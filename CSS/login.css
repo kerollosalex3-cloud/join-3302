@@ -194,7 +194,7 @@ html.skip-logo-intro .toast {
     justify-content: center;
     gap: 32px;
     padding: 24px;
-    color: #a8a8a8;
+    color: var(--color-primary);
     font-size: 14px;
 }
 
