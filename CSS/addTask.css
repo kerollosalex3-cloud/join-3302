@@ -51,6 +51,9 @@
 
 /* start task fields */
 .task-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 48px;
     margin-top: 40px;
 }
 
@@ -78,7 +81,8 @@
 }
 
 .task-field input,
-.task-field textarea {
+.task-field textarea,
+.task-field select {
     width: 100%;
     min-width: 0;
     padding: 12px 16px;
@@ -102,9 +106,17 @@
 }
 
 .task-field input:focus,
-.task-field textarea:focus {
+.task-field textarea:focus,
+.task-field select:focus {
     border-color: var(--color-accent);
     outline: 1px solid var(--color-accent);
+}
+
+@media (max-width: 1200px) {
+    .task-form {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
 }
 
 @media (max-width: 700px) {
@@ -114,11 +126,123 @@
 
     .task-field label,
     .task-field input,
-    .task-field textarea {
+    .task-field textarea,
+    .task-field select {
         font-size: 16px;
     }
 }
 /* end task fields */
+
+/* start task options */
+.task-options {
+    width: auto;
+    min-width: 0;
+    padding-left: 24px;
+    border-left: 1px solid var(--color-border);
+}
+
+.task-priority {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.task-priority legend {
+    margin-bottom: 8px;
+    padding: 0;
+    color: var(--color-primary);
+    font-size: 20px;
+}
+
+.priority-options {
+    display: flex;
+    gap: 12px;
+}
+
+.priority-option {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.priority-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+.priority-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 12px 8px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background: var(--color-surface);
+    box-shadow: 0 0 4px #0000001a;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.priority-option img {
+    flex-shrink: 0;
+}
+
+.priority-option input:focus-visible + label {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+}
+
+#priority-urgent:checked + label {
+    background: var(--color-urgent);
+}
+
+#priority-medium:checked + label {
+    background: var(--color-medium);
+}
+
+#priority-low:checked + label {
+    background: var(--color-low);
+}
+
+.priority-option input:checked + label {
+    color: var(--color-surface);
+    font-weight: 700;
+}
+
+.priority-option input:checked + label img {
+    filter: brightness(0) invert(1);
+}
+
+@media (max-width: 1200px) {
+    .task-options {
+        width: 100%;
+        padding-left: 0;
+        border-left: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .task-priority legend {
+        font-size: 16px;
+    }
+
+    .priority-options {
+        gap: 8px;
+    }
+
+    .priority-option label {
+        gap: 6px;
+        padding: 12px 4px;
+        font-size: 14px;
+    }
+}
+/* end task options */
 
 /* start navigation */
 .add-task-mobile-nav {
