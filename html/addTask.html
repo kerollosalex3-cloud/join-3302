@@ -60,6 +60,22 @@
             <!-- start add task -->
             <main class="add-task-main">
                 <h1>Add Task</h1>
+                <section class="task-form" aria-label="Task details">
+                    <div class="task-fields">
+                        <div class="task-field">
+                            <label for="task-title">Title<span class="task-required">*</span></label>
+                            <input id="task-title" name="title" type="text" placeholder="Enter a title" aria-required="true">
+                        </div>
+                        <div class="task-field">
+                            <label for="task-description">Description</label>
+                            <textarea id="task-description" name="description" placeholder="Enter a Description" rows="4"></textarea>
+                        </div>
+                        <div class="task-field">
+                            <label for="task-due-date">Due date<span class="task-required">*</span></label>
+                            <input id="task-due-date" name="dueDate" type="date" aria-required="true">
+                        </div>
+                    </div>
+                </section>
             </main>
             <!-- end add task -->
         </div>
