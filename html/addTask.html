@@ -75,6 +75,33 @@
                             <input id="task-due-date" name="dueDate" type="date" aria-required="true">
                         </div>
                     </div>
+                    <div class="task-fields task-options">
+                        <fieldset class="task-priority">
+                            <legend>Priority</legend>
+                            <div class="priority-options">
+                                <div class="priority-option">
+                                    <input id="priority-urgent" name="priority" type="radio" value="urgent">
+                                    <label for="priority-urgent">Urgent<img src="../assets/icons/boar-prio-urgent.svg" alt=""></label>
+                                </div>
+                                <div class="priority-option">
+                                    <input id="priority-medium" name="priority" type="radio" value="medium" checked>
+                                    <label for="priority-medium">Medium<img src="../assets/icons/boar-prio-medium.svg" alt=""></label>
+                                </div>
+                                <div class="priority-option">
+                                    <input id="priority-low" name="priority" type="radio" value="low">
+                                    <label for="priority-low">Low<img src="../assets/icons/board-prio-low.svg" alt=""></label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="task-field">
+                            <label for="task-category">Category<span class="task-required">*</span></label>
+                            <select id="task-category" name="category" aria-required="true">
+                                <option value="" disabled selected>Select task category</option>
+                                <option value="user-story">User Story</option>
+                                <option value="technical-task">Technical Task</option>
+                            </select>
+                        </div>
+                    </div>
                 </section>
             </main>
             <!-- end add task -->
