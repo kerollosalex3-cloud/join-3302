@@ -49,6 +49,77 @@
 }
 /* end add task */
 
+/* start task fields */
+.task-form {
+    margin-top: 40px;
+}
+
+.task-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 440px;
+}
+
+.task-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-field label {
+    font-size: 20px;
+    color: var(--color-primary);
+}
+
+.task-required {
+    color: var(--color-urgent);
+}
+
+.task-field input,
+.task-field textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-sizing: border-box;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 20px;
+}
+
+.task-field textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.task-field input::placeholder,
+.task-field textarea::placeholder {
+    color: var(--color-muted);
+}
+
+.task-field input:focus,
+.task-field textarea:focus {
+    border-color: var(--color-accent);
+    outline: 1px solid var(--color-accent);
+}
+
+@media (max-width: 700px) {
+    .task-form {
+        margin-top: 32px;
+    }
+
+    .task-field label,
+    .task-field input,
+    .task-field textarea {
+        font-size: 16px;
+    }
+}
+/* end task fields */
+
 /* start navigation */
 .add-task-mobile-nav {
     display: none;
