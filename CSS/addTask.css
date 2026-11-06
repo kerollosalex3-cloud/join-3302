@@ -71,7 +71,8 @@
     gap: 8px;
 }
 
-.task-field label {
+.task-field label,
+.task-field-label {
     font-size: 20px;
     color: var(--color-primary);
 }
@@ -125,6 +126,7 @@
     }
 
     .task-field label,
+    .task-field-label,
     .task-field input,
     .task-field textarea,
     .task-field select {
@@ -243,6 +245,65 @@
     }
 }
 /* end task options */
+
+/* start assigned contacts */
+.task-assignees {
+    position: relative;
+    font-size: 20px;
+}
+
+.task-assignees summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    list-style: none;
+    cursor: pointer;
+}
+
+.task-assignees summary::-webkit-details-marker {
+    display: none;
+}
+
+.task-assignees summary::after {
+    content: "▾";
+}
+
+.task-assignees[open] summary,
+.task-assignees summary:focus-visible {
+    border-color: var(--color-accent);
+    outline: 1px solid var(--color-accent);
+}
+
+.task-contact-list {
+    position: absolute;
+    z-index: 2;
+    top: calc(100% + 4px);
+    right: 0;
+    left: 0;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    box-shadow: 0 4px 8px #0000001a;
+}
+
+.task-contact-list p {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 16px;
+}
+
+@media (max-width: 700px) {
+    .task-assignees {
+        font-size: 16px;
+    }
+}
+/* end assigned contacts */
 
 /* start navigation */
 .add-task-mobile-nav {
