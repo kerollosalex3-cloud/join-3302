@@ -66,6 +66,16 @@
     accent-color: #2a3647;
 }
 
+.privacy-consent a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.privacy-consent a:hover,
+.privacy-consent a:focus-visible {
+    text-decoration: underline;
+}
+
 .privacy-consent {
     justify-content: center;
 }
