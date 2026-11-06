@@ -198,6 +198,17 @@ html.skip-logo-intro .toast {
     font-size: 14px;
 }
 
+.login-footer a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.login-footer a:hover,
+.login-footer a:focus-visible {
+    color: var(--color-accent);
+    text-decoration: underline;
+}
+
 .toast:not(:empty) {
     position: fixed;
     right: 24px;
