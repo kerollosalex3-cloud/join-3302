@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../CSS/addTask.css">
     <link rel="stylesheet" href="../CSS/subtasks.css">
+    <link rel="stylesheet" href="../CSS/taskForm.css">
+    <script src="../scripts/taskValidation.js" defer></script>
     <script src="../scripts/addTask.js" defer></script>
     <script src="../scripts/subtasks.js" defer></script>
 </head>
@@ -63,11 +65,12 @@
             <!-- start add task -->
             <main class="add-task-main">
                 <h1>Add Task</h1>
-                <section class="task-form" aria-label="Task details">
+                <form id="task-form" class="task-form" aria-label="Task details" novalidate>
                     <div class="task-fields">
                         <div class="task-field">
                             <label for="task-title">Title<span class="task-required">*</span></label>
-                            <input id="task-title" name="title" type="text" placeholder="Enter a title" aria-required="true">
+                            <input id="task-title" name="title" type="text" placeholder="Enter a title" aria-required="true" aria-describedby="task-title-error">
+                            <small id="task-title-error" class="task-error"></small>
                         </div>
                         <div class="task-field">
                             <label for="task-description">Description</label>
@@ -75,7 +78,8 @@
                         </div>
                         <div class="task-field">
                             <label for="task-due-date">Due date<span class="task-required">*</span></label>
-                            <input id="task-due-date" name="dueDate" type="date" aria-required="true">
+                            <input id="task-due-date" name="dueDate" type="date" aria-required="true" aria-describedby="task-dueDate-error">
+                            <small id="task-dueDate-error" class="task-error"></small>
                         </div>
                     </div>
                     <div class="task-fields task-options">
@@ -107,11 +111,12 @@
                         </div>
                         <div class="task-field">
                             <label for="task-category">Category<span class="task-required">*</span></label>
-                            <select id="task-category" name="category" aria-required="true">
+                            <select id="task-category" name="category" aria-required="true" aria-describedby="task-category-error">
                                 <option value="" disabled selected>Select task category</option>
                                 <option value="user-story">User Story</option>
                                 <option value="technical-task">Technical Task</option>
                             </select>
+                            <small id="task-category-error" class="task-error"></small>
                         </div>
                         <!-- start subtasks -->
                         <div class="task-field task-subtasks">
@@ -126,6 +131,28 @@
                         </div>
                         <!-- end subtasks -->
                     </div>
+                    <div class="task-form-actions">
+                        <p class="task-required-note"><span class="task-required">*</span>This field is required</p>
+                        <div class="task-form-buttons">
+                            <button id="clear-task" class="btn secondary-btn" type="button">Clear</button>
+                            <button id="preview-task" class="btn" type="submit" disabled>Preview task</button>
+                        </div>
+                        <p id="task-save-note" class="task-save-note" role="status">Preview only. Tasks are not saved yet.</p>
+                    </div>
+                </form>
+                <section id="task-preview" tabindex="-1" aria-labelledby="task-preview-title" hidden>
+                    <h2 id="task-preview-title">Task preview</h2>
+                    <p>This task has not been saved.</p>
+                    <dl>
+                        <dt>Title</dt><dd id="preview-task-title"></dd>
+                        <dt>Description</dt><dd id="preview-task-description"></dd>
+                        <dt>Due date</dt><dd id="preview-task-dueDate"></dd>
+                        <dt>Priority</dt><dd id="preview-task-priority"></dd>
+                        <dt>Category</dt><dd id="preview-task-category"></dd>
+                        <dt>Assigned to</dt><dd>No contacts selected.</dd>
+                    </dl>
+                    <h3>Subtasks</h3>
+                    <ul id="preview-task-subtasks"></ul>
                 </section>
             </main>
             <!-- end add task -->
@@ -146,6 +173,7 @@
             </div>
         </li>
     </template>
+    <template id="preview-subtask-template"><li></li></template>
 
     <!-- start mobile navigation -->
     <nav class="add-task-mobile-nav" aria-label="Hauptnavigation">
