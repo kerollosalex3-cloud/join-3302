@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../CSS/root.css">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../CSS/addTask.css">
+    <script src="../scripts/addTask.js" defer></script>
 </head>
 
 <body class="add-task-page">
@@ -93,6 +94,15 @@
                                 </div>
                             </div>
                         </fieldset>
+                        <div class="task-field">
+                            <span id="task-assignees-label" class="task-field-label">Assigned to</span>
+                            <details id="task-assignees" class="task-assignees" aria-labelledby="task-assignees-label">
+                                <summary>Select contacts to assign</summary>
+                                <div class="task-contact-list">
+                                    <p>No contacts loaded yet.</p>
+                                </div>
+                            </details>
+                        </div>
                         <div class="task-field">
                             <label for="task-category">Category<span class="task-required">*</span></label>
                             <select id="task-category" name="category" aria-required="true">
