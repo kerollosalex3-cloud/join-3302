@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="../CSS/root.css">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../CSS/addTask.css">
+    <link rel="stylesheet" href="../CSS/subtasks.css">
     <script src="../scripts/addTask.js" defer></script>
+    <script src="../scripts/subtasks.js" defer></script>
 </head>
 
 <body class="add-task-page">
@@ -111,12 +113,39 @@
                                 <option value="technical-task">Technical Task</option>
                             </select>
                         </div>
+                        <!-- start subtasks -->
+                        <div class="task-field task-subtasks">
+                            <label for="subtask-input">Subtasks</label>
+                            <div class="subtask-entry">
+                                <input id="subtask-input" class="subtask-input" type="text" placeholder="Add new subtask" autocomplete="off">
+                                <button id="add-subtask" class="subtask-add" type="button" aria-label="Add subtask" disabled>
+                                    <img src="../assets/icons/add.svg" alt="">
+                                </button>
+                            </div>
+                            <ul id="subtask-list" aria-label="Subtasks"></ul>
+                        </div>
+                        <!-- end subtasks -->
                     </div>
                 </section>
             </main>
             <!-- end add task -->
         </div>
     </div>
+
+    <template id="subtask-template">
+        <li class="subtask-item">
+            <div class="subtask-content">
+                <span class="subtask-text"></span>
+                <input class="subtask-edit-input" type="text" aria-label="Edit subtask" hidden>
+                <small class="subtask-error" hidden>Please enter a subtask.</small>
+            </div>
+            <div class="subtask-actions">
+                <button class="edit-subtask" type="button" aria-label="Edit subtask"><img src="../assets/icons/edit.svg" alt=""></button>
+                <button class="save-subtask" type="button" aria-label="Save subtask" hidden><img src="../assets/icons/check.svg" alt=""></button>
+                <button class="delete-subtask" type="button" aria-label="Delete subtask"><img src="../assets/icons/trasch.svg" alt=""></button>
+            </div>
+        </li>
+    </template>
 
     <!-- start mobile navigation -->
     <nav class="add-task-mobile-nav" aria-label="Hauptnavigation">
