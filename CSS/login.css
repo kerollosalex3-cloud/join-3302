@@ -131,6 +131,30 @@ html.skip-logo-intro .toast {
     }
 }
 
+@keyframes intro-background-mobile {
+
+    0%,
+    95% {
+        background: rgba(42, 54, 71, 1);
+    }
+
+    100% {
+        background: #f6f7f8;
+    }
+}
+
+@keyframes intro-background-desktop {
+
+    0%,
+    95% {
+        background: #fff;
+    }
+
+    100% {
+        background: #f6f7f8;
+    }
+}
+
 @keyframes page-reveal {
     from {
         opacity: 0;
@@ -284,6 +308,10 @@ html.skip-logo-intro .toast {
 }
 
 @media (max-width: 600px) {
+    .login-page:not(.register-page) {
+        animation-name: intro-background-mobile;
+    }
+
     .login-header {
         display: contents;
     }
@@ -385,6 +413,21 @@ html.skip-logo-intro .toast {
 
     .toast:not(:empty) {
         bottom: 80px;
+    }
+}
+
+@media (min-width: 768px) {
+    .login-page:not(.register-page) {
+        animation-name: intro-background-desktop;
+    }
+
+    .login-page:not(.register-page) .login-logo {
+        animation-name: logo-intro;
+        opacity: 1;
+    }
+
+    .login-page:not(.register-page) .login-logo-intro {
+        display: none;
     }
 }
 
