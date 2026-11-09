@@ -47,9 +47,23 @@
                 </a>
                 <p>Kanban Project Management Tool</p>
                 <div class="header-actions">
-                    <img src="../assets/icons/help.svg" alt="Help">
-                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
-                    <span class="summary-mobile-avatar" aria-label="Stefan Müller"></span>
+                    <a class="help-icon-link" href="./help.html" aria-label="Help">
+                        <img src="../assets/icons/help.svg" alt="">
+                    </a>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="">
+                            <span class="summary-mobile-avatar" aria-hidden="true"></span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true"
+                            inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal-notice.html">Legal Notice</a>
+                            <a href="./privacy-policy.html">Privacy Policy</a>
+                            <a href="../index.html">Log out</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
             <main class="summary-main">
@@ -141,6 +155,7 @@
             <span>Contacts</span>
         </a>
     </nav>
+    <script src="../scripts/profile-menu.js"></script>
 </body>
 
 </html>
