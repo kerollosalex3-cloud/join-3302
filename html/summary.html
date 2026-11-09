@@ -42,10 +42,28 @@
         </aside>
         <div class="app-content">
             <header class="header">
+                <a class="summary-mobile-logo" href="../index.html" aria-label="Join Startseite">
+                    <img src="../assets/icons/logo.svg" alt="Join">
+                </a>
                 <p>Kanban Project Management Tool</p>
                 <div class="header-actions">
-                    <img src="../assets/icons/help.svg" alt="Help">
-                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
+                    <a class="help-icon-link" href="./help.html" aria-label="Help">
+                        <img src="../assets/icons/help.svg" alt="">
+                    </a>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="">
+                            <span class="summary-mobile-avatar" aria-hidden="true"></span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true"
+                            inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal-notice.html">Legal Notice</a>
+                            <a href="./privacy-policy.html">Privacy Policy</a>
+                            <a href="../index.html">Log out</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
             <main class="summary-main">
@@ -119,6 +137,25 @@
             </main>
         </div>
     </div>
+    <nav class="summary-mobile-nav" aria-label="Hauptnavigation">
+        <a href="./summary.html" class="active" aria-current="page">
+            <img src="../assets/icons/summary.svg" alt="">
+            <span>Summary</span>
+        </a>
+        <a href="./addTask.html">
+            <img src="../assets/icons/addTask.svg" alt="">
+            <span>Add Task</span>
+        </a>
+        <a href="./board.html">
+            <img src="../assets/icons/board.svg" alt="">
+            <span>Board</span>
+        </a>
+        <a href="./contacts.html">
+            <img src="../assets/icons/contact.svg" alt="">
+            <span>Contacts</span>
+        </a>
+    </nav>
+    <script src="../scripts/profile-menu.js"></script>
 </body>
 
 </html>
