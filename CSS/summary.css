@@ -1,0 +1,452 @@
+.app-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-content main {
+    flex: 1;
+}
+
+.summary-main {
+    display: flex;
+    align-items: flex-start;
+    padding: 64px 72px;
+    box-sizing: border-box;
+}
+
+.summary-dashboard {
+    display: grid;
+    width: min(100%, 900px);
+    grid-template-columns: minmax(0, 438px) minmax(250px, 1fr);
+    align-items: center;
+    gap: 60px;
+}
+
+.summary-heading {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 44px;
+}
+
+.summary-heading h2 {
+    margin: 0;
+    color: var(--color-text);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.summary-heading p {
+    margin: 0;
+    padding-left: 24px;
+    border-left: 2px solid var(--color-accent);
+    color: var(--color-primary);
+    font-size: 20px;
+    line-height: 48px;
+    white-space: nowrap;
+}
+
+.summary-top-cards,
+.summary-bottom-cards {
+    display: grid;
+    gap: 24px;
+}
+
+.summary-top-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 20px;
+}
+
+.summary-bottom-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 20px;
+}
+
+.summary-card {
+    display: flex;
+    min-width: 0;
+    min-height: 132px;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 24px;
+    background: var(--color-surface);
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+    transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+}
+
+@media (hover: hover), (min-width: 768px) {
+    .summary-card:hover {
+        transform: translateY(-4px);
+        background: var(--color-primary);
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.25);
+    }
+
+    .summary-card:hover strong,
+    .summary-card:hover .summary-card-copy,
+    .summary-card:hover .summary-card-copy span,
+    .summary-card:hover>span,
+    .summary-card:hover .upcoming-deadline,
+    .summary-card:hover .upcoming-deadline strong {
+        color: var(--color-surface);
+    }
+
+    .summary-card:hover .metric-icon:not(.urgent-icon) {
+        background: var(--color-surface);
+    }
+
+    .summary-card:hover .metric-icon:not(.urgent-icon) svg {
+        stroke: var(--color-primary);
+    }
+
+    .summary-card:hover .upcoming-deadline {
+        border-left-color: rgba(255, 255, 255, 0.6);
+    }
+}
+
+.summary-card-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--color-primary);
+    text-align: center;
+}
+
+.summary-card strong {
+    color: var(--color-text);
+    font-size: 64px;
+    line-height: 1.05;
+}
+
+.summary-card-copy span,
+.compact-card>span {
+    color: var(--color-primary);
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.metric-icon {
+    display: grid;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-primary);
+}
+
+.metric-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: var(--color-surface);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.metric-icon img {
+    width: 28px;
+    height: 28px;
+}
+
+.urgent-card {
+    justify-content: stretch;
+    gap: 0;
+}
+
+.urgent-metric {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.urgent-icon {
+    background: var(--color-urgent);
+}
+
+.upcoming-deadline {
+    display: flex;
+    min-height: 80px;
+    flex: 1.2;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-left: 1px solid var(--color-border);
+    color: var(--color-primary);
+    text-align: center;
+}
+
+.upcoming-deadline strong {
+    color: var(--color-primary);
+    font-size: 16px;
+}
+
+.upcoming-deadline span {
+    font-size: 14px;
+}
+
+.compact-card {
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.summary-greeting p,
+.summary-greeting h2 {
+    margin: 0;
+}
+
+.summary-greeting p {
+    color: var(--color-primary);
+    font-size: 47px;
+    line-height: 1.25;
+}
+
+.summary-greeting h1 {
+    color: var(--color-greeting);
+    font-size: 64px;
+    line-height: 1.2;
+}
+
+.summary-mobile-logo,
+.summary-mobile-nav,
+.summary-mobile-avatar {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        display: none;
+    }
+
+    .header {
+        height: 56px;
+        padding: 0 16px;
+    }
+
+    .summary-mobile-logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .summary-mobile-logo img {
+        display: block;
+        width: 32px;
+        height: 32px;
+    }
+
+    .header > p,
+    .header-actions > img {
+        display: none;
+    }
+
+    .header-actions {
+        gap: 0;
+    }
+
+    .header .header-avatar {
+        display: none;
+    }
+
+    .summary-mobile-avatar {
+        display: grid;
+        width: 24px;
+        height: 24px;
+        place-items: center;
+        border: 1px solid var(--color-primary);
+        border-radius: 50%;
+        color: var(--color-primary);
+        font-size: 9px;
+        font-weight: var(--font-weight-bold);
+    }
+
+    .summary-mobile-avatar::before {
+        content: "SM";
+    }
+
+    .summary-mobile-nav {
+        position: fixed;
+        z-index: 10;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        justify-content: space-around;
+        min-height: 56px;
+        padding: 4px 8px;
+        background: var(--color-primary);
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .summary-mobile-nav a {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        border-radius: 8px;
+        color: var(--color-sidebar-text);
+        font-size: 10px;
+        text-decoration: none;
+    }
+
+    .summary-mobile-nav a.active {
+        background: var(--color-sidebar-active);
+    }
+
+    .summary-mobile-nav img {
+        width: 16px;
+        height: 16px;
+        filter: brightness(0) invert(1);
+    }
+
+    .summary-main {
+        padding: 28px 12px 80px;
+    }
+
+    .summary-dashboard {
+        display: block;
+        width: 100%;
+    }
+
+    .summary-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 20px;
+    }
+
+    .summary-heading h2 {
+        font-size: 30px;
+        line-height: 1.2;
+    }
+
+    .summary-heading p {
+        position: relative;
+        padding: 0 0 10px;
+        border: 0;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .summary-heading p::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 56px;
+        height: 2px;
+        background: var(--color-accent);
+        content: "";
+    }
+
+    .summary-top-cards {
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .summary-card {
+        min-height: 70px;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 14px;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .summary-card strong {
+        font-size: 30px;
+    }
+
+    .summary-card-copy span,
+    .compact-card > span {
+        font-size: 10px;
+        line-height: 1.2;
+    }
+
+    .metric-icon {
+        width: 24px;
+        height: 24px;
+        flex-basis: 24px;
+    }
+
+    .metric-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .urgent-card {
+        min-height: 70px;
+    }
+
+    .urgent-metric {
+        gap: 8px;
+    }
+
+    .upcoming-deadline {
+        min-height: 48px;
+        gap: 4px;
+        padding-left: 8px;
+    }
+
+    .upcoming-deadline strong {
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    .upcoming-deadline span {
+        font-size: 9px;
+    }
+
+    .summary-bottom-cards {
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .compact-card {
+        min-height: 72px;
+        gap: 0;
+        padding: 8px 4px;
+    }
+
+    .compact-card strong {
+        font-size: 30px;
+    }
+
+    .summary-greeting {
+        display: none;
+    }
+}
+
+@media (max-width: 340px) {
+    .summary-card {
+        gap: 5px;
+        padding: 6px;
+    }
+
+    .summary-card-copy span,
+    .compact-card > span {
+        font-size: 9px;
+    }
+
+    .urgent-metric {
+        gap: 5px;
+    }
+
+    .upcoming-deadline {
+        padding-left: 5px;
+    }
+
+    .upcoming-deadline strong,
+    .upcoming-deadline span {
+        font-size: 8px;
+    }
+}

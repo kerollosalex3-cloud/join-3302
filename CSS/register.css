@@ -39,7 +39,7 @@
 
 .register-back-link:hover,
 .register-back-link:focus-visible {
-    background: #e7e7e7;
+    background: var(--color-login-register-bg);
 }
 
 .register-page .register-prompt,

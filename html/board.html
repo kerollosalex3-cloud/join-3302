@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board - Join</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../CSS/board.css">
+</head>
+
+<body class="board-page">
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a class="sidebar-logo" href="../index.html" aria-label="Join Startseite">
+                <img src="../assets/icons/join-logo-white.svg" alt="Join">
+            </a>
+            <nav class="sidebar-nav" aria-label="Hauptnavigation">
+                <a class="sidebar-link" href="summary.html">
+                    <img src="../assets/icons/summary.svg" alt="">
+                    <span>Summary</span>
+                </a>
+                <a class="sidebar-link" href="addTask.html">
+                    <img src="../assets/icons/addTask.svg" alt="">
+                    <span>Add Task</span>
+                </a>
+                <a class="sidebar-link active" href="board.html" aria-current="page">
+                    <img src="../assets/icons/board.svg" alt="">
+                    <span>Board</span>
+                </a>
+                <a class="sidebar-link" href="contacts.html">
+                    <img src="../assets/icons/contact.svg" alt="">
+                    <span>Contacts</span>
+                </a>
+            </nav>
+            <div class="sidebar-legal">
+                <a href="./privacy-policy.html">Privacy Policy</a>
+                <a href="./legal-notice.html">Legal notice</a>
+            </div>
+        </aside>
+        <div class="app-content">
+            <header class="header">
+                <a class="board-mobile-logo" href="../index.html" aria-label="Join Startseite">
+                    <img src="../assets/icons/logo.svg" alt="Join">
+                </a>
+                <p class="board-project-name">Kanban Project Management Tool</p>
+                <div class="header-actions">
+                    <img src="../assets/icons/help.svg" alt="Help">
+                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
+                    <span class="board-mobile-avatar" aria-label="Stefan Müller"></span>
+                </div>
+            </header>
+            <main>
+                <div class="main-headline">
+                    <div class="main-headline-top">
+                        <h2>Board</h2>
+                        <div class="board-controls">
+                            <label class="board-search">
+                                <input id="boardSearchInput" type="search" placeholder="Find Task"
+                                    aria-label="Find Task">
+                                <span class="board-search-icon" aria-hidden="true">
+                                    <img src="../assets/icons/search.svg" alt="">
+                                </span>
+                            </label>
+                            <button class="btn board-add-task" id="addTaskButton" type="button">
+                                <span>Add task</span>
+                                <img src="../assets/icons/add-white.svg" alt="">
+                            </button>
+                        </div>
+                    </div>
+                    <section class="board-columns" aria-label="Task board">
+                        <section class="board-column" aria-labelledby="todo-heading">
+                            <div class="board-column-heading">
+                                <h3 id="todo-heading">To do</h3>
+                                <button class="board-column-add" type="button" aria-label="Add task to To do">
+                                    <img src="../assets/icons/add.svg" alt="">
+                                </button>
+                            </div>
+                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
+                                aria-label="View task: Kochwelt Page and Recipe Recommender" data-due-date="10/05/2023">
+                                <span class="task-category">User Story</span>
+                                <h4>Kochwelt Page &amp; Recipe Recommender</h4>
+                                <p class="task-description">Build start page with recipe recommendation.</p>
+                                <ul class="task-subtask-data" hidden>
+                                    <li data-completed="true">Implement Recipe Recommendation</li>
+                                    <li data-completed="false">Start Page Layout</li>
+                                </ul>
+                                <div class="task-subtasks">
+                                    <span class="task-progress" aria-label="1 of 2 subtasks completed">
+                                        <span style="width: 50%"></span>
+                                    </span>
+                                    <span>1/2 Subtasks</span>
+                                </div>
+                                <div class="task-card-footer">
+                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
+                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
+                                        <span class="task-assignee task-assignee-two"
+                                            data-name="Emmanuel Mauer">EM</span>
+                                        <span class="task-assignee task-assignee-three"
+                                            data-name="Marcel Bauer">MB</span>
+                                    </div>
+                                    <img class="task-priority task-priority-medium"
+                                        src="../assets/icons/boar-prio-medium.svg" alt="Medium priority">
+                                </div>
+                            </article>
+                        </section>
+                        <section class="board-column" aria-labelledby="in-progress-heading">
+                            <div class="board-column-heading">
+                                <h3 id="in-progress-heading">In progress</h3>
+                                <button class="board-column-add" type="button" aria-label="Add task to In progress">
+                                    <img src="../assets/icons/add.svg" alt="">
+                                </button>
+                            </div>
+                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
+                                aria-label="View task: HTML Base Template Creation">
+                                <span class="task-category task-category-technical">Technical Task</span>
+                                <h4>HTML Base Template Creation</h4>
+                                <p class="task-description">Create reusable HTML base templates...</p>
+                                <div class="task-card-footer">
+                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
+                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
+                                        <span class="task-assignee task-assignee-two"
+                                            data-name="Emmanuel Mauer">EM</span>
+                                        <span class="task-assignee task-assignee-three"
+                                            data-name="Marcel Bauer">MB</span>
+                                    </div>
+                                    <img class="task-priority task-priority-low"
+                                        src="../assets/icons/board-prio-low.svg" alt="Low priority">
+                                </div>
+                            </article>
+                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
+                                aria-label="View task: Daily Kochwelt Recipe">
+                                <span class="task-category">User Story</span>
+                                <h4>Daily Kochwelt Recipe</h4>
+                                <p class="task-description">Implement daily recipe and portion calculator...</p>
+                                <div class="task-card-footer">
+                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
+                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
+                                        <span class="task-assignee task-assignee-two"
+                                            data-name="Emmanuel Mauer">EM</span>
+                                        <span class="task-assignee task-assignee-three"
+                                            data-name="Marcel Bauer">MB</span>
+                                    </div>
+                                    <img class="task-priority task-priority-medium"
+                                        src="../assets/icons/boar-prio-medium.svg" alt="Medium priority">
+                                </div>
+                            </article>
+                        </section>
+                        <section class="board-column" aria-labelledby="await-feedback-heading">
+                            <div class="board-column-heading">
+                                <h3 id="await-feedback-heading">Await feedback</h3>
+                                <button class="board-column-add" type="button" aria-label="Add task to Await feedback">
+                                    <img src="../assets/icons/add.svg" alt="">
+                                </button>
+                            </div>
+                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
+                                aria-label="View task: CSS Architecture Planning">
+                                <span class="task-category task-category-technical">Technical Task</span>
+                                <h4>CSS Architecture Planning</h4>
+                                <p class="task-description">Define CSS naming conventions and structure...</p>
+                                <div class="task-subtasks">
+                                    <span class="task-progress" aria-label="2 of 2 subtasks completed">
+                                        <span style="width: 100%"></span>
+                                    </span>
+                                    <span>2/2 Subtasks</span>
+                                </div>
+                                <div class="task-card-footer">
+                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
+                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
+                                        <span class="task-assignee task-assignee-two"
+                                            data-name="Emmanuel Mauer">EM</span>
+                                        <span class="task-assignee task-assignee-three"
+                                            data-name="Marcel Bauer">MB</span>
+                                    </div>
+                                    <img class="task-priority task-priority-urgent"
+                                        src="../assets/icons/boar-prio-urgent.svg" alt="Urgent priority">
+                                </div>
+                            </article>
+                        </section>
+                        <section class="board-column" aria-labelledby="done-heading">
+                            <div class="board-column-heading">
+                                <h3 id="done-heading">Done</h3>
+                                <button class="board-column-add" type="button" aria-label="Add task to Done">
+                                    <img src="../assets/icons/add.svg" alt="">
+                                </button>
+                            </div>
+                            <p class="board-empty">No tasks Done</p>
+                        </section>
+                    </section>
+                    <p class="board-search-empty" id="boardSearchEmpty" role="status" aria-live="polite" hidden>
+                        Keine passende Task gefunden. Bitte prüfe Titel oder Beschreibung.
+                    </p>
+                </div>
+            </main>
+        </div>
+    </div>
+    <nav class="board-mobile-nav" aria-label="Hauptnavigation">
+        <a href="./summary.html">
+            <img src="../assets/icons/summary.svg" alt="">
+            <span>Summary</span>
+        </a>
+        <a href="./addTask.html">
+            <img src="../assets/icons/addTask.svg" alt="">
+            <span>Add Tasks</span>
+        </a>
+        <a href="./board.html" class="active" aria-current="page">
+            <img src="../assets/icons/board.svg" alt="">
+            <span>Board</span>
+        </a>
+        <a href="./contacts.html">
+            <img src="../assets/icons/contact.svg" alt="">
+            <span>Contacts</span>
+        </a>
+    </nav>
+    <dialog class="task-dialog" aria-labelledby="task-dialog-title">
+        <div class="task-dialog-content">
+            <div class="task-dialog-top">
+                <span class="task-dialog-category"></span>
+                <button class="task-dialog-close" type="button" aria-label="Close task details">
+                    <img src="../assets/icons/close.svg" alt="">
+                </button>
+            </div>
+            <h2 class="task-dialog-title" id="task-dialog-title"></h2>
+            <p class="task-dialog-description"></p>
+            <div class="task-dialog-detail">
+                <span>Due date:</span>
+                <span class="task-dialog-due-date"></span>
+            </div>
+            <div class="task-dialog-detail">
+                <span>Priority:</span>
+                <span class="task-dialog-priority">
+                    <span class="task-dialog-priority-label"></span>
+                    <img class="task-dialog-priority-icon" alt="">
+                </span>
+            </div>
+            <section class="task-dialog-section">
+                <h3>Assigned To:</h3>
+                <ul class="task-dialog-assignees"></ul>
+            </section>
+            <section class="task-dialog-section">
+                <h3>Subtasks</h3>
+                <ul class="task-dialog-subtasks"></ul>
+            </section>
+            <div class="task-dialog-actions">
+                <button class="task-dialog-action" type="button">
+                    <img src="../assets/icons/trasch.svg" alt="">
+                    <span>Delete</span>
+                </button>
+                <span class="task-dialog-action-separator" aria-hidden="true"></span>
+                <button class="task-dialog-action" type="button">
+                    <img src="../assets/icons/edit.svg" alt="">
+                    <span>Edit</span>
+                </button>
+            </div>
+        </div>
+    </dialog>
+    <script src="../scripts/board.js" defer></script>
+</body>
+
+</html>
