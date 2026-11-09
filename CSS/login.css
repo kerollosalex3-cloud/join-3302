@@ -13,6 +13,7 @@ body {
     display: flex;
     min-height: 100vh;
     flex-direction: column;
+    animation: intro-background 3s ease-in-out;
 }
 
 .login-header {
@@ -30,7 +31,21 @@ body {
     --logo-half-height: 60.4px;
     width: var(--logo-size);
     height: auto;
-    animation: logo-intro 3s ease-in-out;
+    animation: logo-intro 3s ease-in-out, logo-normal-reveal 3s ease-in-out both;
+}
+
+.login-logo-intro {
+    --logo-size: 100px;
+    --logo-position-x: max(5vw, 24px);
+    --logo-position-y: 48px;
+    --logo-half-width: 50px;
+    --logo-half-height: 60.4px;
+    position: absolute;
+    top: var(--logo-position-y);
+    left: var(--logo-position-x);
+    width: var(--logo-size);
+    height: auto;
+    animation: logo-intro 3s ease-in-out, logo-intro-hide 3s ease-in-out both;
 }
 
 .register-prompt,
@@ -43,9 +58,18 @@ body {
     animation: page-reveal 400ms ease 3s both;
 }
 
+html.skip-logo-intro .login-page {
+    animation: none;
+}
+
 html.skip-logo-intro .login-logo {
     animation: none;
     transform: none;
+    opacity: 1;
+}
+
+html.skip-logo-intro .login-logo-intro {
+    display: none;
 }
 
 html.skip-logo-intro .register-prompt,
@@ -68,6 +92,42 @@ html.skip-logo-intro .toast {
 
     100% {
         transform: translate(0, 0) scale(1);
+    }
+}
+
+@keyframes logo-normal-reveal {
+
+    0%,
+    95% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes logo-intro-hide {
+
+    0%,
+    95% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes intro-background {
+
+    0%,
+    95% {
+        background: rgba(42, 54, 71, 1);
+    }
+
+    100% {
+        background: #f6f7f8;
     }
 }
 
@@ -162,7 +222,7 @@ html.skip-logo-intro .toast {
 .field-error {
     display: block;
     color: #e60026;
-    font-size: 13px;
+    font-size: 16px;
     text-align: left;
 }
 
@@ -195,7 +255,7 @@ html.skip-logo-intro .toast {
     gap: 32px;
     padding: 24px;
     color: #a8a8a8;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .toast:not(:empty) {
@@ -225,36 +285,147 @@ html.skip-logo-intro .toast {
 
 @media (max-width: 600px) {
     .login-header {
-        align-items: center;
-        padding: 24px;
+        display: contents;
     }
 
     .login-logo {
         --logo-size: 64px;
-        --logo-position-x: 24px;
-        --logo-position-y: 24px;
+        --logo-position-x: 32px;
+        --logo-position-y: 40px;
+        --logo-half-width: 32px;
+        --logo-half-height: 38.65px;
+        position: absolute;
+        top: 40px;
+        left: 32px;
+    }
+
+    .login-logo-intro {
+        --logo-position-x: 32px;
+        --logo-position-y: 40px;
+        --logo-size: 64px;
         --logo-half-width: 32px;
         --logo-half-height: 38.65px;
     }
 
     .register-prompt {
-        gap: 8px;
-        padding-top: 0;
-        font-size: 14px;
+        order: 2;
+        position: relative;
+        z-index: 1;
+        align-self: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 0;
+        margin-block: auto;
     }
 
-    .register-link {
-        padding: 10px;
+    .login-main {
+        order: 1;
+        flex: 1 0 auto;
+        padding: 102px 16px 0;
     }
 
     .login-box {
-        padding: 32px 24px;
+        display: flex;
+        width: min(100%, 396px);
+        height: 400px;
+        flex-direction: column;
+        gap: 32px;
+        padding: 32px;
+        border-radius: 30px;
+    }
+
+    .auth-title {
+        margin-bottom: 0;
+        font-size: 32px;
+    }
+
+    .auth-form {
+        gap: 16px;
+    }
+
+    .auth-form input {
+        min-height: 40px;
+        padding: 8px 42px 8px 14px;
+        border-radius: 8px;
+    }
+
+    .input-with-icon .input-icon {
+        top: 10px;
+        right: 12px;
+    }
+
+    .login-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .login-actions .btn {
+        flex: none;
+        width: min(100%, 160px);
+        min-height: 48px;
+        padding: 6px 12px;
+        white-space: nowrap;
+    }
+
+    .register-link {
+        padding: 12px 16px;
+        white-space: nowrap;
+    }
+
+    .login-footer {
+        order: 3;
+        padding: 16px 12px 24px;
+    }
+
+    .login-footer a {
+        font-size: 16px;
+    }
+
+    .toast:not(:empty) {
+        bottom: 80px;
+    }
+}
+
+@media (max-width: 600px) and (max-height: 700px) {
+    .login-main {
+        padding-top: 130px;
+    }
+
+    .login-box {
+        height: 360px;
+    }
+
+    .register-prompt {
+        margin-block: 16px;
+    }
+}
+
+@media (max-width: 600px) and (min-height: 701px) {
+    .login-main {
+        padding-top: 59px;
+    }
+
+    .register-prompt {
+        position: absolute;
+        top: calc(75vh + 68px);
+        margin: 0;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .login-page {
+        animation: none;
+    }
+
     .login-logo {
         animation: none;
+        opacity: 1;
+    }
+
+    .login-logo-intro {
+        display: none;
     }
 
     .register-prompt,
