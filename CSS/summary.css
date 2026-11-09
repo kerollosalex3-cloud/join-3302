@@ -32,7 +32,6 @@
 .summary-heading h2 {
     margin: 0;
     color: var(--color-text);
-    font-size: 61px;
     line-height: 1.2;
     white-space: nowrap;
 }
@@ -148,6 +147,11 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-width: 2;
+}
+
+.metric-icon img {
+    width: 28px;
+    height: 28px;
 }
 
 .urgent-card {
