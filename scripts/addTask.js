@@ -3,6 +3,7 @@ const taskForm = document.getElementById('task-form');
 const taskPreview = document.getElementById('task-preview');
 const taskSaveNote = document.getElementById('task-save-note');
 const taskFields = ['title', 'dueDate', 'category'];
+let previewTask = null;
 
 document.addEventListener('click', closeTaskContacts);
 document.addEventListener('keydown', closeTaskContacts);
@@ -12,6 +13,7 @@ taskForm.addEventListener('click', updateTaskForm);
 taskForm.addEventListener('focusout', validateTaskField);
 taskForm.addEventListener('submit', previewTaskForm);
 document.getElementById('clear-task').addEventListener('click', clearTaskForm);
+document.getElementById('edit-task-preview').addEventListener('click', editTaskPreview);
 updateTaskPreviewButton();
 
 /** Closes the contacts dropdown on an outside click or Escape.
@@ -25,7 +27,7 @@ function closeTaskContacts(event) {
     if (event.key === 'Escape') taskAssignees.querySelector('summary').focus();
 }
 
-/** Reads the current task and committed subtask entries.
+/** Reads the current task and added subtask entries.
  * @returns {object} Unsaved task values.
  */
 function readTaskForm() {
@@ -114,6 +116,7 @@ function previewTaskForm(event) {
  * @param {object} task - Validated task values.
  */
 function showTaskPreview(task) {
+    previewTask = task;
     ['title', 'description', 'dueDate'].forEach(field => {
         document.getElementById('preview-task-' + field).textContent = task[field] || 'No description.';
     });
@@ -139,6 +142,7 @@ function showTaskSubtasks(subtasks) {
 
 /** Resets fields, subtasks, validation messages and the preview. */
 function clearTaskForm() {
+    previewTask = null;
     taskForm.reset();
     document.getElementById('subtask-list').replaceChildren();
     updateSubtaskButton();
@@ -148,4 +152,23 @@ function clearTaskForm() {
     taskSaveNote.textContent = 'Preview only. Tasks are not saved yet.';
     updateTaskPreviewButton();
     taskForm.elements.title.focus();
+}
+
+/** Loads unsaved preview values back into the same form.
+ * @param {object} task - Values from the local preview, not database data.
+ */
+function loadTaskForm(task) {
+    clearTaskForm();
+    ['title', 'description', 'dueDate', 'priority', 'category'].forEach(field => {
+        taskForm.elements[field].value = task[field];
+    });
+    task.subtasks.forEach(appendSubtask);
+    updateTaskPreviewButton();
+    taskForm.elements.title.focus();
+}
+
+/** Returns to editing the current unsaved preview. */
+function editTaskPreview() {
+    if (!previewTask) return;
+    loadTaskForm(previewTask);
 }
