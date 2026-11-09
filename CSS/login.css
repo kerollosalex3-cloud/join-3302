@@ -162,7 +162,7 @@ html.skip-logo-intro .toast {
 .field-error {
     display: block;
     color: #e60026;
-    font-size: 13px;
+    font-size: 16px;
     text-align: left;
 }
 
@@ -195,7 +195,7 @@ html.skip-logo-intro .toast {
     gap: 32px;
     padding: 24px;
     color: #a8a8a8;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .toast:not(:empty) {
@@ -240,7 +240,7 @@ html.skip-logo-intro .toast {
     .register-prompt {
         gap: 8px;
         padding-top: 0;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .register-link {
