@@ -17,9 +17,7 @@ function updateSubtaskButton() {
 function addSubtask() {
     const text = subtaskInput.value.trim();
     if (!text) return;
-    const row = document.getElementById('subtask-template').content.firstElementChild.cloneNode(true);
-    row.querySelector('.subtask-text').textContent = text;
-    subtaskList.appendChild(row);
+    appendSubtask(text);
     subtaskInput.value = '';
     updateSubtaskButton();
     subtaskInput.focus();
@@ -101,4 +99,13 @@ function handleSubtaskEditKey(event) {
     const row = event.target.closest('.subtask-item');
     if (event.key === 'Enter') saveSubtask(row);
     else finishSubtaskEdit(row);
+}
+
+/** Adds a text-only row for a new or loaded subtask.
+ * @param {string} text - Subtask title.
+ */
+function appendSubtask(text) {
+    const row = document.getElementById('subtask-template').content.firstElementChild.cloneNode(true);
+    row.querySelector('.subtask-text').textContent = text;
+    subtaskList.appendChild(row);
 }
