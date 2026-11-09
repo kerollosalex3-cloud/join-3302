@@ -17,7 +17,7 @@
 .summary-dashboard {
     display: grid;
     width: min(100%, 900px);
-    grid-template-columns: minmax(0, 438px) minmax(250px, 1fr);
+    grid-template-columns: minmax(0, 536px) minmax(250px, 1fr);
     align-items: center;
     gap: 60px;
 }
@@ -219,6 +219,44 @@
     display: none;
 }
 
+@media (min-width: 701px) and (max-width: 1222px) {
+    .summary-main {
+        padding: 40px 32px;
+    }
+
+    .summary-dashboard {
+        width: min(100%, 700px);
+        grid-template-columns: minmax(0, 1fr);
+        gap: 32px;
+    }
+
+    .summary-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 24px;
+    }
+
+    .summary-heading h2 {
+        font-size: 48px;
+    }
+
+    .summary-heading p {
+        padding-left: 0;
+        border-left: 0;
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .summary-greeting p {
+        font-size: 36px;
+    }
+
+    .summary-greeting h1 {
+        font-size: 48px;
+    }
+}
+
 @media (max-width: 700px) {
     .sidebar {
         display: none;
@@ -418,7 +456,46 @@
     }
 
     .summary-greeting {
-        display: none;
+        position: fixed;
+        z-index: 5;
+        inset: 56px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        background: var(--color-background);
+        text-align: center;
+        animation: summary-greeting-intro 2s ease forwards;
+    }
+
+    .summary-greeting p {
+        font-size: 20px;
+        line-height: 1.25;
+    }
+
+    .summary-greeting h1 {
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    @keyframes summary-greeting-intro {
+        0%,
+        80% {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        100% {
+            opacity: 0;
+            visibility: hidden;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .summary-greeting {
+            animation-duration: 1ms;
+        }
     }
 }
 
