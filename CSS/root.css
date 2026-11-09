@@ -18,9 +18,12 @@
 /* 2. Als CSS-Variable hinterlegen  */
 :root {
     --font-main: 'Inter', sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-bold: 700;
     --color-primary: #2a3647;
     --color-accent: #29abe2;
-    --color-background: #f6f7f8;
+    --color-login-register-bg: rgba(255, 255, 255, 1);
+    --color-background: rgba(246, 247, 248, 1);
     --color-surface: #fff;
     --color-text: #000;
     --color-muted: #a8a8a8;
@@ -40,13 +43,19 @@ body {
 
 h1 {
     font-family: var(--font-main);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
+    font-size: 64px;
+}
+
+h2 {
+    font-family: var(--font-main);
+    font-weight: var(--font-weight-bold);
     font-size: 61px;
 }
 
 p {
     font-family: var(--font-main);
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     font-size: 20px;
 }
 
@@ -67,7 +76,7 @@ button {
     border-radius: 8px;
     color: var(--color-surface);
     background: var(--color-primary);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .btn:hover,
