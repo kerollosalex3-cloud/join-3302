@@ -21,6 +21,21 @@
     line-height: 1.15;
 }
 
+.privacy-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.privacy-heading h1 {
+    margin: 0;
+}
+
+.privacy-back-link {
+    display: none;
+}
+
 .help-intro,
 .help-section p,
 .help-section li,
@@ -92,6 +107,48 @@
     text-decoration: underline;
 }
 
+@media (min-width: 768px) {
+
+    .help-page .app-layout,
+    .privacy-page .app-layout,
+    .external-legal-page .app-layout {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+    }
+
+    .help-page .sidebar,
+    .privacy-page .sidebar,
+    .external-legal-page .sidebar {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .help-page .app-content,
+    .privacy-page .app-content,
+    .external-legal-page .app-content {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
+.external-legal-page .sidebar-nav,
+.external-privacy-page .sidebar-nav {
+    flex: 1;
+    justify-content: flex-start;
+    margin-top: 50px;
+}
+
+.external-legal-page .sidebar-legal a.active,
+.external-privacy-page .sidebar-legal a.active {
+    margin: -8px -40px;
+    padding: 8px 40px;
+    color: var(--color-sidebar-text);
+    background: var(--color-sidebar-active);
+}
+
 @media (max-width: 767px) {
     .sidebar {
         display: none;
@@ -114,7 +171,7 @@
     }
 
     .board-project-name,
-    .header-actions > img {
+    .header-actions>img {
         display: none;
     }
 
@@ -175,8 +232,42 @@
         filter: brightness(0) invert(1);
     }
 
+    .external-legal-page .board-project-name,
+    .external-privacy-page .board-project-name {
+        display: block;
+        margin-left: 16px;
+        font-size: 14px;
+    }
+
     .help-main {
         padding: 28px 20px 88px;
+    }
+
+    .privacy-page .help-main {
+        background: var(--color-surface);
+    }
+
+    .privacy-heading {
+        margin-bottom: 16px;
+    }
+
+    .privacy-page .privacy-heading h1 {
+        font-size: 24px;
+    }
+
+    .privacy-back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+    }
+
+    .privacy-back-link img {
+        display: block;
+        width: 24px;
+        height: 24px;
     }
 
     .help-content h1 {
