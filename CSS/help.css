@@ -1,0 +1,303 @@
+.help-main {
+    padding: 48px 64px 64px;
+    box-sizing: border-box;
+}
+
+.board-mobile-logo,
+.board-mobile-nav {
+    display: none;
+}
+
+.help-page .help-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-content {
+    width: min(100%, 900px);
+    margin: 0 auto;
+}
+
+.help-content h1 {
+    margin: 0 0 16px;
+    color: var(--color-text);
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.15;
+}
+
+.help-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.help-heading h1 {
+    margin: 0;
+}
+
+.help-back-link {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-back-link img {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.privacy-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.privacy-heading h1 {
+    margin: 0;
+}
+
+.privacy-back-link {
+    display: none;
+}
+
+.help-intro,
+.help-section p,
+.help-section li,
+.help-note p {
+    color: var(--color-primary);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.help-intro {
+    max-width: 760px;
+    margin: 0 0 32px;
+}
+
+.help-section {
+    margin-top: 28px;
+}
+
+.help-section h2,
+.help-note h2 {
+    margin: 0 0 10px;
+    color: var(--color-text);
+    font-size: 23px;
+    line-height: 1.3;
+}
+
+.help-section p {
+    margin: 0;
+}
+
+.help-section ol {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding-left: 24px;
+}
+
+.help-note {
+    margin-top: 32px;
+    padding: 20px 24px;
+    border-left: 3px solid var(--color-accent);
+    border-radius: 8px;
+    background: var(--color-surface);
+}
+
+.help-note h2 {
+    font-size: 19px;
+}
+
+.help-note p {
+    margin: 0;
+}
+
+.help-contact {
+    margin: 32px 0 0;
+    color: var(--color-primary);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.contact-email {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.contact-email:hover,
+.contact-email:focus-visible {
+    text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+
+    .help-page .app-layout,
+    .privacy-page .app-layout,
+    .external-legal-page .app-layout {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+    }
+
+    .help-page .sidebar,
+    .privacy-page .sidebar,
+    .external-legal-page .sidebar {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .help-page .app-content,
+    .privacy-page .app-content,
+    .external-legal-page .app-content {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
+.external-legal-page .sidebar-nav,
+.external-privacy-page .sidebar-nav {
+    flex: 1;
+    justify-content: flex-start;
+    margin-top: 50px;
+}
+
+.external-legal-page .sidebar-legal a.active,
+.external-privacy-page .sidebar-legal a.active {
+    margin: -8px -40px;
+    padding: 8px 40px;
+    color: var(--color-sidebar-text);
+    background: var(--color-sidebar-active);
+}
+
+@media (max-width: 767px) {
+    .sidebar {
+        display: none;
+    }
+
+    .header {
+        height: 56px;
+        padding: 0 16px;
+    }
+
+    .board-mobile-logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .board-mobile-logo img {
+        display: block;
+        width: 32px;
+        height: 32px;
+    }
+
+    .board-project-name,
+    .header-actions>img {
+        display: none;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .board-mobile-nav {
+        position: fixed;
+        z-index: 10;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        justify-content: space-around;
+        min-height: 56px;
+        padding: 4px 8px;
+        background: var(--color-primary);
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .board-mobile-nav a {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        border-radius: 8px;
+        color: var(--color-sidebar-text);
+        font-size: 10px;
+        text-decoration: none;
+    }
+
+    .board-mobile-nav img {
+        width: 16px;
+        height: 16px;
+        filter: brightness(0) invert(1);
+    }
+
+    .external-legal-page .board-project-name,
+    .external-privacy-page .board-project-name {
+        display: block;
+        margin-left: 16px;
+        font-size: 14px;
+    }
+
+    .help-main {
+        padding: 28px 20px 88px;
+    }
+
+    .privacy-page .help-main {
+        background: var(--color-surface);
+    }
+
+    .privacy-heading {
+        margin-bottom: 16px;
+    }
+
+    .privacy-page .privacy-heading h1 {
+        font-size: 24px;
+    }
+
+    .privacy-back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+    }
+
+    .privacy-back-link img {
+        display: block;
+        width: 24px;
+        height: 24px;
+    }
+
+    .help-content h1 {
+        font-size: 32px;
+    }
+
+    .help-intro,
+    .help-section p,
+    .help-section li,
+    .help-note p,
+    .help-contact {
+        font-size: 15px;
+    }
+
+    .help-section h2 {
+        font-size: 20px;
+    }
+
+    .help-note {
+        padding: 16px;
+    }
+}
