@@ -50,13 +50,28 @@
                     <a class="help-icon-link" href="./help.html" aria-label="Help">
                         <img src="../assets/icons/help.svg" alt="">
                     </a>
-                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
-                    <span class="board-mobile-avatar" aria-label="Stefan Müller"></span>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <span class="header-avatar" aria-hidden="true">G</span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true" inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal.html">Legal Notice</a>
+                            <a href="./privacy.html">Privacy Policy</a>
+                            <a href="../index.html">Log out</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
             <main class="help-main">
                 <article class="help-content">
-                    <h1>Help</h1>
+                    <div class="help-heading">
+                        <h1>Help</h1>
+                        <a class="help-back-link" href="./summary.html" aria-label="Back to summary">
+                            <img src="../assets/icons/arrow-back.svg" alt="">
+                        </a>
+                    </div>
                     <p class="help-intro">
                         Welcome to the help page for Join, your guide to using our kanban project management tool. Here,
                         we'll provide an overview of what Join is, how it can benefit you, and how to use it.
@@ -154,6 +169,8 @@
             <span>Contacts</span>
         </a>
     </nav>
+    <script src="../scripts/profile-menu.js" defer></script>
+    <script type="module" src="../scripts/header-avatar.js"></script>
 </body>
 
 </html>

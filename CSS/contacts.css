@@ -20,17 +20,6 @@
     display: none;
 }
 
-.header-avatar {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border: 3px solid var(--color-primary);
-    border-radius: 50%;
-    color: var(--color-accent);
-    font-weight: 700;
-}
-
 .contacts-main {
     display: flex;
     flex: 1;
@@ -358,7 +347,7 @@
     .contacts-page .header { height: 80px; padding: 16px 24px; }
     .contacts-page .header p { display: none; }
     .mobile-logo { display: block; width: 32px; height: 40px; object-fit: contain; }
-    .header-avatar { width: 40px; height: 40px; }
+    .contacts-page .header-actions { gap: 8px; }
     .contacts-main { flex-direction: column-reverse; }
     .contacts-content { padding: 32px 24px 8px; }
     .contacts-heading { margin-bottom: 24px; }

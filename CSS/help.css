@@ -4,8 +4,7 @@
 }
 
 .board-mobile-logo,
-.board-mobile-nav,
-.board-mobile-avatar {
+.board-mobile-nav {
     display: none;
 }
 
@@ -25,6 +24,32 @@
     color: var(--color-text);
     font-size: clamp(32px, 5vw, 48px);
     line-height: 1.15;
+}
+
+.help-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.help-heading h1 {
+    margin: 0;
+}
+
+.help-back-link {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-back-link img {
+    display: block;
+    width: 24px;
+    height: 24px;
 }
 
 .privacy-heading {
@@ -182,27 +207,7 @@
     }
 
     .header-actions {
-        gap: 0;
-    }
-
-    .header .header-avatar {
-        display: none;
-    }
-
-    .board-mobile-avatar {
-        display: grid;
-        width: 24px;
-        height: 24px;
-        place-items: center;
-        border: 1px solid var(--color-primary);
-        border-radius: 50%;
-        color: var(--color-primary);
-        font-size: 9px;
-        font-weight: var(--font-weight-bold);
-    }
-
-    .board-mobile-avatar::before {
-        content: "SM";
+        gap: 8px;
     }
 
     .board-mobile-nav {
