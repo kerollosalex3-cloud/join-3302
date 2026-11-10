@@ -23,20 +23,21 @@
     <main class="login-main">
         <section class="login-box">
             <h1 class="auth-title">Log in</h1>
-            <form class="auth-form" novalidate>
+            <form id="login-form" class="auth-form" novalidate>
                 <label class="input-with-icon">
-                    <input type="email" name="email" placeholder="E-Mail" autocomplete="username">
+                    <input id="login-email" type="email" name="email" placeholder="E-Mail" autocomplete="username">
                     <img class="input-icon" src="assets/icons/mail.svg" alt="">
-                    <small class="field-error" aria-live="polite"></small>
+                    <small id="login-email-error" class="field-error" aria-live="polite"></small>
                 </label>
                 <label class="input-with-icon">
-                    <input type="password" name="password" placeholder="Password" autocomplete="current-password">
+                    <input id="login-password" type="password" name="password" placeholder="Password"
+                        autocomplete="current-password">
                     <img class="input-icon" src="assets/icons/lock.svg" alt="">
-                    <small class="field-error" aria-live="polite"></small>
+                    <small id="login-password-error" class="field-error" aria-live="polite"></small>
                 </label>
                 <div class="login-actions">
-                    <button class="btn login-submit" type="submit">Log in</button>
-                    <button class="btn secondary-btn guest-login" type="button">Guest Log in</button>
+                    <button id="login-submit" class="btn login-submit" type="submit">Log in</button>
+                    <button id="gbtn" class="btn secondary-btn guest-login" type="button">Guest Log in</button>
                 </div>
             </form>
 
@@ -47,7 +48,7 @@
         <a href="html/privacy-external.html">Datenschutzerklärung</a>
         <a href="html/legal-external.html">Legal notice</a>
     </footer>
-    <div class="toast" role="status" aria-live="polite"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script type="module" src="scripts/login.js"></script>
 </body>
 
