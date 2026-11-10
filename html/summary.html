@@ -53,7 +53,7 @@
                     <div class="profile-menu-wrapper">
                         <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
                             aria-expanded="false" aria-controls="profile-menu">
-                            <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="">
+                            <span class="header-avatar-initials" aria-hidden="true"></span>
                             <span class="summary-mobile-avatar" aria-hidden="true"></span>
                         </button>
                         <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true" inert>
@@ -101,7 +101,7 @@
                         <article class="summary-card urgent-card">
                             <div class="urgent-metric">
                                 <span class="metric-icon urgent-icon">
-                                    <img src="../assets/icons/board-prio-low.svg" alt="">
+                                    <img src="../assets/icons/Prio-urgent.svg" alt="">
                                 </span>
                                 <span class="summary-card-copy">
                                     <strong>1</strong>
@@ -130,7 +130,7 @@
                     </div>
                     <div class="summary-greeting">
                         <p>Good morning,</p>
-                        <h1>Sofia Müller</h1>
+                        <h1 id="greeting-name"></h1>
                     </div>
                 </section>
             </main>
@@ -155,6 +155,7 @@
         </a>
     </nav>
     <script src="../scripts/profile-menu.js"></script>
+    <script type="module" src="../scripts/summary.js"></script>
 </body>
 
 </html>
