@@ -2,18 +2,18 @@
 <html lang="de">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Join</title>
-    <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg">
-    <link rel="stylesheet" href="CSS/root.css">
-    <link rel="stylesheet" href="CSS/login.css">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+    <link rel="stylesheet" href="CSS/root.css" />
+    <link rel="stylesheet" href="CSS/login.css" />
 </head>
 
 <body class="login-page">
     <header class="login-header">
-        <img class="login-logo" src="assets/icons/logo.svg" alt="Join">
-        <img class="login-logo-intro" src="assets/icons/logo-white.svg" alt="" aria-hidden="true">
+        <img class="login-logo" src="assets/icons/logo.svg" alt="Join" />
+        <img class="login-logo-intro" src="assets/icons/logo-white.svg" alt="" aria-hidden="true" />
         <div class="register-prompt">
             <span class="register-prompt-text">Not a Join user?</span>
             <a class="register-link" href="./html/register.html">Sign up</a>
@@ -23,31 +23,40 @@
     <main class="login-main">
         <section class="login-box">
             <h1 class="auth-title">Log in</h1>
-            <form class="auth-form" novalidate>
+
+            <form id="login-form" class="auth-form" novalidate>
                 <label class="input-with-icon">
-                    <input type="email" name="email" placeholder="E-Mail" autocomplete="username">
-                    <img class="input-icon" src="assets/icons/mail.svg" alt="">
-                    <small class="field-error" aria-live="polite"></small>
+                    <input id="login-email" type="email" name="email" placeholder="E-Mail" autocomplete="username"
+                        aria-describedby="login-email-error" />
+                    <img class="input-icon" src="assets/icons/mail.svg" alt="" />
+                    <small id="login-email-error" class="field-error" aria-live="polite"></small>
                 </label>
+
                 <label class="input-with-icon">
-                    <input type="password" name="password" placeholder="Password" autocomplete="current-password">
-                    <img class="input-icon" src="assets/icons/lock.svg" alt="">
-                    <small class="field-error" aria-live="polite"></small>
+                    <input id="login-password" type="password" name="password" placeholder="Password"
+                        autocomplete="current-password" aria-describedby="login-password-error" />
+                    <button class="password-toggle" type="button" aria-label="Show password" disabled
+                        data-visible-icon="assets/icons/visibility.svg"
+                        data-hidden-icon="assets/icons/visibility_off.svg">
+                        <img class="input-icon" src="assets/icons/lock.svg" alt="" />
+                    </button>
+                    <small id="login-password-error" class="field-error" aria-live="polite"></small>
                 </label>
+
                 <div class="login-actions">
-                    <button class="btn login-submit" type="submit">Log in</button>
-                    <button class="btn secondary-btn guest-login" type="button">Guest Log in</button>
+                    <button id="login-submit" class="btn login-submit" type="submit">Log in</button>
+                    <button id="gbtn" class="btn secondary-btn guest-login" type="button">Guest Log in</button>
                 </div>
             </form>
-
         </section>
     </main>
 
     <footer class="login-footer">
-        <a href="html/privacy-external.html">Datenschutzerklärung</a>
+        <a href="html/privacy-external.html">Privacy Policy</a>
         <a href="html/legal-external.html">Legal notice</a>
     </footer>
-    <div class="toast" role="status" aria-live="polite"></div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script type="module" src="scripts/login.js"></script>
 </body>
 

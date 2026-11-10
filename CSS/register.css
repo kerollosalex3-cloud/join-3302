@@ -53,11 +53,13 @@
 }
 
 .register-page .auth-form .privacy-consent {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 18px max-content;
     align-items: center;
-    gap: 12px;
-    color: #a8a8a8;
+    justify-content: center;
+    gap: 4px 12px;
+    width: 100%;
+    color: rgba(18, 70, 88, 1);
     font-size: 16px;
 }
 
@@ -85,7 +87,7 @@
 }
 
 .privacy-consent .field-error {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
     text-align: center;
 }
 
@@ -168,6 +170,15 @@
     }
 
     .register-page .auth-form .input-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .register-page .password-toggle .input-icon {
+        position: static;
+    }
+
+    .register-page .password-toggle {
         top: 9px;
         right: 12px;
         width: 18px;
@@ -175,7 +186,8 @@
     }
 
     .register-page .auth-form .privacy-consent {
-        gap: 8px;
+        grid-template-columns: 18px max-content;
+        gap: 4px 8px;
         font-size: 16px;
     }
 
@@ -185,7 +197,7 @@
         min-height: 18px;
     }
 
-    .register-page .auth-form > .btn {
+    .register-page .auth-form>.btn {
         align-self: center;
         width: min(100%, 160px);
         min-height: 48px;
