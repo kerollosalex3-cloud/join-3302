@@ -262,10 +262,17 @@
     outline-offset: 3px;
 }
 
-.header-avatar-trigger .header-avatar {
-    display: block;
+.header-avatar-initials {
+    display: grid;
     width: 56px;
     height: 56px;
+    place-items: center;
+    border: 3px solid var(--color-text);
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-primary);
+    font-size: 18px;
+    font-weight: var(--font-weight-bold);
 }
 
 .profile-menu {
@@ -524,11 +531,7 @@
         font-weight: var(--font-weight-bold);
     }
 
-    .summary-mobile-avatar::before {
-        content: "SM";
-    }
-
-    .header-avatar-trigger .header-avatar {
+    .header-avatar-trigger .header-avatar-initials {
         display: none;
     }
 
