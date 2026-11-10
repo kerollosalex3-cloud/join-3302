@@ -18,16 +18,37 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getDatabase(app);
 
+/**
+ * Builds a database path for a user's profile or a nested profile value.
+ * @param {string} uid Firebase Authentication user ID.
+ * @param {string} [nestedPath] Optional path below the user's profile.
+ * @returns {string} Realtime Database path.
+ */
 export function userPath(uid, nestedPath = "") {
     return nestedPath ? `users/${uid}/${nestedPath}` : `users/${uid}`;
 }
 
+/**
+ * Escapes HTML-sensitive characters in plain text.
+ * @param {string} [value] Text to escape.
+ * @returns {string} Safe HTML text.
+ */
 export function escapeHtml(value = "") {
-    return String(value).replace(/[&<>"']/g, (char) => ({
+    return String(value).replace(/[&<>"']/g, escapeHtmlCharacter);
+}
+
+/**
+ * Converts one HTML-sensitive character to its entity representation.
+ * @param {string} character Character matched by the HTML-sensitive pattern.
+ * @returns {string} HTML entity or unchanged character.
+ */
+function escapeHtmlCharacter(character) {
+    const entities = {
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#039;",
-    }[char]));
+    };
+    return entities[character] || character;
 }
