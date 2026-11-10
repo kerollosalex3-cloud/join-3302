@@ -17,7 +17,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     width: 232px;
-    height: auto;
+    height: 100vh;
     min-height: 100vh;
     padding: 64px 0;
     box-sizing: border-box;
@@ -74,7 +74,7 @@ body {
 
 .sidebar-legal a {
     color: var(--color-muted);
-    font-size: 14px;
+    font-size: 16px;
     text-decoration: none;
 }
 

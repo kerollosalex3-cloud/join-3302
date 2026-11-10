@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts – Join</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../CSS/contacts.css">
+    <script src="../scripts/contactValidation.js" defer></script>
+    <script src="../scripts/contacts.js" defer></script>
+</head>
+
+<body class="contacts-page">
+    <div class="app-layout">
+        <!-- start sidebar -->
+        <aside class="sidebar">
+            <a class="sidebar-logo" href="../index.html" aria-label="Join home">
+                <img src="../assets/icons/join-logo-white.svg" alt="Join">
+            </a>
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <a class="sidebar-link" href="summary.html"><img src="../assets/icons/summary.svg" alt=""><span>Summary</span></a>
+                <a class="sidebar-link" href="addTask.html"><img src="../assets/icons/addTask.svg" alt=""><span>Add Task</span></a>
+                <a class="sidebar-link" href="board.html"><img src="../assets/icons/board.svg" alt=""><span>Board</span></a>
+                <a class="sidebar-link active" href="contacts.html" aria-current="page"><img src="../assets/icons/contact.svg" alt=""><span>Contacts</span></a>
+            </nav>
+            <div class="sidebar-legal">
+                <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="legal-notice.html">Legal notice</a>
+            </div>
+        </aside>
+        <!-- end sidebar -->
+
+        <div class="app-content">
+            <!-- start header -->
+            <header class="header">
+                <img class="mobile-logo" src="../assets/icons/logo.svg" alt="Join">
+                <p>Kanban Project Management Tool</p>
+                <div class="header-actions">
+                    <a class="help-icon-link" href="./help.html" aria-label="Help">
+                        <img src="../assets/icons/help.svg" alt="">
+                    </a>
+                    <span class="header-avatar" aria-label="Profile preview">G</span>
+                </div>
+            </header>
+            <!-- end header -->
+
+            <!-- start contacts -->
+            <main class="contacts-main">
+                <section class="contacts-list" aria-label="Contact list">
+                    <button id="add-contact" class="btn add-contact-button" type="button">Add new contact <span aria-hidden="true">+</span></button>
+                    <div class="contacts-empty"><p>No contacts loaded.</p><p class="preview-note">Preview only. Contacts are not saved yet.</p></div>
+                    <ul id="contact-list" aria-label="Contacts"></ul>
+                </section>
+                <section class="contacts-content" aria-labelledby="contacts-title">
+                    <div class="contacts-heading"><h1 id="contacts-title">Contacts</h1><p>Better with a team</p></div>
+                    <p class="contacts-intro">Add a contact to preview the form.</p>
+                    <div id="contact-preview" hidden>
+                        <div class="contact-profile"><span id="preview-initials" class="contact-avatar" aria-hidden="true"></span><div><h2 id="preview-name"></h2><button id="edit-preview" class="contact-edit" type="button">Edit preview</button></div></div>
+                        <h3>Contact Information</h3>
+                        <dl class="contact-information"><dt>Email</dt><dd id="preview-email"></dd><dt>Phone</dt><dd id="preview-phone"></dd></dl>
+                        <p class="preview-note" role="status">This is a preview. Your contact has not been saved.</p>
+                    </div>
+                </section>
+            </main>
+            <!-- end contacts -->
+            <footer class="contacts-mobile-legal"><a href="privacy-policy.html">Privacy Policy</a><a href="legal-notice.html">Legal notice</a></footer>
+        </div>
+    </div>
+
+    <!-- start contact form -->
+    <dialog id="contact-dialog" aria-labelledby="contact-dialog-title" aria-describedby="contact-form-note">
+        <div class="contact-dialog-content">
+            <div class="contact-dialog-intro">
+                <img src="../assets/icons/join-logo-white.svg" alt="" width="56">
+                <h2 id="contact-dialog-title">Add contact</h2>
+                <p>Tasks are better with a team!</p>
+                <span class="contact-dialog-line"></span>
+            </div>
+            <div class="contact-dialog-form">
+                <button id="close-contact" class="contact-close" type="button" aria-label="Close contact form">×</button>
+                <span class="contact-form-avatar" aria-hidden="true"><img src="../assets/icons/person-signup.svg" alt=""></span>
+                <form id="contact-form" novalidate>
+                    <div class="contact-field">
+                        <label for="contact-name">Name</label>
+                        <div class="contact-input"><input id="contact-name" name="name" type="text" placeholder="Name" maxlength="120" autocomplete="name" aria-required="true" aria-describedby="name-error"><img src="../assets/icons/person-signup.svg" alt=""></div>
+                        <small id="name-error" class="contact-error"></small>
+                    </div>
+                    <div class="contact-field">
+                        <label for="contact-email">Email</label>
+                        <div class="contact-input"><input id="contact-email" name="email" type="email" placeholder="Email" maxlength="254" autocomplete="email" aria-required="true" aria-describedby="email-error"><img src="../assets/icons/mail.svg" alt=""></div>
+                        <small id="email-error" class="contact-error"></small>
+                    </div>
+                    <div class="contact-field">
+                        <label for="contact-phone">Phone</label>
+                        <div class="contact-input"><input id="contact-phone" name="phone" type="tel" placeholder="Phone" maxlength="40" autocomplete="tel" aria-required="true" aria-describedby="phone-error"></div>
+                        <small id="phone-error" class="contact-error"></small>
+                    </div>
+                    <p id="contact-form-note" class="preview-note">Preview only. Saving will be available later.</p>
+                    <div class="contact-form-actions"><button id="cancel-contact" class="btn secondary-btn" type="button">Cancel ×</button><button class="btn" type="submit">Preview contact</button></div>
+                </form>
+            </div>
+        </div>
+    </dialog>
+    <!-- end contact form -->
+</body>
+
+</html>
