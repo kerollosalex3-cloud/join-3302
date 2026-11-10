@@ -520,33 +520,12 @@
     }
 
     .board-project-name,
-    .header-actions > img,
-    .board-mobile-avatar {
+    .header-actions > img {
         display: none;
     }
 
     .header-actions {
-        gap: 0;
-    }
-
-    .header .header-avatar {
-        display: none;
-    }
-
-    .board-mobile-avatar {
-        display: grid;
-        width: 24px;
-        height: 24px;
-        place-items: center;
-        border: 1px solid var(--color-primary);
-        border-radius: 50%;
-        color: var(--color-primary);
-        font-size: 9px;
-        font-weight: var(--font-weight-bold);
-    }
-
-    .board-mobile-avatar::before {
-        content: "SM";
+        gap: 8px;
     }
 
     .board-mobile-nav {

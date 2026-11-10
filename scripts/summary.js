@@ -4,7 +4,6 @@ import { auth, db, userPath } from "./firebase.js";
 
 const greetingName = document.querySelector("#greeting-name");
 const avatarInitials = document.querySelector(".header-avatar-initials");
-const mobileAvatarInitials = document.querySelector(".summary-mobile-avatar");
 const avatarTrigger = document.querySelector(".header-avatar-trigger");
 
 /**
@@ -82,7 +81,6 @@ async function resolveSignedInUserName(user) {
 function renderUserDisplay(name, initials) {
     greetingName.textContent = name;
     avatarInitials.textContent = initials;
-    mobileAvatarInitials.textContent = initials;
     avatarTrigger.setAttribute("aria-label", `Open profile menu for ${name}`);
 }
 
