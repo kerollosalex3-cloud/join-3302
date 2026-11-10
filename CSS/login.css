@@ -245,13 +245,18 @@ html.skip-logo-intro .toast {
 
 .field-error {
     display: block;
+    height: 14px;
     color: #e60026;
-    font-size: 16px;
+    font-size: 11px;
+    line-height: 14px;
     text-align: left;
+    visibility: hidden;
+    white-space: nowrap;
+    overflow: visible;
 }
 
-.field-error:empty {
-    display: none;
+.field-error:not(:empty) {
+    visibility: visible;
 }
 
 .input-with-icon .input-icon {
@@ -260,6 +265,28 @@ html.skip-logo-intro .toast {
     right: 16px;
     width: 20px;
     height: 20px;
+    pointer-events: none;
+}
+
+.password-toggle .input-icon {
+    position: static;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    display: grid;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    place-items: center;
+}
+
+.password-toggle:disabled {
     pointer-events: none;
 }
 
@@ -278,7 +305,7 @@ html.skip-logo-intro .toast {
     justify-content: center;
     gap: 32px;
     padding: 24px;
-    color: #a8a8a8;
+    color: rgba(18, 70, 88, 1);
     font-size: 16px;
 }
 
@@ -382,7 +409,12 @@ html.skip-logo-intro .toast {
         border-radius: 8px;
     }
 
-    .input-with-icon .input-icon {
+    .input-with-icon>.input-icon {
+        top: 10px;
+        right: 12px;
+    }
+
+    .password-toggle {
         top: 10px;
         right: 12px;
     }
