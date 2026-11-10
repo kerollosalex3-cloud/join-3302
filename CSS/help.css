@@ -9,6 +9,12 @@
     display: none;
 }
 
+.help-page .help-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .help-content {
     width: min(100%, 900px);
     margin: 0 auto;
