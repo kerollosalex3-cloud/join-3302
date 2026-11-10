@@ -2,7 +2,7 @@ import {
     createUserWithEmailAndPassword,
     updateProfile,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { auth, db, userPath } from "./firebase.js";
 import { bindPasswordVisibility, getElement, showToast } from "../script.js";
 
@@ -62,10 +62,10 @@ function updateSubmitState() {
     submitButton.disabled = !privacyOk;
 }
 
-async function saveUserProfile(uid, name) {
-    await set(ref(db, userPath(uid, "profile")), {
+async function saveUserProfile(uid, name, email) {
+    await update(ref(db, userPath(uid)), {
         name,
-        createdAt: Date.now(),
+        email,
     });
 }
 
@@ -113,26 +113,63 @@ async function register(event) {
 
     submitButton.disabled = true;
 
+    let credential;
     try {
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(credential.user, { displayName: name });
-        await saveUserProfile(credential.user.uid, name);
-        location.href = "summary.html";
+        credential = await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
         updateSubmitState();
-        switch (error.code) {
-            case "auth/email-already-in-use":
-                setFieldError(emailInput, emailError, "This email is already in use.");
-                break;
-            case "auth/invalid-email":
-                setFieldError(emailInput, emailError, "Gib eine gültige Emailadresse an.");
-                break;
-            case "auth/weak-password":
-                setFieldError(passwordInput, passwordError, "Password must be at least 6 characters.");
-                break;
-            default:
-                showToast("Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben.");
+        showRegistrationError(error);
+        return;
+    }
+
+    let profileWarning = "";
+    try {
+        await updateProfile(credential.user, { displayName: name });
+    } catch {
+        profileWarning = "Der Profilname konnte nicht in Firebase Authentication gespeichert werden.";
+    }
+
+    let databaseWriteFailed = false;
+    try {
+        await saveUserProfile(credential.user.uid, name, email);
+    } catch (error) {
+        databaseWriteFailed = true;
+        const reason = error.code || "unknown";
+        profileWarning = `Auth-Konto erstellt, Datenbankeintrag fehlgeschlagen (${reason}). Prüfe die Realtime-Database-Regeln für users/${credential.user.uid}.`;
+    }
+
+    if (profileWarning) {
+        showToast(profileWarning);
+        if (!databaseWriteFailed) {
+            window.setTimeout(() => {
+                location.href = "summary.html";
+            }, 2500);
         }
+        return;
+    }
+
+    location.href = "summary.html";
+}
+
+function showRegistrationError(error) {
+    switch (error.code) {
+        case "auth/email-already-in-use":
+            setFieldError(emailInput, emailError, "Diese E-Mail-Adresse wird bereits verwendet.");
+            break;
+        case "auth/invalid-email":
+            setFieldError(emailInput, emailError, "Gib eine gültige Emailadresse an.");
+            break;
+        case "auth/weak-password":
+            setFieldError(passwordInput, passwordError, "Das Passwort muss mindestens 6 Zeichen lang sein.");
+            break;
+        case "auth/operation-not-allowed":
+            showToast("E-Mail-/Passwort-Registrierung ist in Firebase nicht aktiviert.");
+            break;
+        case "auth/network-request-failed":
+            showToast("Firebase ist nicht erreichbar. Prüfe deine Internetverbindung.");
+            break;
+        default:
+            showToast("Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben und die Firebase-Konfiguration.");
     }
 }
 
