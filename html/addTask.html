@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Task - Join</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../CSS/addTask.css">
+    <link rel="stylesheet" href="../CSS/subtasks.css">
+    <link rel="stylesheet" href="../CSS/taskForm.css">
+    <script src="../scripts/taskValidation.js" defer></script>
+    <script src="../scripts/addTask.js" defer></script>
+    <script src="../scripts/subtasks.js" defer></script>
+</head>
+
+<body class="add-task-page">
+    <div class="app-layout">
+        <!-- start sidebar -->
+        <aside class="sidebar">
+            <a class="sidebar-logo" href="../index.html" aria-label="Join Startseite">
+                <img src="../assets/icons/join-logo-white.svg" alt="Join">
+            </a>
+            <nav class="sidebar-nav" aria-label="Hauptnavigation">
+                <a class="sidebar-link" href="summary.html">
+                    <img src="../assets/icons/summary.svg" alt="">
+                    <span>Summary</span>
+                </a>
+                <a class="sidebar-link active" href="addTask.html" aria-current="page">
+                    <img src="../assets/icons/addTask.svg" alt="">
+                    <span>Add Task</span>
+                </a>
+                <a class="sidebar-link" href="board.html">
+                    <img src="../assets/icons/board.svg" alt="">
+                    <span>Board</span>
+                </a>
+                <a class="sidebar-link" href="contacts.html">
+                    <img src="../assets/icons/contact.svg" alt="">
+                    <span>Contacts</span>
+                </a>
+            </nav>
+            <div class="sidebar-legal">
+                <a href="privacy-policy.html">Privacy Policy</a>
+                <a href="legal-notice.html">Legal notice</a>
+            </div>
+        </aside>
+        <!-- end sidebar -->
+
+        <div class="app-content">
+            <!-- start header -->
+            <header class="header">
+                <a class="add-task-mobile-logo" href="../index.html" aria-label="Join Startseite">
+                    <img src="../assets/icons/logo.svg" alt="Join">
+                </a>
+                <p>Kanban Project Management Tool</p>
+                <div class="header-actions">
+                    <img src="../assets/icons/help.svg" alt="Help">
+                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
+                </div>
+            </header>
+            <!-- end header -->
+
+            <!-- start add task -->
+            <main class="add-task-main">
+                <h1>Add Task</h1>
+                <form id="task-form" class="task-form" aria-label="Task details" novalidate>
+                    <div class="task-fields">
+                        <div class="task-field">
+                            <label for="task-title">Title<span class="task-required">*</span></label>
+                            <input id="task-title" name="title" type="text" placeholder="Enter a title" aria-required="true" aria-describedby="task-title-error">
+                            <small id="task-title-error" class="task-error"></small>
+                        </div>
+                        <div class="task-field">
+                            <label for="task-description">Description</label>
+                            <textarea id="task-description" name="description" placeholder="Enter a Description" rows="4"></textarea>
+                        </div>
+                        <div class="task-field">
+                            <label for="task-due-date">Due date<span class="task-required">*</span></label>
+                            <input id="task-due-date" name="dueDate" type="date" aria-required="true" aria-describedby="task-dueDate-error">
+                            <small id="task-dueDate-error" class="task-error"></small>
+                        </div>
+                    </div>
+                    <div class="task-fields task-options">
+                        <fieldset class="task-priority">
+                            <legend>Priority</legend>
+                            <div class="priority-options">
+                                <div class="priority-option">
+                                    <input id="priority-urgent" name="priority" type="radio" value="urgent">
+                                    <label for="priority-urgent">Urgent<img src="../assets/icons/boar-prio-urgent.svg" alt=""></label>
+                                </div>
+                                <div class="priority-option">
+                                    <input id="priority-medium" name="priority" type="radio" value="medium" checked>
+                                    <label for="priority-medium">Medium<img src="../assets/icons/boar-prio-medium.svg" alt=""></label>
+                                </div>
+                                <div class="priority-option">
+                                    <input id="priority-low" name="priority" type="radio" value="low">
+                                    <label for="priority-low">Low<img src="../assets/icons/board-prio-low.svg" alt=""></label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="task-field">
+                            <span id="task-assignees-label" class="task-field-label">Assigned to</span>
+                            <details id="task-assignees" class="task-assignees" aria-labelledby="task-assignees-label">
+                                <summary>Select contacts to assign</summary>
+                                <div class="task-contact-list">
+                                    <p>No contacts loaded yet.</p>
+                                </div>
+                            </details>
+                        </div>
+                        <div class="task-field">
+                            <label for="task-category">Category<span class="task-required">*</span></label>
+                            <select id="task-category" name="category" aria-required="true" aria-describedby="task-category-error">
+                                <option value="" disabled selected>Select task category</option>
+                                <option value="user-story">User Story</option>
+                                <option value="technical-task">Technical Task</option>
+                            </select>
+                            <small id="task-category-error" class="task-error"></small>
+                        </div>
+                        <!-- start subtasks -->
+                        <div class="task-field task-subtasks">
+                            <label for="subtask-input">Subtasks</label>
+                            <div class="subtask-entry">
+                                <input id="subtask-input" class="subtask-input" type="text" placeholder="Add new subtask" autocomplete="off">
+                                <button id="add-subtask" class="subtask-add" type="button" aria-label="Add subtask" disabled>
+                                    <img src="../assets/icons/add.svg" alt="">
+                                </button>
+                            </div>
+                            <ul id="subtask-list" aria-label="Subtasks"></ul>
+                        </div>
+                        <!-- end subtasks -->
+                    </div>
+                    <div class="task-form-actions">
+                        <p class="task-required-note"><span class="task-required">*</span>This field is required</p>
+                        <div class="task-form-buttons">
+                            <button id="clear-task" class="btn secondary-btn" type="button">Clear</button>
+                            <button id="preview-task" class="btn" type="submit" disabled>Preview task</button>
+                        </div>
+                        <p id="task-save-note" class="task-save-note" role="status">Preview only. Tasks are not saved yet.</p>
+                    </div>
+                </form>
+                <section id="task-preview" tabindex="-1" aria-labelledby="task-preview-title" hidden>
+                    <h2 id="task-preview-title">Task preview</h2>
+                    <p>This task has not been saved.</p>
+                    <button id="edit-task-preview" class="btn secondary-btn" type="button">Edit preview</button>
+                    <dl>
+                        <dt>Title</dt><dd id="preview-task-title"></dd>
+                        <dt>Description</dt><dd id="preview-task-description"></dd>
+                        <dt>Due date</dt><dd id="preview-task-dueDate"></dd>
+                        <dt>Priority</dt><dd id="preview-task-priority"></dd>
+                        <dt>Category</dt><dd id="preview-task-category"></dd>
+                        <dt>Assigned to</dt><dd>No contacts selected.</dd>
+                    </dl>
+                    <h3>Subtasks</h3>
+                    <ul id="preview-task-subtasks"></ul>
+                </section>
+            </main>
+            <!-- end add task -->
+        </div>
+    </div>
+
+    <template id="subtask-template">
+        <li class="subtask-item">
+            <div class="subtask-content">
+                <span class="subtask-text"></span>
+                <input class="subtask-edit-input" type="text" aria-label="Edit subtask" hidden>
+                <small class="subtask-error" hidden>Please enter a subtask.</small>
+            </div>
+            <div class="subtask-actions">
+                <button class="edit-subtask" type="button" aria-label="Edit subtask"><img src="../assets/icons/edit.svg" alt=""></button>
+                <button class="save-subtask" type="button" aria-label="Save subtask" hidden><img src="../assets/icons/check.svg" alt=""></button>
+                <button class="delete-subtask" type="button" aria-label="Delete subtask"><img src="../assets/icons/trasch.svg" alt=""></button>
+            </div>
+        </li>
+    </template>
+    <template id="preview-subtask-template"><li></li></template>
+
+    <!-- start mobile navigation -->
+    <nav class="add-task-mobile-nav" aria-label="Hauptnavigation">
+        <a href="summary.html">
+            <img src="../assets/icons/summary.svg" alt="">
+            <span>Summary</span>
+        </a>
+        <a class="active" href="addTask.html" aria-current="page">
+            <img src="../assets/icons/addTask.svg" alt="">
+            <span>Add Task</span>
+        </a>
+        <a href="board.html">
+            <img src="../assets/icons/board.svg" alt="">
+            <span>Board</span>
+        </a>
+        <a href="contacts.html">
+            <img src="../assets/icons/contact.svg" alt="">
+            <span>Contacts</span>
+        </a>
+    </nav>
+    <!-- end mobile navigation -->
+</body>
+
+</html>
