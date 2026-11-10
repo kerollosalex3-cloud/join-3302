@@ -282,6 +282,11 @@ html.skip-logo-intro .toast {
     font-size: 16px;
 }
 
+.login-footer a {
+    color: rgba(104, 104, 104, 1);
+    text-decoration: none;
+}
+
 .toast:not(:empty) {
     position: fixed;
     right: 24px;
