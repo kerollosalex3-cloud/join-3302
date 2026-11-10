@@ -36,8 +36,8 @@
                 </a>
             </nav>
             <div class="sidebar-legal">
-                <a href="./privacy-policy.html">Privacy Policy</a>
-                <a href="./legal-notice.html">Legal notice</a>
+                <a href="./privacy.html">Privacy Policy</a>
+                <a href="./legal.html">Legal notice</a>
             </div>
         </aside>
         <div class="app-content">
@@ -47,9 +47,21 @@
                 </a>
                 <p class="board-project-name">Kanban Project Management Tool</p>
                 <div class="header-actions">
-                    <img src="../assets/icons/help.svg" alt="Help">
-                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
-                    <span class="board-mobile-avatar" aria-label="Stefan Müller"></span>
+                    <a class="help-icon-link" href="./help.html" aria-label="Help">
+                        <img src="../assets/icons/help.svg" alt="">
+                    </a>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <span class="header-avatar" aria-hidden="true">G</span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true" inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal.html">Legal Notice</a>
+                            <a href="./privacy.html">Privacy Policy</a>
+                            <a href="../index.html">Log out</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
             <main>
@@ -257,6 +269,8 @@
         </div>
     </dialog>
     <script src="../scripts/board.js" defer></script>
+    <script src="../scripts/profile-menu.js" defer></script>
+    <script type="module" src="../scripts/header-avatar.js"></script>
 </body>
 
 </html>
