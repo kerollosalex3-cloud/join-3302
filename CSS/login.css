@@ -4,7 +4,7 @@
 }
 
 body {
-    min-height: 100vh;
+    min-height: 100dvh;
     color: var(--color-primary);
     background: var(--color-background);
 }
@@ -20,7 +20,7 @@ body {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 48px max(5vw, 24px);
+    padding: 40px max(5vw, 24px);
 }
 
 .login-logo {
@@ -194,7 +194,6 @@ html.skip-logo-intro .toast {
     display: grid;
     flex: 1;
     place-items: center;
-    padding: 24px;
 }
 
 .login-box {
@@ -214,7 +213,6 @@ html.skip-logo-intro .toast {
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 24px;
 }
 
 .auth-form label {
@@ -390,17 +388,12 @@ html.skip-logo-intro .toast {
         height: 400px;
         flex-direction: column;
         gap: 32px;
-        padding: 32px;
         border-radius: 30px;
     }
 
     .auth-title {
         margin-bottom: 0;
         font-size: 32px;
-    }
-
-    .auth-form {
-        gap: 16px;
     }
 
     .auth-form input {
@@ -422,8 +415,7 @@ html.skip-logo-intro .toast {
     .login-actions {
         flex-direction: column;
         align-items: center;
-        gap: 12px;
-        margin-top: 8px;
+        gap: 10px;
     }
 
     .login-actions .btn {
