@@ -106,8 +106,8 @@
         --logo-half-width: 32px;
         --logo-half-height: 38.65px;
         position: absolute;
-        top: 40px;
-        left: 32px;
+        top: 20px;
+        left: 20px;
         width: 64px;
     }
 
@@ -122,7 +122,7 @@
         width: min(100%, 396px);
         height: auto;
         min-height: 0;
-        padding: 20px 12px;
+        padding: 10px 12px;
         border-radius: 20px;
     }
 
@@ -159,7 +159,7 @@
     }
 
     .register-page .auth-form {
-        gap: 14px;
+        gap: 10px;
     }
 
     .register-page .auth-form input:not([type="checkbox"]) {

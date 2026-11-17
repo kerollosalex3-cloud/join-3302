@@ -6,14 +6,17 @@ let draggedCard = null;
 let draggedTaskId = null;
 let dropPlaceholder = null;
 let dragImage = null;
+let dragImageOffsetX = 0;
+let dragImageOffsetY = 0;
+let nativeDragImage = null;
 
 /**
  * Handle task drop and update Firebase.
  * @param {string} taskId
  * @param {string} status
  */
-async function handleTaskDrop(taskId, status) {
-    if (!taskId || !validStatuses.has(status)) {
+async function handleTaskDrop(taskId, status, orderedTaskIds) {
+    if (!taskId || !validStatuses.has(status) || !orderedTaskIds.includes(taskId)) {
         console.error("Invalid drop - taskId:", taskId, "status:", status);
         return;
     }
@@ -21,9 +24,12 @@ async function handleTaskDrop(taskId, status) {
     console.log("Dropping task", taskId, "to status", status);
     
     try {
-        const updateRef = ref(db, `tasks/${taskId}`);
-        console.log("Updating Firebase at:", `tasks/${taskId}`);
-        await update(updateRef, { status });
+        const updates = {};
+        orderedTaskIds.forEach((orderedTaskId, order) => {
+            updates[`${orderedTaskId}/status`] = status;
+            updates[`${orderedTaskId}/order`] = order;
+        });
+        await update(ref(db, "tasks"), updates);
         console.log("Task moved successfully to", status);
     } catch (error) {
         console.error("Could not move task:", error);
@@ -31,6 +37,68 @@ async function handleTaskDrop(taskId, status) {
         console.error("Error code:", error.code);
         alert(`Error moving task: ${error.message}`);
     }
+}
+
+function positionDragImage(event) {
+    if (!dragImage || (event.clientX === 0 && event.clientY === 0)) return;
+    dragImage.style.left = `${event.clientX - dragImageOffsetX}px`;
+    dragImage.style.top = `${event.clientY - dragImageOffsetY}px`;
+}
+
+function removeDragImages() {
+    dragImage?.remove();
+    dragImage = null;
+    nativeDragImage?.remove();
+    nativeDragImage = null;
+}
+
+function findNearestColumn(boardColumns, clientX, clientY) {
+    let nearestColumn = null;
+    let shortestDistance = Infinity;
+
+    for (const column of boardColumns.querySelectorAll(".board-column")) {
+        const rect = column.getBoundingClientRect();
+        const distanceX = Math.max(rect.left - clientX, 0, clientX - rect.right);
+        const distanceY = Math.max(rect.top - clientY, 0, clientY - rect.bottom);
+        const distance = distanceX ** 2 + distanceY ** 2;
+        if (distance < shortestDistance) {
+            nearestColumn = column;
+            shortestDistance = distance;
+        }
+    }
+
+    return nearestColumn;
+}
+
+function completeDrop(event, column) {
+    const taskList = column?.querySelector(".board-column-tasks");
+    const status = taskList?.dataset.status;
+    const taskId = event.dataTransfer?.getData("text/plain") || draggedTaskId;
+    if (!taskList) {
+        handleTaskDrop(taskId, status, [taskId]);
+        removeDragImages();
+        return;
+    }
+
+    const orderedCards = [...taskList.querySelectorAll(".task-card")]
+        .filter(card => card !== draggedCard);
+    if (!dropPlaceholder) {
+        orderedCards.push(draggedCard);
+        handleTaskDrop(taskId, status, orderedCards.map(card => card.dataset.taskId));
+        removeDragImages();
+        return;
+    }
+
+    if (dropPlaceholder.parentElement !== taskList) taskList.append(dropPlaceholder);
+    const children = [...taskList.children];
+    const placeholderIndex = children.indexOf(dropPlaceholder);
+    const insertionIndex = children
+        .slice(0, placeholderIndex)
+        .filter(child => child.classList.contains("task-card") && child !== draggedCard)
+        .length;
+    orderedCards.splice(insertionIndex, 0, draggedCard);
+    handleTaskDrop(taskId, status, orderedCards.map(card => card.dataset.taskId));
+    removeDragImages();
 }
 
 /**
@@ -42,6 +110,7 @@ function attachDropZoneListeners(column) {
         if (!draggedCard) return;
         event.preventDefault();
         if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+        positionDragImage(event);
         column.classList.add("drag-area-highlight");
 
         const taskList = column.querySelector(".board-column-tasks");
@@ -59,20 +128,15 @@ function attachDropZoneListeners(column) {
     column.addEventListener("dragleave", (event) => {
         if (!event.relatedTarget || !column.contains(event.relatedTarget)) {
             column.classList.remove("drag-area-highlight");
-            if (dropPlaceholder?.parentElement === column.querySelector(".board-column-tasks")) {
-                dropPlaceholder.remove();
-            }
         }
     });
 
     column.addEventListener("drop", (event) => {
         if (!draggedCard) return;
         event.preventDefault();
+        event.stopPropagation();
         column.classList.remove("drag-area-highlight");
-
-        const status = column.querySelector(".board-column-tasks")?.dataset.status;
-        const taskId = event.dataTransfer?.getData("text/plain") || draggedTaskId;
-        handleTaskDrop(taskId, status);
+        completeDrop(event, column);
     });
 }
 
@@ -88,6 +152,21 @@ function initializeDragAndDrop() {
     }
 
     console.log("Initializing drag and drop");
+
+    boardColumns.addEventListener("dragover", (event) => {
+        if (!draggedCard) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+        positionDragImage(event);
+    });
+
+    boardColumns.addEventListener("drop", (event) => {
+        if (!draggedCard || event.target !== boardColumns) return;
+        event.preventDefault();
+
+        const column = findNearestColumn(boardColumns, event.clientX, event.clientY);
+        completeDrop(event, column);
+    });
 
     // Dragstart on task cards
     boardColumns.addEventListener("dragstart", (event) => {
@@ -107,36 +186,47 @@ function initializeDragAndDrop() {
             event.dataTransfer.setData("text/plain", draggedTaskId);
 
             const rect = card.getBoundingClientRect();
+            dragImageOffsetX = event.clientX - rect.left;
+            dragImageOffsetY = event.clientY - rect.top;
             dragImage = card.cloneNode(true);
-            dragImage.classList.add("dragging");
             dragImage.setAttribute("aria-hidden", "true");
             dragImage.removeAttribute("id");
             Object.assign(dragImage.style, {
                 position: "fixed",
-                left: "-10000px",
-                top: "0",
-                width: `${rect.width}px`,
-                height: `${rect.height}px`,
+                left: `${rect.left}px`,
+                top: `${rect.top}px`,
+                width: `${card.offsetWidth}px`,
+                height: `${card.offsetHeight}px`,
                 margin: "0",
                 pointerEvents: "none",
-                opacity: "1",
-                transform: "rotate(5deg)"
+                zIndex: "2147483647"
             });
             document.body.append(dragImage);
             dragImage.getBoundingClientRect();
-            event.dataTransfer.setDragImage(dragImage, event.clientX - rect.left, event.clientY - rect.top);
+            nativeDragImage = document.createElement("canvas");
+            nativeDragImage.width = 1;
+            nativeDragImage.height = 1;
+            Object.assign(nativeDragImage.style, {
+                position: "fixed",
+                left: "0",
+                top: "0",
+                pointerEvents: "none"
+            });
+            document.body.append(nativeDragImage);
+            event.dataTransfer.setDragImage(nativeDragImage, 0, 0);
         }
         console.log("Drag started:", draggedTaskId);
     });
 
-    boardColumns.addEventListener("dragend", () => {
+    boardColumns.addEventListener("drag", positionDragImage);
+
+    document.addEventListener("dragend", () => {
         draggedCard?.classList.remove("dragging");
         draggedCard = null;
         draggedTaskId = null;
         dropPlaceholder?.remove();
         dropPlaceholder = null;
-        dragImage?.remove();
-        dragImage = null;
+        removeDragImages();
         document.querySelectorAll(".board-column").forEach(column => {
             column.classList.remove("drag-area-highlight");
         });

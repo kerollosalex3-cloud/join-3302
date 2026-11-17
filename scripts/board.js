@@ -203,10 +203,21 @@ function renderTasks() {
         container.replaceChildren();
     }
 
-    for (const task of allTasks) {
-        const status = task.status || "todo";
-        const container = columnContainers[status];
-        if (container) {
+    const insertionOrder = new Map(allTasks.map((task, index) => [task.id, index]));
+    for (const [status, container] of Object.entries(columnContainers)) {
+        const columnTasks = allTasks
+            .filter(task => (task.status || "todo") === status)
+            .sort((first, second) => {
+                const firstOrder = first.order != null && Number.isFinite(Number(first.order))
+                    ? Number(first.order)
+                    : insertionOrder.get(first.id);
+                const secondOrder = second.order != null && Number.isFinite(Number(second.order))
+                    ? Number(second.order)
+                    : insertionOrder.get(second.id);
+                return firstOrder - secondOrder || insertionOrder.get(first.id) - insertionOrder.get(second.id);
+            });
+
+        for (const task of columnTasks) {
             const card = createTaskCard(task);
             container.append(card);
             bindTaskCard(card);
