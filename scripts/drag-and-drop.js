@@ -37,6 +37,7 @@ async function handleTaskDrop(taskId, status) {
  */
 function attachDropZoneListeners(zone) {
     zone.addEventListener("dragover", (event) => {
+        // MUST preventDefault for drop to work
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
         zone.classList.add("drag-area-highlight");
@@ -44,8 +45,8 @@ function attachDropZoneListeners(zone) {
     });
 
     zone.addEventListener("dragleave", (event) => {
-        // Only remove highlight if leaving the zone itself, not child elements
-        if (event.target === zone) {
+        // Check if we're actually leaving the zone (relatedTarget is outside)
+        if (!event.relatedTarget?.closest?.(".board-column-tasks")) {
             zone.classList.remove("drag-area-highlight");
             console.log("👋 Dragleave from zone:", zone.dataset.status);
         }
