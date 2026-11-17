@@ -34,6 +34,7 @@ export function createTaskCard(task) {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-haspopup", "dialog");
+    card.setAttribute("draggable", "true");
     card.dataset.taskId = task.id;
     if (task.dueDate) {
         card.dataset.dueDate = task.dueDate;

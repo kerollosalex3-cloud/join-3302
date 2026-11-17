@@ -4,29 +4,56 @@ import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 const validStatuses = new Set(["todo", "in-progress", "await-feedback", "done"]);
 let draggedTaskId = null;
 
-// Globale Funktionen für HTML-Attribute
-window.startDragging = function(taskId) {
-    draggedTaskId = taskId;
-    console.log("Dragging task:", taskId);
-};
+/**
+ * Handle drag start on a task card.
+ * @param {DragEvent} event
+ */
+function handleDragStart(event) {
+    const card = event.target.closest(".task-card");
+    if (!card) return;
+    
+    draggedTaskId = card.dataset.taskId;
+    if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", draggedTaskId);
+    }
+    console.log("Started dragging:", draggedTaskId);
+}
 
-window.allowDrop = function(event) {
+/**
+ * Handle drag over a drop zone.
+ * @param {DragEvent} event
+ */
+function handleDragOver(event) {
     event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
+    if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+    }
     const zone = event.currentTarget;
     zone.classList.add("drag-area-highlight");
-};
+}
 
-window.removeDragHighlight = function(event) {
-    event.currentTarget.classList.remove("drag-area-highlight");
-};
+/**
+ * Handle drag leave from a drop zone.
+ * @param {DragEvent} event
+ */
+function handleDragLeave(event) {
+    const zone = event.currentTarget;
+    zone.classList.remove("drag-area-highlight");
+}
 
-window.dropTask = async function(event, status) {
+/**
+ * Handle drop on a drop zone.
+ * @param {DragEvent} event
+ */
+async function handleDrop(event) {
     event.preventDefault();
-    event.currentTarget.classList.remove("drag-area-highlight");
+    const zone = event.currentTarget;
+    zone.classList.remove("drag-area-highlight");
     
+    const status = zone.dataset.status;
     if (!draggedTaskId || !validStatuses.has(status)) {
-        console.log("Invalid drop:", draggedTaskId, status);
+        console.log("Invalid drop - taskId:", draggedTaskId, "status:", status);
         return;
     }
 
@@ -41,55 +68,69 @@ window.dropTask = async function(event, status) {
     }
     
     draggedTaskId = null;
-};
-
-// Dynamisch Attribute zu neu geladenen Karten hinzufügen
-function enhanceTaskCards(root) {
-    for (const card of root.querySelectorAll(".task-card:not([draggable])")) {
-        card.setAttribute("draggable", "true");
-        const taskId = card.dataset.taskId;
-        card.setAttribute("ondragstart", `startDragging('${taskId}')`);
-        card.setAttribute("ondragend", "draggedTaskId = null;");
-    }
 }
 
-function enhanceDropZones(root) {
-    for (const zone of root.querySelectorAll(".board-column-tasks")) {
-        const status = zone.dataset.status;
-        zone.setAttribute("ondragover", "allowDrop(event)");
-        zone.setAttribute("ondragleave", "removeDragHighlight(event)");
-        zone.setAttribute("ondrop", `dropTask(event, '${status}')`);
-    }
+/**
+ * Attach drag handlers to a card.
+ * @param {HTMLElement} card
+ */
+function attachCardHandlers(card) {
+    card.addEventListener("dragstart", handleDragStart);
 }
 
+/**
+ * Attach drop handlers to a zone.
+ * @param {HTMLElement} zone
+ */
+function attachZoneHandlers(zone) {
+    zone.addEventListener("dragover", handleDragOver);
+    zone.addEventListener("dragleave", handleDragLeave);
+    zone.addEventListener("drop", handleDrop);
+}
+
+/**
+ * Initialize drag and drop for existing elements.
+ */
 function initializeDragAndDrop() {
     const boardColumns = document.querySelector(".board-columns");
     if (!boardColumns) {
-        console.log("Board columns not found yet");
+        console.log("Board columns not found");
         return;
     }
 
-    enhanceTaskCards(boardColumns);
-    enhanceDropZones(boardColumns);
+    // Attach to existing cards
+    for (const card of boardColumns.querySelectorAll(".task-card")) {
+        attachCardHandlers(card);
+    }
 
-    // Beobachte neue Karten
-    new MutationObserver((mutations) => {
+    // Attach to drop zones
+    for (const zone of boardColumns.querySelectorAll(".board-column-tasks")) {
+        attachZoneHandlers(zone);
+    }
+
+    // Watch for new cards
+    const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
                 if (node instanceof HTMLElement) {
-                    enhanceTaskCards(node);
-                    enhanceDropZones(node);
+                    if (node.classList.contains("task-card")) {
+                        attachCardHandlers(node);
+                    }
+                    for (const card of node.querySelectorAll(".task-card")) {
+                        attachCardHandlers(card);
+                    }
                 }
             }
         }
-    }).observe(boardColumns, { childList: true, subtree: true });
+    });
 
+    observer.observe(boardColumns, { childList: true, subtree: true });
     console.log("Drag and drop initialized");
 }
 
-// Warte auf DOM und starte dann
+// Wait for DOM to be ready
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializeDragAndDrop);
 } else {
-    setTimeout(initializeDragAndDrop, 100);
+    setTimeout(initializeDragAndDrop, 50);
 }
