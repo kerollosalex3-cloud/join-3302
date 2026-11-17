@@ -102,12 +102,19 @@
 }
 
 .task-drop-placeholder {
+    display: block;
     box-sizing: border-box;
     flex: 0 0 auto;
-    border: 2px dotted var(--color-accent);
+    min-height: 48px;
+    border: 2px dashed var(--color-accent);
     border-radius: 20px;
-    background: rgba(41, 171, 226, 0.06);
+    background: rgba(41, 171, 226, 0.16);
     pointer-events: none;
+}
+
+.board-column.drag-area-highlight .board-column-tasks {
+    border-radius: 12px;
+    background: rgba(41, 171, 226, 0.06);
 }
 
 .task-card:focus-visible {
@@ -640,7 +647,7 @@
     }
 
     .board-columns {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: minmax(0, 1fr);
         gap: 16px;
     }
 
@@ -660,10 +667,6 @@
 @media (max-width: 424px) {
     .main-headline {
         padding: 24px 12px;
-    }
-
-    .board-columns {
-        grid-template-columns: minmax(0, 1fr);
     }
 
     .task-dialog-content {
