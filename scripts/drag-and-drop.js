@@ -21,18 +21,22 @@ function highlightDropZone(activeZone) {
  */
 async function handleTaskDrop(taskId, status) {
     if (!taskId || !validStatuses.has(status)) {
-        console.log("Invalid drop - taskId:", taskId, "status:", status);
+        console.error("Invalid drop - taskId:", taskId, "status:", status);
         return;
     }
 
-    console.log("Dropping task", taskId, "to status", status);
+    console.log("🚀 Dropping task", taskId, "to status", status);
     
     try {
-        await update(ref(db, `tasks/${taskId}`), { status });
-        console.log("Task moved successfully");
+        const updateRef = ref(db, `tasks/${taskId}`);
+        console.log("📝 Updating Firebase at:", `tasks/${taskId}`);
+        await update(updateRef, { status });
+        console.log("✅ Task moved successfully to", status);
     } catch (error) {
-        console.error("Could not move task:", error);
-        alert(`Error: ${error.message}`);
+        console.error("❌ Could not move task:", error);
+        console.error("Error message:", error.message);
+        console.error("Error code:", error.code);
+        alert(`Error moving task: ${error.message}`);
     }
 }
 
@@ -42,9 +46,12 @@ async function handleTaskDrop(taskId, status) {
 function initializeDragAndDrop() {
     const boardColumns = document.querySelector(".board-columns");
     if (!boardColumns) {
-        console.log("Board columns not found");
+        console.log("⏳ Board columns not found, retrying...");
+        setTimeout(initializeDragAndDrop, 500);
         return;
     }
+
+    console.log("🎯 Initializing drag and drop on boardColumns");
 
     boardColumns.addEventListener("dragstart", (event) => {
         const card = event.target.closest(".task-card");
@@ -55,14 +62,14 @@ function initializeDragAndDrop() {
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData("text/plain", card.dataset.taskId);
         }
-        console.log("Started dragging:", card.dataset.taskId);
+        console.log("🎬 Drag started:", card.dataset.taskId);
     });
 
     boardColumns.addEventListener("dragend", () => {
         draggedCard?.classList.remove("dragging");
         draggedCard = null;
         highlightDropZone(null);
-        console.log("Drag ended");
+        console.log("🛑 Drag ended");
     });
 
     boardColumns.addEventListener("dragover", (event) => {
@@ -77,7 +84,7 @@ function initializeDragAndDrop() {
 
     boardColumns.addEventListener("dragleave", (event) => {
         if (!draggedCard) return;
-        // Check if we're leaving the entire board or just a child element
+        // Only remove highlight if we're leaving the board entirely
         if (!event.relatedTarget || !event.relatedTarget.closest?.(".board-column-tasks")) {
             highlightDropZone(null);
         }
@@ -85,22 +92,30 @@ function initializeDragAndDrop() {
 
     boardColumns.addEventListener("drop", (event) => {
         const zone = event.target.closest(".board-column-tasks");
-        if (!zone || !draggedCard) return;
+        if (!zone || !draggedCard) {
+            console.log("⚠️ Drop rejected: zone?", !!zone, "draggedCard?", !!draggedCard);
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         highlightDropZone(null);
         
         const taskId = event.dataTransfer?.getData("text/plain");
         const status = zone.dataset.status;
+        console.log("📥 Drop zone:", status, "Task ID from dataTransfer:", taskId);
         handleTaskDrop(taskId, status);
     });
 
-    console.log("Drag and drop initialized");
+    console.log("✨ Drag and drop initialized");
 }
 
 // Wait for DOM to be ready
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeDragAndDrop);
+    document.addEventListener("DOMContentLoaded", () => {
+        console.log("📄 DOMContentLoaded fired");
+        initializeDragAndDrop();
+    });
 } else {
+    console.log("📄 DOM already loaded");
     setTimeout(initializeDragAndDrop, 50);
 }
