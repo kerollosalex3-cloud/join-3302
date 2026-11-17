@@ -3,16 +3,7 @@ import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 
 const validStatuses = new Set(["todo", "in-progress", "await-feedback", "done"]);
 let draggedCard = null;
-
-/**
- * Highlight the drop zone column.
- * @param {HTMLElement|null} activeZone
- */
-function highlightDropZone(activeZone) {
-    document.querySelectorAll(".board-column-tasks").forEach((zone) => {
-        zone.classList.toggle("drag-area-highlight", zone === activeZone);
-    });
-}
+let draggedTaskId = null;
 
 /**
  * Handle task drop and update Firebase.
@@ -41,6 +32,38 @@ async function handleTaskDrop(taskId, status) {
 }
 
 /**
+ * Attach event listeners to a drop zone.
+ * @param {HTMLElement} zone
+ */
+function attachDropZoneListeners(zone) {
+    zone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        zone.classList.add("drag-area-highlight");
+        console.log("🎯 Dragover on zone:", zone.dataset.status);
+    });
+
+    zone.addEventListener("dragleave", (event) => {
+        // Only remove highlight if leaving the zone itself, not child elements
+        if (event.target === zone) {
+            zone.classList.remove("drag-area-highlight");
+            console.log("👋 Dragleave from zone:", zone.dataset.status);
+        }
+    });
+
+    zone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        zone.classList.remove("drag-area-highlight");
+        
+        const taskId = event.dataTransfer.getData("text/plain");
+        const status = zone.dataset.status;
+        console.log("📥 Drop on zone:", status, "Task:", taskId);
+        handleTaskDrop(taskId, status);
+    });
+}
+
+/**
  * Initialize drag and drop for the board.
  */
 function initializeDragAndDrop() {
@@ -51,61 +74,51 @@ function initializeDragAndDrop() {
         return;
     }
 
-    console.log("🎯 Initializing drag and drop on boardColumns");
+    console.log("🎯 Initializing drag and drop");
 
+    // Dragstart on task cards
     boardColumns.addEventListener("dragstart", (event) => {
         const card = event.target.closest(".task-card");
         if (!card) return;
         draggedCard = card;
+        draggedTaskId = card.dataset.taskId;
         card.classList.add("dragging");
         if (event.dataTransfer) {
             event.dataTransfer.effectAllowed = "move";
-            event.dataTransfer.setData("text/plain", card.dataset.taskId);
+            event.dataTransfer.setData("text/plain", draggedTaskId);
         }
-        console.log("🎬 Drag started:", card.dataset.taskId);
+        console.log("🎬 Drag started:", draggedTaskId);
     });
 
     boardColumns.addEventListener("dragend", () => {
         draggedCard?.classList.remove("dragging");
         draggedCard = null;
-        highlightDropZone(null);
+        draggedTaskId = null;
+        // Remove highlights from all zones
+        document.querySelectorAll(".board-column-tasks").forEach(zone => {
+            zone.classList.remove("drag-area-highlight");
+        });
         console.log("🛑 Drag ended");
     });
 
-    boardColumns.addEventListener("dragover", (event) => {
-        const zone = event.target.closest(".board-column-tasks");
-        if (!zone || !draggedCard) return;
-        event.preventDefault();
-        if (event.dataTransfer) {
-            event.dataTransfer.dropEffect = "move";
+    // Attach listeners to existing drop zones
+    for (const zone of boardColumns.querySelectorAll(".board-column-tasks")) {
+        attachDropZoneListeners(zone);
+    }
+
+    // Watch for new drop zones
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node instanceof HTMLElement && node.classList.contains("board-column-tasks")) {
+                    console.log("📌 New drop zone detected, attaching listeners");
+                    attachDropZoneListeners(node);
+                }
+            }
         }
-        highlightDropZone(zone);
     });
 
-    boardColumns.addEventListener("dragleave", (event) => {
-        if (!draggedCard) return;
-        // Only remove highlight if we're leaving the board entirely
-        if (!event.relatedTarget || !event.relatedTarget.closest?.(".board-column-tasks")) {
-            highlightDropZone(null);
-        }
-    });
-
-    boardColumns.addEventListener("drop", (event) => {
-        const zone = event.target.closest(".board-column-tasks");
-        if (!zone || !draggedCard) {
-            console.log("⚠️ Drop rejected: zone?", !!zone, "draggedCard?", !!draggedCard);
-            return;
-        }
-        event.preventDefault();
-        event.stopPropagation();
-        highlightDropZone(null);
-        
-        const taskId = event.dataTransfer?.getData("text/plain");
-        const status = zone.dataset.status;
-        console.log("📥 Drop zone:", status, "Task ID from dataTransfer:", taskId);
-        handleTaskDrop(taskId, status);
-    });
-
+    observer.observe(boardColumns, { childList: true, subtree: true });
     console.log("✨ Drag and drop initialized");
 }
 
