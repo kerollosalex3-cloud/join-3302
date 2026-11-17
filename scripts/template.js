@@ -50,7 +50,7 @@ export function createTaskCard(task) {
                <span class="task-progress" aria-label="${task.subtasks.filter(s => s.completed).length} of ${task.subtasks.length} subtasks completed">
                    <span style="width: ${task.subtasks.length > 0 ? Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100) : 0}%"></span>
                </span>
-               <span>${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
+               <span class="task-subtask-count">${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
            </div>`
         : "";
 

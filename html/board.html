@@ -70,18 +70,22 @@
                         <h2>Board</h2>
                         <div class="board-controls">
                             <div class="board-search-wrapper">
-                                <label class="board-search">
+                                <form class="board-search" id="boardSearchForm">
                                     <input id="boardSearchInput" type="search" placeholder="Find Task"
                                         aria-label="Find Task">
-                                    <span class="board-search-icon" aria-hidden="true">
+                                    <button class="board-search-icon" type="submit"
+                                        aria-label="Search tasks. Double-click to show all tasks."
+                                        title="Double-click to show all tasks">
                                         <img src="../assets/icons/search.svg" alt="">
-                                    </span>
-                                </label>
-                                <p class="board-search-empty" id="boardSearchEmpty" role="status" aria-live="polite" hidden>
-                                    Keine passende Task gefunden. Bitte prüfe Titel oder Beschreibung.
+                                    </button>
+                                </form>
+                                <p class="board-search-empty" id="boardSearchEmpty" role="status" aria-live="polite"
+                                    hidden>
+                                    Keine passende Task gefunden.
                                 </p>
                             </div>
-                            <a class="btn board-add-task" id="addTaskButton" href="./addTask.html" aria-label="Add task">
+                            <a class="btn board-add-task" id="addTaskButton" href="./addTask.html"
+                                aria-label="Add task">
                                 <span>Add task</span>
                                 <img src="../assets/icons/add-white.svg" alt="">
                             </a>
@@ -151,6 +155,14 @@
             <span>Contacts</span>
         </a>
     </nav>
+    <dialog class="board-add-task-dialog" aria-label="Add task">
+        <div class="board-add-task-dialog-content">
+            <button class="board-add-task-close" type="button" aria-label="Close add task form">
+                <img src="../assets/icons/close.svg" alt="">
+            </button>
+            <iframe class="board-add-task-frame" title="Add task form" src="about:blank"></iframe>
+        </div>
+    </dialog>
     <dialog class="task-dialog" aria-labelledby="task-dialog-title">
         <div class="task-dialog-content">
             <div class="task-dialog-top">

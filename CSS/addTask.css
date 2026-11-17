@@ -349,3 +349,37 @@
     }
 }
 /* end navigation */
+
+html.add-task-overlay-mode,
+html.add-task-overlay-mode body {
+    height: 100%;
+    overflow: hidden;
+}
+
+html.add-task-overlay-mode .app-layout {
+    display: block;
+    height: 100%;
+    min-height: 100%;
+}
+
+html.add-task-overlay-mode .sidebar,
+html.add-task-overlay-mode .header,
+html.add-task-overlay-mode .add-task-mobile-nav {
+    display: none;
+}
+
+html.add-task-overlay-mode .app-content {
+    height: 100%;
+    overflow-y: auto;
+}
+
+html.add-task-overlay-mode .add-task-main {
+    width: 100%;
+    max-width: 1208px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+html.add-task-overlay-mode .task-form {
+    margin-top: 24px;
+}
