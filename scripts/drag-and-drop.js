@@ -21,6 +21,15 @@ function handleDragStart(event) {
 }
 
 /**
+ * Handle drag end on a task card.
+ * @param {DragEvent} event
+ */
+function handleDragEnd(event) {
+    console.log("Drag ended");
+    draggedTaskId = null;
+}
+
+/**
  * Handle drag over a drop zone.
  * @param {DragEvent} event
  */
@@ -39,7 +48,9 @@ function handleDragOver(event) {
  */
 function handleDragLeave(event) {
     const zone = event.currentTarget;
-    zone.classList.remove("drag-area-highlight");
+    if (zone === event.target) {
+        zone.classList.remove("drag-area-highlight");
+    }
 }
 
 /**
@@ -48,19 +59,25 @@ function handleDragLeave(event) {
  */
 async function handleDrop(event) {
     event.preventDefault();
+    event.stopPropagation();
+    
     const zone = event.currentTarget;
     zone.classList.remove("drag-area-highlight");
     
     const status = zone.dataset.status;
-    if (!draggedTaskId || !validStatuses.has(status)) {
-        console.log("Invalid drop - taskId:", draggedTaskId, "status:", status);
+    const taskId = draggedTaskId;
+    
+    console.log("Drop event - taskId:", taskId, "status:", status);
+    
+    if (!taskId || !validStatuses.has(status)) {
+        console.log("Invalid drop - taskId:", taskId, "status:", status);
         return;
     }
 
-    console.log("Dropping task", draggedTaskId, "to status", status);
+    console.log("Dropping task", taskId, "to status", status);
     
     try {
-        await update(ref(db, `tasks/${draggedTaskId}`), { status });
+        await update(ref(db, `tasks/${taskId}`), { status });
         console.log("Task moved successfully");
     } catch (error) {
         console.error("Could not move task:", error);
@@ -75,7 +92,10 @@ async function handleDrop(event) {
  * @param {HTMLElement} card
  */
 function attachCardHandlers(card) {
+    card.removeEventListener("dragstart", handleDragStart);
+    card.removeEventListener("dragend", handleDragEnd);
     card.addEventListener("dragstart", handleDragStart);
+    card.addEventListener("dragend", handleDragEnd);
 }
 
 /**
@@ -83,6 +103,9 @@ function attachCardHandlers(card) {
  * @param {HTMLElement} zone
  */
 function attachZoneHandlers(zone) {
+    zone.removeEventListener("dragover", handleDragOver);
+    zone.removeEventListener("dragleave", handleDragLeave);
+    zone.removeEventListener("drop", handleDrop);
     zone.addEventListener("dragover", handleDragOver);
     zone.addEventListener("dragleave", handleDragLeave);
     zone.addEventListener("drop", handleDrop);
@@ -108,16 +131,25 @@ function initializeDragAndDrop() {
         attachZoneHandlers(zone);
     }
 
-    // Watch for new cards
+    // Watch for new cards and zones
     const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
                 if (node instanceof HTMLElement) {
+                    // New card added
                     if (node.classList.contains("task-card")) {
                         attachCardHandlers(node);
                     }
+                    // New zone added
+                    if (node.classList.contains("board-column-tasks")) {
+                        attachZoneHandlers(node);
+                    }
+                    // Search in subtree
                     for (const card of node.querySelectorAll(".task-card")) {
                         attachCardHandlers(card);
+                    }
+                    for (const zone of node.querySelectorAll(".board-column-tasks")) {
+                        attachZoneHandlers(zone);
                     }
                 }
             }
