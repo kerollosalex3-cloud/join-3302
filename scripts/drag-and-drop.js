@@ -100,8 +100,9 @@ function findNearestColumn(boardColumns, clientX, clientY) {
  */
 function getOrderedTaskIds(taskList) {
     const cards = [...taskList.querySelectorAll(".task-card")].filter(card => card !== draggedCard);
-    const precedingCards = [...dropPlaceholder.parentElement.children]
-        .slice(0, [...dropPlaceholder.parentElement.children].indexOf(dropPlaceholder))
+    const children = [...dropPlaceholder.parentElement.children];
+    const precedingCards = children
+        .slice(0, children.indexOf(dropPlaceholder))
         .filter(element => element.classList.contains("task-card") && element !== draggedCard);
     const insertionIndex = Math.min(precedingCards.length, cards.length);
     cards.splice(insertionIndex, 0, draggedCard);
@@ -118,23 +119,50 @@ function completeDrop(event, column) {
     const taskId = event.dataTransfer?.getData("text/plain") || draggedTaskId;
     if (!taskList || !dropPlaceholder) return showDropError("Kein gültiges Ablageziel.");
     if (dropPlaceholder.parentElement !== taskList) taskList.append(dropPlaceholder);
-    handleTaskDrop(taskId, taskList.dataset.status, getOrderedTaskIds(taskList));
+    const orderedTaskIds = getOrderedTaskIds(taskList);
+    taskList.insertBefore(draggedCard, dropPlaceholder);
+    dropPlaceholder.remove();
+    handleTaskDrop(taskId, taskList.dataset.status, orderedTaskIds);
     removeDragImages();
 }
 
 /**
- * Moves the placeholder relative to the card currently under the pointer.
+ * Checks whether the pointer is currently over the placeholder.
+ * @param {DragEvent} event Current drag event.
+ * @returns {boolean} Whether the placeholder already marks the pointer position.
+ */
+function pointerIsOverPlaceholder(event) {
+    const rect = dropPlaceholder?.getBoundingClientRect();
+    return Boolean(rect && event.clientY >= rect.top && event.clientY <= rect.bottom);
+}
+
+/**
+ * Finds the first visible card below the pointer.
+ * @param {DragEvent} event Current drag event.
+ * @param {HTMLElement} taskList Target task container.
+ * @returns {HTMLElement|null} Card that should follow the placeholder.
+ */
+function findCardAfterPointer(event, taskList) {
+    const cards = [...taskList.querySelectorAll(".task-card")]
+        .filter(card => card !== draggedCard && !card.hidden);
+
+    return cards.find(card => {
+        const rect = card.getBoundingClientRect();
+        return event.clientY < rect.top + rect.height / 2;
+    }) || null;
+}
+
+/**
+ * Moves the placeholder to the insertion position under the pointer.
  * @param {DragEvent} event Current drag event.
  * @param {HTMLElement} taskList Target task container.
  */
 function placeDropPlaceholder(event, taskList) {
-    const targetCard = event.target.closest(".task-card");
-    if (!targetCard || targetCard === draggedCard || !taskList.contains(targetCard)) {
-        taskList.append(dropPlaceholder);
-        return;
-    }
-    const insertBefore = event.clientY < targetCard.getBoundingClientRect().top + targetCard.offsetHeight / 2;
-    taskList.insertBefore(dropPlaceholder, insertBefore ? targetCard : targetCard.nextSibling);
+    if (dropPlaceholder.parentElement === taskList && pointerIsOverPlaceholder(event)) return;
+
+    const cardAfter = findCardAfterPointer(event, taskList);
+    if (dropPlaceholder.parentElement === taskList && dropPlaceholder.nextElementSibling === cardAfter) return;
+    taskList.insertBefore(dropPlaceholder, cardAfter);
 }
 
 /**
@@ -283,15 +311,17 @@ function handleDragStart(event) {
         event.dataTransfer.setData("text/plain", draggedTaskId);
         createDragImages(event, card);
     }
-    card.classList.add("dragging");
     createDropPlaceholder(card);
+    requestAnimationFrame(() => {
+        if (draggedCard === card) card.classList.add("drag-source-hidden");
+    });
 }
 
 /**
  * Clears drag state and restores board visuals after dragging.
  */
 function handleDragEnd() {
-    draggedCard?.classList.remove("dragging");
+    draggedCard?.classList.remove("drag-source-hidden");
     draggedCard = null;
     draggedTaskId = null;
     dropPlaceholder?.remove();

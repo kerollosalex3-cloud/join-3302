@@ -166,6 +166,10 @@
     transform: rotate(5deg);
 }
 
+.task-card.drag-source-hidden {
+    display: none;
+}
+
 .task-drop-placeholder {
     display: block;
     box-sizing: border-box;
