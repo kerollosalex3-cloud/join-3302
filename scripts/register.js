@@ -4,7 +4,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { auth, db, userPath } from "./firebase.js";
-import { bindPasswordVisibility, getElement, showToast } from "../script.js";
+import {
+    bindPasswordVisibility,
+    getElement,
+    setFieldError,
+    showToast
+} from "../script.js";
 
 const registerForm = getElement("#register-form");
 if (!registerForm) {
@@ -24,11 +29,6 @@ const privacyError = getElement("#register-privacy-error");
 
 bindPasswordVisibility(passwordInput, passwordInput.closest(".input-with-icon").querySelector(".password-toggle"));
 bindPasswordVisibility(confirmInput, confirmInput.closest(".input-with-icon").querySelector(".password-toggle"));
-
-function setFieldError(input, errorElement, message) {
-    input.setAttribute("aria-invalid", String(Boolean(message)));
-    errorElement.textContent = message;
-}
 
 function updateSubmitState() {
     const nameOk = nameInput.value.trim().length > 0;

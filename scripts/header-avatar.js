@@ -1,22 +1,9 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { auth, db, userPath } from "./firebase.js";
+import { getInitials } from "../script.js";
 
 const avatar = document.querySelector(".header-avatar");
-
-/**
- * Builds the two-letter avatar text from a user's full name.
- * @param {string} name User's display name.
- * @returns {string} Avatar initials.
- */
-function getInitials(name) {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length > 1) {
-        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toLocaleUpperCase();
-    }
-
-    return parts[0]?.slice(0, 2).toLocaleUpperCase() || "G";
-}
 
 /**
  * Resolves the name stored in the signed-in user's database profile.

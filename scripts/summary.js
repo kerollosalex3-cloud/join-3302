@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { auth, db, userPath } from "./firebase.js";
+import { getInitials } from "../script.js";
 
 const greetingName = document.querySelector("#greeting-name");
 const avatarInitials = document.querySelector(".header-avatar-initials");
@@ -31,20 +32,6 @@ async function getDatabaseUserName(user) {
     }
 
     return databaseName.trim();
-}
-
-/**
- * Creates initials from the first and last name components.
- * @param {string} name Full name.
- * @returns {string} User initials.
- */
-function getInitials(name) {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length > 1) {
-        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toLocaleUpperCase();
-    }
-
-    return parts[0]?.slice(0, 2).toLocaleUpperCase() || "G";
 }
 
 /**

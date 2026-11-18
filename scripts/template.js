@@ -1,4 +1,4 @@
-import { escapeHtml } from "./firebase.js";
+import { escapeHtml } from "../script.js";
 
 /**
  * Returns the priority icon path based on the priority level.

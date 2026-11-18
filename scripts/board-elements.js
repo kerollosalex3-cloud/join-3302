@@ -1,17 +1,4 @@
-/**
- * Finds a required element and throws when the page markup is incomplete.
- * @param {string} selector CSS selector for the element.
- * @param {typeof Element} elementType Expected DOM element type.
- * @param {ParentNode} root Search root.
- * @returns {Element} Matching element.
- */
-function requireElement(selector, elementType, root = document) {
-    const element = root.querySelector(selector);
-    if (!(element instanceof elementType)) {
-        throw new Error(`Required board element is missing: ${selector}`);
-    }
-    return element;
-}
+import { requireElement } from "../script.js";
 
 const taskDialog = requireElement(".task-dialog", HTMLDialogElement);
 

@@ -1,3 +1,6 @@
+import { getInitials, isBackdropClick, setFieldError } from "../script.js";
+import { getContactErrors } from "./contactValidation.js";
+
 const contactDialog = document.getElementById('contact-dialog');
 const contactForm = document.getElementById('contact-form');
 const contactFields = ['name', 'email', 'phone'];
@@ -9,7 +12,7 @@ document.getElementById('close-contact').addEventListener('click', closeContactF
 document.getElementById('cancel-contact').addEventListener('click', closeContactForm);
 contactForm.addEventListener('submit', previewContactForm);
 contactDialog.addEventListener('click', event => {
-    if (event.target === contactDialog) closeContactForm();
+    if (isBackdropClick(event, contactDialog)) closeContactForm();
 });
 contactDialog.addEventListener('close', () => document.body.classList.remove('contact-dialog-open'));
 contactDialog.addEventListener('keydown', keepContactFormFocus);
@@ -68,8 +71,11 @@ function readContactForm() {
  * @param {string} message - Error text, empty when valid.
  */
 function setContactFieldError(field, message) {
-    contactForm.elements[field].setAttribute('aria-invalid', Boolean(message));
-    document.getElementById(field + '-error').textContent = message;
+    setFieldError(
+        contactForm.elements[field],
+        document.getElementById(`${field}-error`),
+        message
+    );
 }
 
 /** Clears the old error while the user corrects a field.
@@ -100,8 +106,7 @@ function showContactPreview() {
     contactFields.forEach(field => {
         document.getElementById('preview-' + field).textContent = previewContact[field];
     });
-    const parts = previewContact.name.split(/\s+/);
-    document.getElementById('preview-initials').textContent = (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+    document.getElementById('preview-initials').textContent = getInitials(previewContact.name);
     document.getElementById('contact-preview').hidden = false;
     document.querySelector('.contacts-intro').hidden = true;
 }
