@@ -1,5 +1,7 @@
 import { createTaskCard } from "./template.js";
 import { boardElements } from "./board-elements.js";
+import { db } from "./firebase.js";
+import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 let renderedTasks = [];
 let taskSelectHandler = null;
@@ -95,9 +97,91 @@ function handleTaskCardClick(event) {
  * @param {KeyboardEvent} event Card keyboard event.
  */
 function handleTaskCardKeydown(event) {
+    if (event.target.closest(".task-move-menu")) return;
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     handleTaskCardClick(event);
+}
+
+/**
+ * Closes every task move menu.
+ */
+function closeMoveMenus() {
+    document.querySelectorAll(".task-move-options").forEach(menu => { menu.hidden = true; });
+    document.querySelectorAll(".task-move-toggle")
+        .forEach(button => button.setAttribute("aria-expanded", "false"));
+}
+
+/**
+ * Toggles the move menu without opening task details.
+ * @param {MouseEvent} event Move button click.
+ */
+function toggleMoveMenu(event) {
+    event.stopPropagation();
+    const button = event.currentTarget;
+    const menu = button.nextElementSibling;
+    const willOpen = menu.hidden;
+    closeMoveMenus();
+    menu.hidden = !willOpen;
+    button.setAttribute("aria-expanded", String(willOpen));
+}
+
+/**
+ * Counts tasks currently rendered in a destination column.
+ * @param {string} status Destination status.
+ * @returns {number} Destination card count.
+ */
+function getDestinationTaskCount(status) {
+    return getColumnContainers()[status].querySelectorAll(".task-card").length;
+}
+
+/**
+ * Persists a task move and closes the menu.
+ * @param {string} taskId Task ID.
+ * @param {string} status Destination status.
+ * @returns {Promise<void>} Resolves after the move.
+ */
+async function saveTaskMove(taskId, status) {
+    await update(ref(db, `tasks/${taskId}`), {
+        status,
+        order: getDestinationTaskCount(status)
+    });
+    closeMoveMenus();
+}
+
+/**
+ * Moves a task to the selected status.
+ * @param {MouseEvent} event Move option click.
+ * @returns {Promise<void>} Resolves after Firebase update.
+ */
+async function moveTaskViaMenu(event) {
+    event.stopPropagation();
+    const card = event.currentTarget.closest(".task-card");
+    const taskId = card.dataset.taskId;
+    const status = event.currentTarget.dataset.destinationStatus;
+    if (status === card.dataset.taskStatus) {
+        closeMoveMenus();
+        return;
+    }
+    try {
+        await saveTaskMove(taskId, status);
+    } catch (error) {
+        window.alert(`Die Aufgabe konnte nicht verschoben werden: ${error.message}`);
+    }
+}
+
+/**
+ * Binds the mobile move controls of a task card.
+ * @param {HTMLElement} card Task card.
+ */
+function bindMoveMenu(card) {
+    const toggle = card.querySelector(".task-move-toggle");
+    const options = card.querySelectorAll(".task-move-options button");
+    toggle.addEventListener("click", toggleMoveMenu);
+    options.forEach(button => {
+        button.hidden = button.dataset.destinationStatus === card.dataset.taskStatus;
+        button.addEventListener("click", moveTaskViaMenu);
+    });
 }
 
 /**
@@ -107,6 +191,7 @@ function handleTaskCardKeydown(event) {
 function bindTaskCard(card) {
     card.addEventListener("click", handleTaskCardClick);
     card.addEventListener("keydown", handleTaskCardKeydown);
+    bindMoveMenu(card);
 }
 
 /**
@@ -160,26 +245,36 @@ function getAvailableColumnHeight(container) {
 }
 
 /**
- * Calculates the height occupied by four cards.
- * @param {HTMLElement[]} cards Visible task cards.
- * @returns {number} Combined height of four cards.
+ * Returns how many cards are visible before a column scrolls.
+ * @returns {number} Visible card limit.
  */
-function getFourCardHeight(cards) {
-    return cards[4].offsetTop - cards[0].offsetTop;
+function getVisibleCardLimit() {
+    return window.matchMedia("(max-width: 767px)").matches ? 3 : 4;
 }
 
 /**
- * Limits a column after the fourth card.
+ * Calculates the height occupied by the visible cards.
+ * @param {HTMLElement[]} cards Visible task cards.
+ * @param {number} limit Visible card limit.
+ * @returns {number} Combined card height.
+ */
+function getVisibleCardsHeight(cards, limit) {
+    return cards[limit].offsetTop - cards[0].offsetTop;
+}
+
+/**
+ * Limits a column after the responsive visible-card limit.
  * @param {HTMLElement} container Column task container.
  */
 function updateColumnHeight(container) {
     const cards = getVisibleCards(container);
-    if (cards.length <= 4) {
+    const limit = getVisibleCardLimit();
+    if (cards.length <= limit) {
         container.style.maxHeight = "";
         return;
     }
     container.style.maxHeight =
-        `${Math.min(getFourCardHeight(cards), getAvailableColumnHeight(container))}px`;
+        `${Math.min(getVisibleCardsHeight(cards, limit), getAvailableColumnHeight(container))}px`;
 }
 
 /**
@@ -258,3 +353,4 @@ export function updateEmptyColumnMessages(query) {
 }
 
 window.addEventListener("resize", scheduleColumnHeightUpdate);
+document.addEventListener("click", closeMoveMenus);
