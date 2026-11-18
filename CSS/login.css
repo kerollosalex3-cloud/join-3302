@@ -48,6 +48,21 @@ body {
     animation: logo-intro 3s ease-in-out, logo-intro-hide 3s ease-in-out both;
 }
 
+@media (min-width: 601px) {
+    .login-page:not(.register-page) .login-header,
+    .register-page .login-header {
+        width: calc(100% - max(10vw, 48px));
+        max-width: 1440px;
+        margin-inline: auto;
+        padding: 40px 0;
+    }
+
+    .login-page:not(.register-page) .login-logo,
+    .login-page:not(.register-page) .login-logo-intro {
+        --logo-position-x: max(max(5vw, 24px), calc((100vw - 1440px) / 2));
+    }
+}
+
 .register-prompt,
 .login-main,
 .login-footer,

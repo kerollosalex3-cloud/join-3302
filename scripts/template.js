@@ -34,7 +34,7 @@ export function createTaskCard(task) {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-haspopup", "dialog");
-    card.dataset.taskId = task.id;
+    card.setAttribute("draggable", "true");
     if (task.dueDate) {
         card.dataset.dueDate = task.dueDate;
     }
@@ -50,7 +50,7 @@ export function createTaskCard(task) {
                <span class="task-progress" aria-label="${task.subtasks.filter(s => s.completed).length} of ${task.subtasks.length} subtasks completed">
                    <span style="width: ${task.subtasks.length > 0 ? Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100) : 0}%"></span>
                </span>
-               <span>${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
+               <span class="task-subtask-count">${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
            </div>`
         : "";
 
@@ -78,6 +78,9 @@ export function createTaskCard(task) {
 
     const ariaLabel = `View task: ${task.title}`;
     card.setAttribute("aria-label", ariaLabel);
+
+    // Set dataset AFTER innerHTML to prevent it from being lost
+    card.dataset.taskId = task.id;
 
     return card;
 }

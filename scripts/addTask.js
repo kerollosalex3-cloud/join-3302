@@ -2,6 +2,14 @@ import { db, auth } from './firebase.js';
 import { ref, push, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
+const pageParams = new URLSearchParams(window.location.search);
+const requestedTaskStatus = pageParams.get('status');
+const taskStatus = validTaskStatuses.has(requestedTaskStatus) ? requestedTaskStatus : 'todo';
+const isOverlayMode = pageParams.get('overlay') === '1';
+
+if (isOverlayMode) document.documentElement.classList.add('add-task-overlay-mode');
+
 const taskAssignees = document.getElementById('task-assignees');
 const taskForm = document.getElementById('task-form');
 const taskPreview = document.getElementById('task-preview');
@@ -65,9 +73,10 @@ async function saveTaskToFirebase() {
             const tasksRef = ref(db, 'tasks');
             await push(tasksRef, {
                 ...taskData,
-                status: 'todo'
+                status: taskStatus
             });
             taskSaveNote.textContent = 'Task saved successfully!';
+            notifyParentTaskSaved();
         }
 
         taskSaveNote.style.color = 'green';
@@ -80,6 +89,14 @@ async function saveTaskToFirebase() {
         taskSaveNote.textContent = `Error saving task: ${error.message}`;
         taskSaveNote.style.color = 'red';
     }
+}
+
+/**
+ * Notifies the board after a task is saved from its embedded form.
+ */
+function notifyParentTaskSaved() {
+    if (!isOverlayMode || window.parent === window) return;
+    window.parent.postMessage({ type: 'join-task-saved' }, window.location.origin);
 }
 
 /** Closes the contacts dropdown on an outside click or Escape.

@@ -51,21 +51,6 @@
     height: 24px;
 }
 
-.privacy-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-
-.privacy-heading h1 {
-    margin: 0;
-}
-
-.privacy-back-link {
-    display: none;
-}
-
 .help-intro,
 .help-section p,
 .help-section li,
@@ -257,27 +242,8 @@
         background: var(--color-surface);
     }
 
-    .privacy-heading {
-        margin-bottom: 16px;
-    }
-
-    .privacy-page .privacy-heading h1 {
+    .privacy-page .help-heading h1 {
         font-size: 24px;
-    }
-
-    .privacy-back-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        flex: 0 0 32px;
-    }
-
-    .privacy-back-link img {
-        display: block;
-        width: 24px;
-        height: 24px;
     }
 
     .help-content h1 {
