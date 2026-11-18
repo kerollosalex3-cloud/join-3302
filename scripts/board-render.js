@@ -133,6 +133,36 @@ function renderColumn(tasks, status, container, insertionOrder) {
 }
 
 /**
+ * Returns visible task cards from one column.
+ * @param {HTMLElement} container Column task container.
+ * @returns {HTMLElement[]} Visible cards.
+ */
+function getVisibleCards(container) {
+    return [...container.querySelectorAll(".task-card:not([hidden])")];
+}
+
+/**
+ * Limits one column to the combined height of five cards.
+ * @param {HTMLElement} container Column task container.
+ */
+function updateColumnHeight(container) {
+    const cards = getVisibleCards(container);
+    if (cards.length <= 5) {
+        container.style.maxHeight = "";
+        return;
+    }
+    const fiveCardHeight = cards[5].offsetTop - cards[0].offsetTop;
+    container.style.maxHeight = `${fiveCardHeight}px`;
+}
+
+/**
+ * Updates the visible height of every task column.
+ */
+function updateColumnHeights() {
+    Object.values(getColumnContainers()).forEach(updateColumnHeight);
+}
+
+/**
  * Renders all tasks in their respective columns.
  * @param {Object[]} tasks All task data.
  * @param {Function} onTaskSelect Task selection callback.
@@ -145,6 +175,7 @@ export function renderTasks(tasks, onTaskSelect) {
     const insertionOrder = new Map(tasks.map((task, index) => [task.id, index]));
     Object.entries(columns).forEach(([status, container]) =>
         renderColumn(tasks, status, container, insertionOrder));
+    updateColumnHeights();
 }
 
 /**
@@ -159,6 +190,7 @@ export function filterTaskCards(query) {
         card.hidden = !(!query || (task && taskMatchesQuery(task, query)));
         if (!card.hidden) visibleTaskCount += 1;
     }
+    updateColumnHeights();
     return visibleTaskCount;
 }
 

@@ -1,3 +1,7 @@
+.board-page {
+    overflow-x: clip;
+}
+
 .board-page main {
     max-width: 1688px;
 }
@@ -28,6 +32,27 @@
 
 .board-column {
     min-width: 0;
+}
+
+.board-column-tasks {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+}
+
+.board-column-tasks::-webkit-scrollbar {
+    width: 6px;
+}
+
+.board-column-tasks::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background: var(--color-border);
+}
+
+.board-column-tasks::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .board-column-heading {

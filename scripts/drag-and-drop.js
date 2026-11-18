@@ -54,13 +54,29 @@ async function handleTaskDrop(taskId, status, orderedTaskIds) {
 }
 
 /**
+ * Calculates a drag preview position inside the viewport.
+ * @param {number} requestedPosition Requested pointer-relative position.
+ * @param {number} previewSize Preview size along the axis.
+ * @param {number} viewportSize Viewport size along the axis.
+ * @returns {number} Clamped viewport position.
+ */
+function clampPreviewPosition(requestedPosition, previewSize, viewportSize) {
+    const maxPosition = Math.max(0, viewportSize - previewSize);
+    return Math.min(Math.max(requestedPosition, 0), maxPosition);
+}
+
+/**
  * Positions the visible drag preview at the pointer.
  * @param {DragEvent} event Current drag event.
  */
 function positionDragImage(event) {
     if (!dragImage || (!event.clientX && !event.clientY)) return;
-    dragImage.style.left = `${event.clientX - dragImageOffsetX - dragImageTransformOffsetX}px`;
-    dragImage.style.top = `${event.clientY - dragImageOffsetY - dragImageTransformOffsetY}px`;
+    const left = event.clientX - dragImageOffsetX - dragImageTransformOffsetX;
+    const top = event.clientY - dragImageOffsetY - dragImageTransformOffsetY;
+    dragImage.style.left =
+        `${clampPreviewPosition(left, dragImage.offsetWidth, window.innerWidth)}px`;
+    dragImage.style.top =
+        `${clampPreviewPosition(top, dragImage.offsetHeight, window.innerHeight)}px`;
 }
 
 /**
