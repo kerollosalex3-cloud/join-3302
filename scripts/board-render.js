@@ -160,29 +160,26 @@ function getAvailableColumnHeight(container) {
 }
 
 /**
- * Calculates the height occupied by five cards.
+ * Calculates the height occupied by four cards.
  * @param {HTMLElement[]} cards Visible task cards.
- * @returns {number} Combined height of five cards.
+ * @returns {number} Combined height of four cards.
  */
-function getFiveCardHeight(cards) {
-    return cards[5].offsetTop - cards[0].offsetTop;
+function getFourCardHeight(cards) {
+    return cards[4].offsetTop - cards[0].offsetTop;
 }
 
 /**
- * Limits a column by both card count and available viewport height.
+ * Limits a column after the fourth card.
  * @param {HTMLElement} container Column task container.
  */
 function updateColumnHeight(container) {
     const cards = getVisibleCards(container);
-    if (cards.length === 0) {
+    if (cards.length <= 4) {
         container.style.maxHeight = "";
         return;
     }
-    const contentHeight = cards.length > 5
-        ? getFiveCardHeight(cards)
-        : container.scrollHeight;
     container.style.maxHeight =
-        `${Math.min(contentHeight, getAvailableColumnHeight(container))}px`;
+        `${Math.min(getFourCardHeight(cards), getAvailableColumnHeight(container))}px`;
 }
 
 /**

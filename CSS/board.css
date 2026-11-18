@@ -2,6 +2,10 @@
     overflow-x: clip;
 }
 
+.board-page.drag-active {
+    overflow-y: clip;
+}
+
 .board-page main {
     max-width: 1688px;
 }
@@ -38,7 +42,6 @@
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-gutter: stable;
     scrollbar-width: thin;
 }
 
