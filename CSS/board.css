@@ -10,7 +10,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 80px 64px;
+    padding: 80px 64px 24px;
 }
 
 .main-headline-top {
@@ -628,7 +628,7 @@
 @media (min-width: 768px) and (max-width: 1023px) {
     .main-headline {
         gap: 28px;
-        padding: 48px 32px;
+        padding: 48px 32px 24px;
     }
 
     .main-headline-top {
@@ -729,7 +729,7 @@
 
     .main-headline {
         gap: 20px;
-        padding: 24px 16px;
+        padding: 24px 16px 16px;
     }
 
     .main-headline-top {
@@ -797,7 +797,7 @@
 
 @media (max-width: 424px) {
     .main-headline {
-        padding: 24px 12px;
+        padding: 24px 12px 16px;
     }
 
     .task-dialog-content {

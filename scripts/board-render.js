@@ -142,17 +142,47 @@ function getVisibleCards(container) {
 }
 
 /**
- * Limits one column to the combined height of five cards.
+ * Returns the spacing needed below a task column.
+ * @returns {number} Bottom spacing in pixels.
+ */
+function getColumnBottomSpacing() {
+    return window.matchMedia("(max-width: 767px)").matches ? 80 : 24;
+}
+
+/**
+ * Calculates the viewport height available below a column.
+ * @param {HTMLElement} container Column task container.
+ * @returns {number} Available column height.
+ */
+function getAvailableColumnHeight(container) {
+    const available = window.innerHeight - container.getBoundingClientRect().top;
+    return Math.max(0, available - getColumnBottomSpacing());
+}
+
+/**
+ * Calculates the height occupied by five cards.
+ * @param {HTMLElement[]} cards Visible task cards.
+ * @returns {number} Combined height of five cards.
+ */
+function getFiveCardHeight(cards) {
+    return cards[5].offsetTop - cards[0].offsetTop;
+}
+
+/**
+ * Limits a column by both card count and available viewport height.
  * @param {HTMLElement} container Column task container.
  */
 function updateColumnHeight(container) {
     const cards = getVisibleCards(container);
-    if (cards.length <= 5) {
+    if (cards.length === 0) {
         container.style.maxHeight = "";
         return;
     }
-    const fiveCardHeight = cards[5].offsetTop - cards[0].offsetTop;
-    container.style.maxHeight = `${fiveCardHeight}px`;
+    const contentHeight = cards.length > 5
+        ? getFiveCardHeight(cards)
+        : container.scrollHeight;
+    container.style.maxHeight =
+        `${Math.min(contentHeight, getAvailableColumnHeight(container))}px`;
 }
 
 /**
@@ -160,6 +190,13 @@ function updateColumnHeight(container) {
  */
 function updateColumnHeights() {
     Object.values(getColumnContainers()).forEach(updateColumnHeight);
+}
+
+/**
+ * Recalculates column heights after the browser finishes layout.
+ */
+function scheduleColumnHeightUpdate() {
+    requestAnimationFrame(updateColumnHeights);
 }
 
 /**
@@ -175,7 +212,7 @@ export function renderTasks(tasks, onTaskSelect) {
     const insertionOrder = new Map(tasks.map((task, index) => [task.id, index]));
     Object.entries(columns).forEach(([status, container]) =>
         renderColumn(tasks, status, container, insertionOrder));
-    updateColumnHeights();
+    scheduleColumnHeightUpdate();
 }
 
 /**
@@ -190,7 +227,7 @@ export function filterTaskCards(query) {
         card.hidden = !(!query || (task && taskMatchesQuery(task, query)));
         if (!card.hidden) visibleTaskCount += 1;
     }
-    updateColumnHeights();
+    scheduleColumnHeightUpdate();
     return visibleTaskCount;
 }
 
@@ -222,3 +259,5 @@ export function updateEmptyColumnMessages(query) {
     boardElements.emptyColumnMessages.forEach(message =>
         updateColumnEmptyMessage(message, query));
 }
+
+window.addEventListener("resize", scheduleColumnHeightUpdate);
