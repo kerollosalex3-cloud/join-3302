@@ -1,30 +1,33 @@
+import { auth, db } from './firebase.js';
+import { push, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
 const contactDialog = document.getElementById('contact-dialog');
 const contactForm = document.getElementById('contact-form');
 const contactFields = ['name', 'email', 'phone'];
-let previewContact = null;
+const contactSubmit = contactForm.querySelector('button[type="submit"]');
+const contactFormNote = document.getElementById('contact-form-note');
+const contactStatus = document.getElementById('contact-status');
 
-document.getElementById('add-contact').addEventListener('click', () => openContactForm(false));
-document.getElementById('edit-preview').addEventListener('click', () => openContactForm(true));
+document.getElementById('add-contact').addEventListener('click', openContactForm);
 document.getElementById('close-contact').addEventListener('click', closeContactForm);
 document.getElementById('cancel-contact').addEventListener('click', closeContactForm);
-contactForm.addEventListener('submit', previewContactForm);
+contactForm.addEventListener('submit', saveContact);
 contactDialog.addEventListener('click', event => {
     if (event.target === contactDialog) closeContactForm();
+});
+contactDialog.addEventListener('cancel', event => {
+    if (contactSubmit.disabled) event.preventDefault();
 });
 contactDialog.addEventListener('close', () => document.body.classList.remove('contact-dialog-open'));
 contactDialog.addEventListener('keydown', keepContactFormFocus);
 contactForm.addEventListener('input', clearContactFieldError);
 
-/** Opens the form with empty or previously previewed values.
- * @param {boolean} edit - Whether to edit the current preview.
- */
-function openContactForm(edit) {
+/** Opens a fresh contact form. */
+function openContactForm() {
     contactForm.reset();
-    contactFields.forEach(field => {
-        setContactFieldError(field, '');
-        if (edit && previewContact) contactForm.elements[field].value = previewContact[field];
-    });
-    document.getElementById('contact-dialog-title').textContent = edit ? 'Edit contact' : 'Add contact';
+    contactFormNote.textContent = '';
+    contactStatus.textContent = '';
+    contactFields.forEach(field => setContactFieldError(field, ''));
     contactDialog.showModal();
     document.body.classList.add('contact-dialog-open');
     contactForm.elements.name.focus();
@@ -32,7 +35,7 @@ function openContactForm(edit) {
 
 /** Closes the contact form without saving data. */
 function closeContactForm() {
-    contactDialog.close();
+    if (!contactSubmit.disabled) contactDialog.close();
 }
 
 /** Keeps Tab navigation inside the open contact form.
@@ -40,7 +43,7 @@ function closeContactForm() {
  */
 function keepContactFormFocus(event) {
     if (event.key !== 'Tab') return;
-    const controls = contactDialog.querySelectorAll('button, input');
+    const controls = contactDialog.querySelectorAll('button:not(:disabled), input');
     const first = controls[0];
     const last = controls[controls.length - 1];
     if (!event.shiftKey && document.activeElement === last) {
@@ -79,29 +82,49 @@ function clearContactFieldError(event) {
     if (contactFields.includes(event.target.name)) setContactFieldError(event.target.name, '');
 }
 
-/** Validates the form and shows an unsaved preview.
+/**
+ * Checks the form before saving a contact.
  * @param {SubmitEvent} event - Form submit event.
  */
-function previewContactForm(event) {
+async function saveContact(event) {
     event.preventDefault();
+    if (contactSubmit.disabled) return;
     const contact = readContactForm();
     const errors = getContactErrors(contact);
     contactFields.forEach(field => setContactFieldError(field, errors[field]));
     const firstError = contactFields.find(field => errors[field]);
     if (firstError) return contactForm.elements[firstError].focus();
-    previewContact = contact;
-    showContactPreview();
-    closeContactForm();
-    document.getElementById('edit-preview').focus();
+    await writeNewContact(contact);
 }
 
-/** Displays validated values as text without storing them. */
-function showContactPreview() {
+/**
+ * Saves the contact and keeps the form open on failure.
+ * @param {{name: string, email: string, phone: string}} contact - Valid contact values.
+ */
+async function writeNewContact(contact) {
+    setContactSaving(true);
+    try {
+        await auth.authStateReady();
+        if (!auth.currentUser) throw new Error('Sign in before adding a contact.');
+        await push(ref(db, 'contacts'), contact);
+    } catch {
+        contactFormNote.textContent = 'Could not save the contact. Check your connection or sign in again.';
+        return;
+    } finally {
+        setContactSaving(false);
+    }
+    closeContactForm();
+    contactStatus.textContent = 'Contact saved.';
+}
+
+/**
+ * Prevents changes and repeat submissions while saving.
+ * @param {boolean} saving - Whether a save is pending.
+ */
+function setContactSaving(saving) {
+    contactSubmit.disabled = saving;
     contactFields.forEach(field => {
-        document.getElementById('preview-' + field).textContent = previewContact[field];
+        contactForm.elements[field].readOnly = saving;
     });
-    const parts = previewContact.name.split(/\s+/);
-    document.getElementById('preview-initials').textContent = (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
-    document.getElementById('contact-preview').hidden = false;
-    document.querySelector('.contacts-intro').hidden = true;
+    if (saving) contactFormNote.textContent = 'Saving contact…';
 }
