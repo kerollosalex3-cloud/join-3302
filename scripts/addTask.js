@@ -1,9 +1,15 @@
+import { db, auth } from './firebase.js';
+import { ref, push, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 const taskAssignees = document.getElementById('task-assignees');
 const taskForm = document.getElementById('task-form');
 const taskPreview = document.getElementById('task-preview');
 const taskSaveNote = document.getElementById('task-save-note');
 const taskFields = ['title', 'dueDate', 'category'];
 let previewTask = null;
+let currentUser = null;
+let editingTaskId = null;
 
 document.addEventListener('click', closeTaskContacts);
 document.addEventListener('keydown', closeTaskContacts);
@@ -14,7 +20,67 @@ taskForm.addEventListener('focusout', validateTaskField);
 taskForm.addEventListener('submit', previewTaskForm);
 document.getElementById('clear-task').addEventListener('click', clearTaskForm);
 document.getElementById('edit-task-preview').addEventListener('click', editTaskPreview);
+document.getElementById('save-task').addEventListener('click', saveTaskToFirebase);
 updateTaskPreviewButton();
+
+/**
+ * Saves or updates the task in Firebase Realtime Database.
+ */
+async function saveTaskToFirebase() {
+    if (!previewTask) return;
+    
+    const errors = getTaskErrors(previewTask, getLocalTaskDate());
+    if (taskFields.some(field => errors[field])) {
+        taskSaveNote.textContent = 'Cannot save task with validation errors.';
+        return;
+    }
+
+    try {
+        const taskData = {
+            title: previewTask.title,
+            description: previewTask.description,
+            dueDate: previewTask.dueDate,
+            priority: previewTask.priority,
+            category: previewTask.category === 'user-story' ? 'user-story' : 'technical-task',
+            subtasks: previewTask.subtasks.map(title => ({
+                title,
+                completed: false
+            })),
+            assignedTo: [],
+            createdBy: currentUser?.uid || 'unknown',
+            createdAt: new Date().toISOString()
+        };
+
+        if (editingTaskId) {
+            const taskRef = ref(db, `tasks/${editingTaskId}`);
+            await update(taskRef, {
+                ...taskData,
+                updatedAt: new Date().toISOString()
+            });
+            taskSaveNote.textContent = 'Task updated successfully!';
+            sessionStorage.removeItem('editingTaskId');
+            sessionStorage.removeItem('editingTask');
+            editingTaskId = null;
+        } else {
+            const tasksRef = ref(db, 'tasks');
+            await push(tasksRef, {
+                ...taskData,
+                status: 'todo'
+            });
+            taskSaveNote.textContent = 'Task saved successfully!';
+        }
+
+        taskSaveNote.style.color = 'green';
+        clearTaskForm();
+        setTimeout(() => {
+            taskSaveNote.textContent = editingTaskId ? 'Task updated. Click "Save Task" to save changes.' : 'Preview only. Click "Save Task" to save it permanently.';
+            taskSaveNote.style.color = '';
+        }, 3000);
+    } catch (error) {
+        taskSaveNote.textContent = `Error saving task: ${error.message}`;
+        taskSaveNote.style.color = 'red';
+    }
+}
 
 /** Closes the contacts dropdown on an outside click or Escape.
  * @param {MouseEvent|KeyboardEvent} event - Click or keyboard event.
@@ -108,7 +174,7 @@ function previewTaskForm(event) {
     const firstError = taskFields.find(field => errors[field]);
     if (firstError) return taskForm.elements[firstError].focus();
     if (hasPendingSubtasks()) return;
-    taskSaveNote.textContent = 'Preview only. Tasks are not saved yet.';
+    taskSaveNote.textContent = 'Preview only. Click "Save Task" to save it permanently.';
     showTaskPreview(task);
 }
 
@@ -149,7 +215,7 @@ function clearTaskForm() {
     taskAssignees.open = false;
     taskFields.forEach(field => setTaskFieldError(field, ''));
     taskPreview.hidden = true;
-    taskSaveNote.textContent = 'Preview only. Tasks are not saved yet.';
+    taskSaveNote.textContent = 'Preview only. Click "Save Task" to save it permanently.';
     updateTaskPreviewButton();
     taskForm.elements.title.focus();
 }
@@ -172,3 +238,59 @@ function editTaskPreview() {
     if (!previewTask) return;
     loadTaskForm(previewTask);
 }
+
+/**
+ * Loads editing task when page is ready.
+ */
+function loadEditingTaskIfPresent() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('edit')) return;
+
+    editingTaskId = params.get('edit');
+    const taskJson = sessionStorage.getItem('editingTask');
+    
+    if (!taskJson) {
+        console.warn('No editing task found in sessionStorage');
+        return;
+    }
+
+    try {
+        const task = JSON.parse(taskJson);
+        console.log('Loading editing task:', task);
+        
+        if (typeof loadTaskForm === 'function') {
+            loadTaskForm({
+                title: task.title || '',
+                description: task.description || '',
+                dueDate: task.dueDate || '',
+                priority: task.priority || 'medium',
+                category: task.category || '',
+                subtasks: task.subtasks ? task.subtasks.map(st => st.title || st) : []
+            });
+            taskSaveNote.textContent = 'Editing task. Click "Save Task" to save changes.';
+            window.history.replaceState({}, document.title, 'addTask.html');
+        } else {
+            console.error('loadTaskForm is not available');
+        }
+    } catch (error) {
+        console.error('Error loading editing task:', error);
+    }
+}
+
+/**
+ * Checks authentication state and loads editing task if present.
+ */
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        
+        // Warte bis DOM ready ist, dann lade die Task
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadEditingTaskIfPresent);
+        } else {
+            loadEditingTaskIfPresent();
+        }
+    } else {
+        window.location.href = "../index.html";
+    }
+});

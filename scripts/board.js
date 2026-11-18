@@ -1,3 +1,8 @@
+import { db, auth, escapeHtml } from "./firebase.js";
+import { createTaskCard } from "./template.js";
+import { onValue, ref, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 /**
  * Finds a required element and throws when the page markup is incomplete.
  * @param {string} selector CSS selector for the element.
@@ -23,10 +28,16 @@ const dialogPriorityIcon = requireElement(".task-dialog-priority-icon", HTMLImag
 const dialogAssignees = requireElement(".task-dialog-assignees", HTMLUListElement, taskDialog);
 const dialogSubtasks = requireElement(".task-dialog-subtasks", HTMLUListElement, taskDialog);
 const closeButton = requireElement(".task-dialog-close", HTMLButtonElement, taskDialog);
+const deleteButton = requireElement(".task-dialog-delete", HTMLButtonElement, taskDialog);
+const editButton = requireElement(".task-dialog-edit", HTMLButtonElement, taskDialog);
 const boardSearchInput = requireElement("#boardSearchInput", HTMLInputElement);
 const boardSearchEmpty = requireElement("#boardSearchEmpty", HTMLElement);
-const taskCards = [...document.querySelectorAll(".task-card")];
+const boardColumns = requireElement(".board-columns", HTMLElement);
 const emptyColumnMessages = [...document.querySelectorAll(".board-empty")];
+
+let allTasks = [];
+let currentUser = null;
+let currentTaskId = null;
 
 /**
  * Reads the required fields from a task card.
@@ -44,111 +55,93 @@ function getTaskDetails(card) {
 
 /**
  * Copies the task's main details into the dialog.
+ * @param {Object} task Task object from Firebase.
  * @param {Element} card Task card element.
- * @param {ReturnType<typeof getTaskDetails>} details Required task fields.
  */
-function populateTaskSummary(card, details) {
-    dialogCategory.textContent = details.category.textContent.trim();
-    dialogCategory.classList.toggle("task-category-technical", details.category.classList.contains("task-category-technical"));
-    dialogTitle.textContent = details.title.textContent.trim();
-    dialogDescription.textContent = details.description.textContent.trim();
-    dialogDueDate.textContent = card.dataset.dueDate || "Not set";
-    dialogPriorityLabel.textContent = details.priority.alt.replace(/\s+priority$/i, "");
+function populateTaskSummary(task, card) {
+    const details = getTaskDetails(card);
+    const categoryLabel = task.category === "technical-task" ? "Technical Task" : "User Story";
+    
+    dialogCategory.textContent = categoryLabel;
+    dialogCategory.classList.toggle("task-category-technical", task.category === "technical-task");
+    dialogTitle.textContent = task.title;
+    dialogDescription.textContent = task.description || "No description.";
+    dialogDueDate.textContent = task.dueDate || "Not set";
+    dialogPriorityLabel.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
     dialogPriorityIcon.src = details.priority.src;
     dialogPriorityIcon.alt = details.priority.alt;
 }
 
 /**
  * Creates one assigned-contact row for the task dialog.
- * @param {Element} assignee Assigned contact badge.
+ * @param {Object} assignee Assigned contact object.
  * @returns {HTMLLIElement} Dialog row with avatar and contact name.
  */
 function createAssigneeItem(assignee) {
     const item = document.createElement("li");
     const avatar = document.createElement("span");
     const name = document.createElement("span");
-    avatar.className = assignee.className;
-    avatar.textContent = assignee.textContent.trim();
-    name.textContent = assignee.dataset.name || assignee.textContent.trim();
+    avatar.textContent = assignee.initials;
+    name.textContent = assignee.name;
     item.append(avatar, name);
     return item;
 }
 
 /**
- * Copies assigned contacts from the card into the dialog.
- * @param {Element} card Task card element.
+ * Copies assigned contacts from the task into the dialog.
+ * @param {Object} task Task object from Firebase.
  */
-function populateAssignees(card) {
+function populateAssignees(task) {
     dialogAssignees.replaceChildren();
-    for (const assignee of card.querySelectorAll(".task-assignees .task-assignee")) {
-        appendAssigneeItem(assignee);
+    if (task.assignedTo && task.assignedTo.length > 0) {
+        for (const assignee of task.assignedTo) {
+            dialogAssignees.append(createAssigneeItem(assignee));
+        }
     }
 }
 
 /**
- * Appends an assigned contact row to the dialog list.
- * @param {Element} assignee Assigned contact badge.
- */
-function appendAssigneeItem(assignee) {
-    dialogAssignees.append(createAssigneeItem(assignee));
-}
-
-/**
  * Creates one subtask row with its completed state.
- * @param {Element} subtask Subtask source element.
+ * @param {Object} subtask Subtask object.
  * @returns {HTMLLIElement} Dialog row for the subtask.
  */
 function createSubtaskItem(subtask) {
     const item = document.createElement("li");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.checked = subtask.dataset.completed === "true";
+    checkbox.checked = subtask.completed;
     checkbox.disabled = true;
-    item.append(checkbox, document.createTextNode(subtask.textContent.trim()));
+    item.append(checkbox, document.createTextNode(subtask.title));
     return item;
 }
 
 /**
- * Copies subtasks from the card into the dialog.
- * @param {Element} card Task card element.
+ * Copies subtasks from the task into the dialog.
+ * @param {Object} task Task object from Firebase.
  */
-function populateSubtasks(card) {
-    const subtasks = card.querySelectorAll(".task-subtask-data li");
+function populateSubtasks(task) {
     dialogSubtasks.replaceChildren();
-    if (subtasks.length === 0) {
-        dialogSubtasks.append(createEmptySubtaskItem());
-        return;
+    if (task.subtasks && task.subtasks.length > 0) {
+        for (const subtask of task.subtasks) {
+            dialogSubtasks.append(createSubtaskItem(subtask));
+        }
+    } else {
+        const item = document.createElement("li");
+        item.textContent = "No subtasks";
+        dialogSubtasks.append(item);
     }
-    for (const subtask of subtasks) appendSubtaskItem(subtask);
-}
-
-/**
- * Creates the empty-state row when a task has no subtask details.
- * @returns {HTMLLIElement} Empty subtask row.
- */
-function createEmptySubtaskItem() {
-    const item = document.createElement("li");
-    item.textContent = "No subtasks";
-    return item;
-}
-
-/**
- * Appends a subtask row to the dialog list.
- * @param {Element} subtask Subtask source element.
- */
-function appendSubtaskItem(subtask) {
-    dialogSubtasks.append(createSubtaskItem(subtask));
 }
 
 /**
  * Opens the dialog with details from the selected card.
  * @param {Element} card Selected task card.
+ * @param {Object} task Task data from Firebase.
  */
-function showTaskDetails(card) {
-    const details = getTaskDetails(card);
-    populateTaskSummary(card, details);
-    populateAssignees(card);
-    populateSubtasks(card);
+function showTaskDetails(card, task) {
+    currentTaskId = task.id;
+    populateTaskSummary(task, card);
+    populateAssignees(task);
+    populateSubtasks(task);
     taskDialog.showModal();
     closeButton.focus();
 }
@@ -158,7 +151,10 @@ function showTaskDetails(card) {
  * @param {MouseEvent} event Card click event.
  */
 function handleTaskCardClick(event) {
-    showTaskDetails(event.currentTarget);
+    const card = event.currentTarget;
+    const taskId = card.dataset.taskId;
+    const task = allTasks.find(t => t.id === taskId);
+    if (task) showTaskDetails(card, task);
 }
 
 /**
@@ -168,7 +164,7 @@ function handleTaskCardClick(event) {
 function handleTaskCardKeydown(event) {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
-    showTaskDetails(event.currentTarget);
+    handleTaskCardClick(event);
 }
 
 /**
@@ -182,26 +178,57 @@ function bindTaskCard(card) {
 
 /**
  * Checks whether a task title or description contains the query.
- * @param {Element} card Task card element.
+ * @param {Object} task Task object.
  * @param {string} query Normalized search query.
  * @returns {boolean} Whether the task matches.
  */
-function taskMatchesQuery(card, query) {
-    const title = card.querySelector("h4")?.textContent || "";
-    const description = card.querySelector(".task-description")?.textContent || "";
-    return title.toLocaleLowerCase().includes(query) ||
-        description.toLocaleLowerCase().includes(query);
+function taskMatchesQuery(task, query) {
+    const title = task.title || "";
+    const description = task.description || "";
+    return title.toLowerCase().includes(query) || description.toLowerCase().includes(query);
 }
 
 /**
- * Applies the current query to every task card.
+ * Renders all tasks in their respective columns.
+ */
+function renderTasks() {
+    const columnContainers = {
+        "todo": requireElement('[data-status="todo"]', HTMLElement),
+        "in-progress": requireElement('[data-status="in-progress"]', HTMLElement),
+        "await-feedback": requireElement('[data-status="await-feedback"]', HTMLElement),
+        "done": requireElement('[data-status="done"]', HTMLElement)
+    };
+
+    for (const container of Object.values(columnContainers)) {
+        container.replaceChildren();
+    }
+
+    for (const task of allTasks) {
+        const status = task.status || "todo";
+        const container = columnContainers[status];
+        if (container) {
+            const card = createTaskCard(task);
+            container.append(card);
+            bindTaskCard(card);
+        }
+    }
+
+    updateEmptyColumnMessages("");
+}
+
+/**
+ * Applies the current search query and filters tasks.
  * @param {string} query Normalized search query.
  * @returns {number} Number of visible task cards.
  */
 function filterTaskCards(query) {
+    const cards = boardColumns.querySelectorAll(".task-card");
     let visibleTaskCount = 0;
-    for (const card of taskCards) {
-        const matches = !query || taskMatchesQuery(card, query);
+    
+    for (const card of cards) {
+        const taskId = card.dataset.taskId;
+        const task = allTasks.find(t => t.id === taskId);
+        const matches = !query || (task && taskMatchesQuery(task, query));
         card.hidden = !matches;
         if (matches) visibleTaskCount += 1;
     }
@@ -213,7 +240,14 @@ function filterTaskCards(query) {
  * @param {string} query Normalized search query.
  */
 function updateEmptyColumnMessages(query) {
-    for (const message of emptyColumnMessages) message.hidden = query.length > 0;
+    for (const message of emptyColumnMessages) {
+        const section = message.closest(".board-column");
+        if (!section) continue;
+        const status = section.querySelector("[data-status]")?.dataset.status;
+        const hasVisibleTasks = status && allTasks.some(t => t.status === status) && 
+                               [...section.querySelectorAll(".task-card")].some(c => !c.hidden);
+        message.hidden = query.length > 0 || hasVisibleTasks;
+    }
 }
 
 /**
@@ -229,7 +263,7 @@ function updateSearchMessage(query, visibleTaskCount) {
  * Filters tasks as the user types.
  */
 function handleBoardSearchInput() {
-    const query = boardSearchInput.value.trim().toLocaleLowerCase();
+    const query = boardSearchInput.value.trim().toLowerCase();
     const visibleTaskCount = filterTaskCards(query);
     updateEmptyColumnMessages(query);
     updateSearchMessage(query, visibleTaskCount);
@@ -250,7 +284,75 @@ function closeTaskDialogOnBackdrop(event) {
     if (event.target === taskDialog) taskDialog.close();
 }
 
-taskCards.forEach(bindTaskCard);
-boardSearchInput.addEventListener("input", handleBoardSearchInput);
-closeButton.addEventListener("click", closeTaskDialog);
-taskDialog.addEventListener("click", closeTaskDialogOnBackdrop);
+/**
+ * Deletes a task from Firebase.
+ */
+async function deleteTask() {
+    if (!currentTaskId || !confirm("Are you sure you want to delete this task?")) return;
+
+    try {
+        const taskRef = ref(db, `tasks/${currentTaskId}`);
+        await remove(taskRef);
+        taskDialog.close();
+    } catch (error) {
+        alert(`Error deleting task: ${error.message}`);
+    }
+}
+
+/**
+ * Exports current task for editing in Add Task form.
+ */
+function editTask() {
+    if (!currentTaskId) return;
+    const task = allTasks.find(t => t.id === currentTaskId);
+    if (!task) return;
+
+    sessionStorage.setItem('editingTaskId', currentTaskId);
+    sessionStorage.setItem('editingTask', JSON.stringify(task));
+    window.location.href = 'addTask.html?edit=' + currentTaskId;
+}
+
+/**
+ * Loads tasks from Firebase Realtime Database.
+ */
+function loadTasksFromFirebase() {
+    const tasksRef = ref(db, "tasks");
+    
+    onValue(tasksRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            allTasks = Object.entries(data).map(([id, task]) => ({
+                id,
+                ...task
+            }));
+        } else {
+            allTasks = [];
+        }
+        renderTasks();
+        handleBoardSearchInput();
+    });
+}
+
+/**
+ * Initializes the board when user is authenticated.
+ */
+function initializeBoard() {
+    loadTasksFromFirebase();
+    boardSearchInput.addEventListener("input", handleBoardSearchInput);
+    closeButton.addEventListener("click", closeTaskDialog);
+    deleteButton.addEventListener("click", deleteTask);
+    editButton.addEventListener("click", editTask);
+    taskDialog.addEventListener("click", closeTaskDialogOnBackdrop);
+}
+
+/**
+ * Checks authentication state and initializes board.
+ */
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        initializeBoard();
+    } else {
+        window.location.href = "../index.html";
+    }
+});

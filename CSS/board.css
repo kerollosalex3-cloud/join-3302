@@ -75,9 +75,10 @@
 }
 
 .board-search-empty {
-    margin: 16px 0 0;
+    margin: 8px 0 0;
     color: #d32f2f;
     font-size: 14px;
+    min-height: 20px;
 }
 
 .task-card,
@@ -401,6 +402,12 @@
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.board-search-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .board-search {
