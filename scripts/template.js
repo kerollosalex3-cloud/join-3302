@@ -1,4 +1,4 @@
-import { escapeHtml } from "./firebase.js";
+import { escapeHtml } from "../script.js";
 
 /**
  * Returns the priority icon path based on the priority level.
@@ -34,7 +34,7 @@ export function createTaskCard(task) {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-haspopup", "dialog");
-    card.dataset.taskId = task.id;
+    card.setAttribute("draggable", "true");
     if (task.dueDate) {
         card.dataset.dueDate = task.dueDate;
     }
@@ -50,7 +50,7 @@ export function createTaskCard(task) {
                <span class="task-progress" aria-label="${task.subtasks.filter(s => s.completed).length} of ${task.subtasks.length} subtasks completed">
                    <span style="width: ${task.subtasks.length > 0 ? Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100) : 0}%"></span>
                </span>
-               <span>${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
+               <span class="task-subtask-count">${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
            </div>`
         : "";
 
@@ -65,7 +65,20 @@ export function createTaskCard(task) {
         : `<div class="task-assignees"></div>`;
 
     card.innerHTML = `
-        <span class="task-category ${categoryClass}">${categoryLabel}</span>
+        <div class="task-card-top">
+            <span class="task-category ${categoryClass}">${categoryLabel}</span>
+            <div class="task-move-menu">
+                <button class="task-move-toggle" type="button"
+                    aria-label="Move task" aria-expanded="false">↔</button>
+                <div class="task-move-options" hidden>
+                    <span>Move to</span>
+                    <button type="button" data-destination-status="todo">To do</button>
+                    <button type="button" data-destination-status="in-progress">In progress</button>
+                    <button type="button" data-destination-status="await-feedback">Await feedback</button>
+                    <button type="button" data-destination-status="done">Done</button>
+                </div>
+            </div>
+        </div>
         <h4>${escapeHtml(task.title)}</h4>
         <p class="task-description">${escapeHtml(task.description)}</p>
         ${subtaskHtml}
@@ -78,6 +91,10 @@ export function createTaskCard(task) {
 
     const ariaLabel = `View task: ${task.title}`;
     card.setAttribute("aria-label", ariaLabel);
+    
+    // Set dataset AFTER innerHTML to prevent it from being lost
+    card.dataset.taskId = task.id;
+    card.dataset.taskStatus = task.status || "todo";
 
     return card;
 }
