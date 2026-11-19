@@ -72,7 +72,7 @@
                             <p>Key Metrics at a Glance</p>
                         </div>
                         <div class="summary-top-cards">
-                            <article class="summary-card">
+                            <a class="summary-card" href="./board.html#todo-heading" data-summary="todo">
                                 <span class="metric-icon">
                                     <svg viewBox="0 0 24 24" aria-hidden="true">
                                         <path d="m4 17.25-.8 3.55 3.55-.8L19.6 7.15a2.1 2.1 0 0 0-2.97-2.97L4 17.25Z">
@@ -81,54 +81,56 @@
                                     </svg>
                                 </span>
                                 <span class="summary-card-copy">
-                                    <strong>1</strong>
+                                    <strong>0</strong>
                                     <span>To-do</span>
                                 </span>
-                            </article>
-                            <article class="summary-card">
+                            </a>
+                            <a class="summary-card" href="./board.html#done-heading" data-summary="done">
                                 <span class="metric-icon">
                                     <svg viewBox="0 0 24 24" aria-hidden="true">
                                         <path d="m5 12.5 4.5 4.5L19 7"></path>
                                     </svg>
                                 </span>
                                 <span class="summary-card-copy">
-                                    <strong>1</strong>
+                                    <strong>0</strong>
                                     <span>Done</span>
                                 </span>
-                            </article>
+                            </a>
                         </div>
-                        <article class="summary-card urgent-card">
+                        <a class="summary-card urgent-card" href="./board.html" data-summary="urgent">
                             <div class="urgent-metric">
                                 <span class="metric-icon urgent-icon">
                                     <img src="../assets/icons/Prio-urgent.svg" alt="">
                                 </span>
                                 <span class="summary-card-copy">
-                                    <strong>1</strong>
+                                    <strong>0</strong>
                                     <span>Urgent</span>
                                 </span>
                             </div>
                             <div class="upcoming-deadline">
-                                <strong>October 16, 2022</strong>
+                                <strong id="summary-next-deadline">No upcoming deadline</strong>
                                 <span>Upcoming Deadline</span>
                             </div>
-                        </article>
+                        </a>
                         <div class="summary-bottom-cards">
-                            <article class="summary-card compact-card">
-                                <strong>5</strong>
+                            <a class="summary-card compact-card" href="./board.html" data-summary="all">
+                                <strong>0</strong>
                                 <span>Tasks in<br>Board</span>
-                            </article>
-                            <article class="summary-card compact-card">
-                                <strong>2</strong>
+                            </a>
+                            <a class="summary-card compact-card"
+                                href="./board.html#in-progress-heading" data-summary="in-progress">
+                                <strong>0</strong>
                                 <span>Tasks In<br>Progress</span>
-                            </article>
-                            <article class="summary-card compact-card">
-                                <strong>2</strong>
+                            </a>
+                            <a class="summary-card compact-card"
+                                href="./board.html#await-feedback-heading" data-summary="await-feedback">
+                                <strong>0</strong>
                                 <span>Awaiting<br>Feedback</span>
-                            </article>
+                            </a>
                         </div>
                     </div>
                     <div class="summary-greeting">
-                        <p>Good morning,</p>
+                        <p id="summary-greeting">Hello,</p>
                         <h1 id="greeting-name"></h1>
                     </div>
                 </section>
