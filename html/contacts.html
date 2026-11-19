@@ -62,16 +62,40 @@
                 <section class="contacts-list" aria-label="Contact list">
                     <button id="add-contact" class="btn add-contact-button" type="button">Add new contact <span aria-hidden="true">+</span></button>
                     <p id="contact-status" class="contacts-empty" role="status"></p>
+                    <p id="contact-list-status" class="contacts-empty" role="status">Loading contacts…</p>
                     <ul id="contact-list" aria-label="Contacts"></ul>
                 </section>
                 <section class="contacts-content" aria-labelledby="contacts-title">
                     <div class="contacts-heading"><h1 id="contacts-title">Contacts</h1><p>Better with a team</p></div>
+                    <section id="contact-details" aria-labelledby="contact-detail-name" hidden>
+                        <h2 id="contact-detail-name" tabindex="-1"></h2>
+                        <h3>Contact Information</h3>
+                        <dl>
+                            <dt>Email</dt><dd id="contact-detail-email"></dd>
+                            <dt>Phone</dt><dd id="contact-detail-phone"></dd>
+                        </dl>
+                    </section>
                 </section>
             </main>
             <!-- end contacts -->
             <footer class="contacts-mobile-legal"><a href="privacy-policy.html">Privacy Policy</a><a href="legal-notice.html">Legal notice</a></footer>
         </div>
     </div>
+
+    <template id="contact-group-template">
+        <li class="contact-group"></li>
+    </template>
+    <template id="contact-row-template">
+        <li>
+            <button class="contact-row" type="button">
+                <span class="contact-list-avatar" aria-hidden="true"></span>
+                <span>
+                    <strong class="contact-list-name"></strong>
+                    <span class="contact-list-email"></span>
+                </span>
+            </button>
+        </li>
+    </template>
 
     <!-- start contact form -->
     <dialog id="contact-dialog" aria-labelledby="contact-dialog-title">

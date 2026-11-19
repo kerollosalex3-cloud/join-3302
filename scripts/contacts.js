@@ -1,6 +1,7 @@
 import { auth, db } from './firebase.js';
-import { push, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
-import { isBackdropClick, setFieldError } from "../script.js";
+import { get, push, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getInitials, isBackdropClick, setFieldError } from "../script.js";
 import { getContactErrors } from "./contactValidation.js";
 
 const contactDialog = document.getElementById('contact-dialog');
@@ -9,6 +10,11 @@ const contactFields = ['name', 'email', 'phone'];
 const contactSubmit = contactForm.querySelector('button[type="submit"]');
 const contactFormNote = document.getElementById('contact-form-note');
 const contactStatus = document.getElementById('contact-status');
+const contactList = document.getElementById('contact-list');
+const contactListStatus = document.getElementById('contact-list-status');
+const contactDetails = document.getElementById('contact-details');
+
+onAuthStateChanged(auth, loadContacts);
 
 document.getElementById('add-contact').addEventListener('click', openContactForm);
 document.getElementById('close-contact').addEventListener('click', closeContactForm);
@@ -132,4 +138,76 @@ function setContactSaving(saving) {
         contactForm.elements[field].readOnly = saving;
     });
     if (saving) contactFormNote.textContent = 'Saving contact…';
+}
+
+/**
+ * Loads the shared contact list for the signed-in account or guest.
+ * @param {object|null} user - Current Firebase user.
+ */
+async function loadContacts(user) {
+    contactList.replaceChildren();
+    contactDetails.hidden = true;
+    contactListStatus.textContent = user ? 'Loading contacts…' : 'Sign in to view contacts.';
+    if (!user) return;
+    try {
+        const snapshot = await get(ref(db, 'contacts'));
+        if (auth.currentUser?.uid === user.uid) showContacts(snapshot.val());
+    } catch {
+        if (auth.currentUser?.uid === user.uid) contactListStatus.textContent = 'Could not load contacts.';
+    }
+}
+
+/**
+ * Sorts saved contacts and groups their rows by first letter.
+ * @param {object|null} records - Contacts returned by Firebase.
+ */
+function showContacts(records) {
+    const contacts = Object.values(records || {})
+        .filter(contact => typeof contact?.name === 'string' && contact.name.trim())
+        .sort((first, second) => first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }));
+    contactListStatus.textContent = contacts.length ? '' : 'No contacts yet.';
+    let previousLetter = '';
+    for (const contact of contacts) {
+        const letter = contact.name.trim().charAt(0).normalize('NFD').replace(/\p{M}/gu, '').toUpperCase();
+        if (letter !== previousLetter) addContactGroup(letter);
+        contactList.append(createContactRow(contact));
+        previousLetter = letter;
+    }
+}
+
+/**
+ * Adds a letter heading above its contact rows.
+ * @param {string} letter - First letter of the name.
+ */
+function addContactGroup(letter) {
+    const group = document.getElementById('contact-group-template').content.firstElementChild.cloneNode(true);
+    group.textContent = letter;
+    contactList.append(group);
+}
+
+/**
+ * Creates a list row from the saved name and email.
+ * @param {object} contact - Saved contact.
+ * @returns {HTMLElement} Contact list row.
+ */
+function createContactRow(contact) {
+    const row = document.getElementById('contact-row-template').content.firstElementChild.cloneNode(true);
+    row.querySelector('.contact-list-avatar').textContent = getInitials(contact.name);
+    row.querySelector('.contact-list-name').textContent = contact.name;
+    row.querySelector('.contact-list-email').textContent = contact.email || '';
+    row.querySelector('button').addEventListener('click', () => showContactDetails(contact));
+    return row;
+}
+
+/**
+ * Displays the saved details of the selected contact.
+ * @param {object} contact - Saved contact.
+ */
+function showContactDetails(contact) {
+    const name = document.getElementById('contact-detail-name');
+    name.textContent = contact.name;
+    document.getElementById('contact-detail-email').textContent = contact.email || '—';
+    document.getElementById('contact-detail-phone').textContent = contact.phone || '—';
+    contactDetails.hidden = false;
+    name.focus();
 }
