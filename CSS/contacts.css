@@ -50,6 +50,15 @@
     line-height: 1;
 }
 
+#contact-search {
+    width: 100%;
+    margin-top: 16px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font: inherit;
+}
+
 .contacts-empty {
     padding: 32px 16px;
     line-height: 1.6;

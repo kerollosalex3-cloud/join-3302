@@ -14,9 +14,13 @@ const contactList = document.getElementById('contact-list');
 const contactListStatus = document.getElementById('contact-list-status');
 const contactDetails = document.getElementById('contact-details');
 
+const contactSearch = document.getElementById('contact-search');
+const contactSearchStatus = document.getElementById('contact-search-status');
 let contactLoadId = 0;
+let savedContacts = [];
 
 onAuthStateChanged(auth, handleContactAuthChange);
+contactSearch.addEventListener('input', filterContacts);
 
 document.getElementById('add-contact').addEventListener('click', openContactForm);
 document.getElementById('close-contact').addEventListener('click', closeContactForm);
@@ -163,7 +167,9 @@ function setContactSaving(saving) {
  * @param {object|null} user - Current Firebase user.
  */
 function handleContactAuthChange(user) {
-    contactList.replaceChildren();
+    savedContacts = [];
+    contactSearch.value = '';
+    filterContacts();
     contactDetails.hidden = true;
     contactStatus.textContent = '';
     return loadContacts(user);
@@ -182,20 +188,39 @@ async function loadContacts(user) {
         if (loadId === contactLoadId && auth.currentUser?.uid === user.uid) showContacts(snapshot.val());
     } catch {
         if (loadId !== contactLoadId || auth.currentUser?.uid !== user.uid) return;
-        contactListStatus.textContent = contactList.children.length ? 'Could not refresh contacts.' : 'Could not load contacts.';
+        contactListStatus.textContent = savedContacts.length ? 'Could not refresh contacts.' : 'Could not load contacts.';
     }
 }
 
 /**
- * Sorts saved contacts and groups their rows by first letter.
+ * Stores contacts in alphabetical order and updates the visible list.
  * @param {object|null} records - Contacts returned by Firebase.
  */
 function showContacts(records) {
-    contactList.replaceChildren();
-    const contacts = Object.values(records || {})
+    savedContacts = Object.values(records || {})
         .filter(contact => typeof contact?.name === 'string' && contact.name.trim())
         .sort((first, second) => first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }));
-    contactListStatus.textContent = contacts.length ? '' : 'No contacts yet.';
+    contactListStatus.textContent = savedContacts.length ? '' : 'No contacts yet.';
+    filterContacts();
+}
+
+/** Filters the list by name, email or phone. */
+function filterContacts() {
+    const query = contactSearch.value.trim().toLocaleLowerCase();
+    const matches = savedContacts.filter(contact =>
+        [contact.name, contact.email, contact.phone].some(value =>
+            String(value || '').toLocaleLowerCase().includes(query)));
+    contactSearchStatus.textContent = query && savedContacts.length && !matches.length
+        ? 'No matching contacts.' : '';
+    renderContactRows(matches);
+}
+
+/**
+ * Displays contact rows grouped by letter.
+ * @param {object[]} contacts - Visible contacts.
+ */
+function renderContactRows(contacts) {
+    contactList.replaceChildren();
     let previousLetter = '';
     for (const contact of contacts) {
         const letter = contact.name.trim().charAt(0).normalize('NFD').replace(/\p{M}/gu, '').toUpperCase();
