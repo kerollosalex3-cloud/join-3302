@@ -14,7 +14,9 @@ const contactList = document.getElementById('contact-list');
 const contactListStatus = document.getElementById('contact-list-status');
 const contactDetails = document.getElementById('contact-details');
 
-onAuthStateChanged(auth, loadContacts);
+let contactLoadId = 0;
+
+onAuthStateChanged(auth, handleContactAuthChange);
 
 document.getElementById('add-contact').addEventListener('click', openContactForm);
 document.getElementById('close-contact').addEventListener('click', closeContactForm);
@@ -32,13 +34,18 @@ contactForm.addEventListener('input', clearContactFieldError);
 
 /** Opens a fresh contact form. */
 function openContactForm() {
-    contactForm.reset();
-    contactFormNote.textContent = '';
+    resetContactForm();
     contactStatus.textContent = '';
-    contactFields.forEach(field => setContactFieldError(field, ''));
     contactDialog.showModal();
     document.body.classList.add('contact-dialog-open');
     contactForm.elements.name.focus();
+}
+
+/** Clears contact fields and their messages. */
+function resetContactForm() {
+    contactForm.reset();
+    contactFormNote.textContent = '';
+    contactFields.forEach(field => setContactFieldError(field, ''));
 }
 
 /** Closes the contact form without saving data. */
@@ -116,16 +123,27 @@ async function writeNewContact(contact) {
     setContactSaving(true);
     try {
         await auth.authStateReady();
-        if (!auth.currentUser) throw new Error('Sign in before adding a contact.');
+        const user = auth.currentUser;
+        if (!user) throw new Error('Sign in before adding a contact.');
         await push(ref(db, 'contacts'), contact);
+        if (auth.currentUser?.uid === user.uid) finishContactSave(user);
     } catch {
         contactFormNote.textContent = 'Could not save the contact. Check your connection or sign in again.';
         return;
     } finally {
         setContactSaving(false);
     }
-    closeContactForm();
+}
+
+/**
+ * Returns to the list and reloads it after a successful save.
+ * @param {object} user - Current Firebase user.
+ */
+function finishContactSave(user) {
+    resetContactForm();
+    contactDialog.close();
     contactStatus.textContent = 'Contact saved.';
+    loadContacts(user);
 }
 
 /**
@@ -141,19 +159,30 @@ function setContactSaving(saving) {
 }
 
 /**
- * Loads the shared contact list for the signed-in account or guest.
+ * Clears contacts from the previous account and loads the current list.
+ * @param {object|null} user - Current Firebase user.
+ */
+function handleContactAuthChange(user) {
+    contactList.replaceChildren();
+    contactDetails.hidden = true;
+    contactStatus.textContent = '';
+    return loadContacts(user);
+}
+
+/**
+ * Loads contacts while keeping already displayed rows visible.
  * @param {object|null} user - Current Firebase user.
  */
 async function loadContacts(user) {
-    contactList.replaceChildren();
-    contactDetails.hidden = true;
+    const loadId = ++contactLoadId;
     contactListStatus.textContent = user ? 'Loading contacts…' : 'Sign in to view contacts.';
     if (!user) return;
     try {
         const snapshot = await get(ref(db, 'contacts'));
-        if (auth.currentUser?.uid === user.uid) showContacts(snapshot.val());
+        if (loadId === contactLoadId && auth.currentUser?.uid === user.uid) showContacts(snapshot.val());
     } catch {
-        if (auth.currentUser?.uid === user.uid) contactListStatus.textContent = 'Could not load contacts.';
+        if (loadId !== contactLoadId || auth.currentUser?.uid !== user.uid) return;
+        contactListStatus.textContent = contactList.children.length ? 'Could not refresh contacts.' : 'Could not load contacts.';
     }
 }
 
@@ -162,6 +191,7 @@ async function loadContacts(user) {
  * @param {object|null} records - Contacts returned by Firebase.
  */
 function showContacts(records) {
+    contactList.replaceChildren();
     const contacts = Object.values(records || {})
         .filter(contact => typeof contact?.name === 'string' && contact.name.trim())
         .sort((first, second) => first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }));
