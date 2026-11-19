@@ -1,4 +1,5 @@
 import { boardElements, validTaskStatuses } from "./board-elements.js";
+import { isBackdropClick } from "../script.js";
 
 /**
  * Gets the status associated with an add-task button.
@@ -37,7 +38,7 @@ function closeAddTaskDialog() {
  * @param {MouseEvent} event Dialog click event.
  */
 function closeAddTaskOnBackdrop(event) {
-    if (event.target === boardElements.addTaskDialog) closeAddTaskDialog();
+    if (isBackdropClick(event, boardElements.addTaskDialog)) closeAddTaskDialog();
 }
 
 /**

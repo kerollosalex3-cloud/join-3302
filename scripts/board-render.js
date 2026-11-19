@@ -1,5 +1,7 @@
 import { createTaskCard } from "./template.js";
 import { boardElements } from "./board-elements.js";
+import { db } from "./firebase.js";
+import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 let renderedTasks = [];
 let taskSelectHandler = null;
@@ -95,9 +97,91 @@ function handleTaskCardClick(event) {
  * @param {KeyboardEvent} event Card keyboard event.
  */
 function handleTaskCardKeydown(event) {
+    if (event.target.closest(".task-move-menu")) return;
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     handleTaskCardClick(event);
+}
+
+/**
+ * Closes every task move menu.
+ */
+function closeMoveMenus() {
+    document.querySelectorAll(".task-move-options").forEach(menu => { menu.hidden = true; });
+    document.querySelectorAll(".task-move-toggle")
+        .forEach(button => button.setAttribute("aria-expanded", "false"));
+}
+
+/**
+ * Toggles the move menu without opening task details.
+ * @param {MouseEvent} event Move button click.
+ */
+function toggleMoveMenu(event) {
+    event.stopPropagation();
+    const button = event.currentTarget;
+    const menu = button.nextElementSibling;
+    const willOpen = menu.hidden;
+    closeMoveMenus();
+    menu.hidden = !willOpen;
+    button.setAttribute("aria-expanded", String(willOpen));
+}
+
+/**
+ * Counts tasks currently rendered in a destination column.
+ * @param {string} status Destination status.
+ * @returns {number} Destination card count.
+ */
+function getDestinationTaskCount(status) {
+    return getColumnContainers()[status].querySelectorAll(".task-card").length;
+}
+
+/**
+ * Persists a task move and closes the menu.
+ * @param {string} taskId Task ID.
+ * @param {string} status Destination status.
+ * @returns {Promise<void>} Resolves after the move.
+ */
+async function saveTaskMove(taskId, status) {
+    await update(ref(db, `tasks/${taskId}`), {
+        status,
+        order: getDestinationTaskCount(status)
+    });
+    closeMoveMenus();
+}
+
+/**
+ * Moves a task to the selected status.
+ * @param {MouseEvent} event Move option click.
+ * @returns {Promise<void>} Resolves after Firebase update.
+ */
+async function moveTaskViaMenu(event) {
+    event.stopPropagation();
+    const card = event.currentTarget.closest(".task-card");
+    const taskId = card.dataset.taskId;
+    const status = event.currentTarget.dataset.destinationStatus;
+    if (status === card.dataset.taskStatus) {
+        closeMoveMenus();
+        return;
+    }
+    try {
+        await saveTaskMove(taskId, status);
+    } catch (error) {
+        window.alert(`Die Aufgabe konnte nicht verschoben werden: ${error.message}`);
+    }
+}
+
+/**
+ * Binds the mobile move controls of a task card.
+ * @param {HTMLElement} card Task card.
+ */
+function bindMoveMenu(card) {
+    const toggle = card.querySelector(".task-move-toggle");
+    const options = card.querySelectorAll(".task-move-options button");
+    toggle.addEventListener("click", toggleMoveMenu);
+    options.forEach(button => {
+        button.hidden = button.dataset.destinationStatus === card.dataset.taskStatus;
+        button.addEventListener("click", moveTaskViaMenu);
+    });
 }
 
 /**
@@ -107,6 +191,7 @@ function handleTaskCardKeydown(event) {
 function bindTaskCard(card) {
     card.addEventListener("click", handleTaskCardClick);
     card.addEventListener("keydown", handleTaskCardKeydown);
+    bindMoveMenu(card);
 }
 
 /**
@@ -142,17 +227,54 @@ function getVisibleCards(container) {
 }
 
 /**
- * Limits one column to the combined height of five cards.
+ * Returns the spacing needed below a task column.
+ * @returns {number} Bottom spacing in pixels.
+ */
+function getColumnBottomSpacing() {
+    return window.matchMedia("(max-width: 767px)").matches ? 80 : 24;
+}
+
+/**
+ * Calculates the viewport height available below a column.
+ * @param {HTMLElement} container Column task container.
+ * @returns {number} Available column height.
+ */
+function getAvailableColumnHeight(container) {
+    const available = window.innerHeight - container.getBoundingClientRect().top;
+    return Math.max(0, available - getColumnBottomSpacing());
+}
+
+/**
+ * Returns how many cards are visible before a column scrolls.
+ * @returns {number} Visible card limit.
+ */
+function getVisibleCardLimit() {
+    return window.matchMedia("(max-width: 767px)").matches ? 3 : 4;
+}
+
+/**
+ * Calculates the height occupied by the visible cards.
+ * @param {HTMLElement[]} cards Visible task cards.
+ * @param {number} limit Visible card limit.
+ * @returns {number} Combined card height.
+ */
+function getVisibleCardsHeight(cards, limit) {
+    return cards[limit].offsetTop - cards[0].offsetTop;
+}
+
+/**
+ * Limits a column after the responsive visible-card limit.
  * @param {HTMLElement} container Column task container.
  */
 function updateColumnHeight(container) {
     const cards = getVisibleCards(container);
-    if (cards.length <= 5) {
+    const limit = getVisibleCardLimit();
+    if (cards.length <= limit) {
         container.style.maxHeight = "";
         return;
     }
-    const fiveCardHeight = cards[5].offsetTop - cards[0].offsetTop;
-    container.style.maxHeight = `${fiveCardHeight}px`;
+    container.style.maxHeight =
+        `${Math.min(getVisibleCardsHeight(cards, limit), getAvailableColumnHeight(container))}px`;
 }
 
 /**
@@ -160,6 +282,13 @@ function updateColumnHeight(container) {
  */
 function updateColumnHeights() {
     Object.values(getColumnContainers()).forEach(updateColumnHeight);
+}
+
+/**
+ * Recalculates column heights after the browser finishes layout.
+ */
+function scheduleColumnHeightUpdate() {
+    requestAnimationFrame(updateColumnHeights);
 }
 
 /**
@@ -175,7 +304,7 @@ export function renderTasks(tasks, onTaskSelect) {
     const insertionOrder = new Map(tasks.map((task, index) => [task.id, index]));
     Object.entries(columns).forEach(([status, container]) =>
         renderColumn(tasks, status, container, insertionOrder));
-    updateColumnHeights();
+    scheduleColumnHeightUpdate();
 }
 
 /**
@@ -190,7 +319,7 @@ export function filterTaskCards(query) {
         card.hidden = !(!query || (task && taskMatchesQuery(task, query)));
         if (!card.hidden) visibleTaskCount += 1;
     }
-    updateColumnHeights();
+    scheduleColumnHeightUpdate();
     return visibleTaskCount;
 }
 
@@ -222,3 +351,6 @@ export function updateEmptyColumnMessages(query) {
     boardElements.emptyColumnMessages.forEach(message =>
         updateColumnEmptyMessage(message, query));
 }
+
+window.addEventListener("resize", scheduleColumnHeightUpdate);
+document.addEventListener("click", closeMoveMenus);

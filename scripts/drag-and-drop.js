@@ -309,6 +309,9 @@ function createNativeDragImage(event) {
     nativeDragImage = document.createElement("canvas");
     nativeDragImage.width = 1;
     nativeDragImage.height = 1;
+    nativeDragImage.style.position = "fixed";
+    nativeDragImage.style.left = "-1px";
+    nativeDragImage.style.top = "-1px";
     document.body.append(nativeDragImage);
     event.dataTransfer.setDragImage(nativeDragImage, 0, 0);
 }
@@ -322,6 +325,7 @@ function handleDragStart(event) {
     if (!card) return;
     draggedCard = card;
     draggedTaskId = card.dataset.taskId;
+    document.body.classList.add("drag-active");
     if (event.dataTransfer) {
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", draggedTaskId);
@@ -337,6 +341,7 @@ function handleDragStart(event) {
  * Clears drag state and restores board visuals after dragging.
  */
 function handleDragEnd() {
+    document.body.classList.remove("drag-active");
     draggedCard?.classList.remove("drag-source-hidden");
     draggedCard = null;
     draggedTaskId = null;

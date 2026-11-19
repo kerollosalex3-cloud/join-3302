@@ -1,5 +1,7 @@
 import { auth, db } from './firebase.js';
 import { push, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import { isBackdropClick, setFieldError } from "../script.js";
+import { getContactErrors } from "./contactValidation.js";
 
 const contactDialog = document.getElementById('contact-dialog');
 const contactForm = document.getElementById('contact-form');
@@ -13,7 +15,7 @@ document.getElementById('close-contact').addEventListener('click', closeContactF
 document.getElementById('cancel-contact').addEventListener('click', closeContactForm);
 contactForm.addEventListener('submit', saveContact);
 contactDialog.addEventListener('click', event => {
-    if (event.target === contactDialog) closeContactForm();
+    if (isBackdropClick(event, contactDialog)) closeContactForm();
 });
 contactDialog.addEventListener('cancel', event => {
     if (contactSubmit.disabled) event.preventDefault();
@@ -71,8 +73,11 @@ function readContactForm() {
  * @param {string} message - Error text, empty when valid.
  */
 function setContactFieldError(field, message) {
-    contactForm.elements[field].setAttribute('aria-invalid', Boolean(message));
-    document.getElementById(field + '-error').textContent = message;
+    setFieldError(
+        contactForm.elements[field],
+        document.getElementById(`${field}-error`),
+        message
+    );
 }
 
 /** Clears the old error while the user corrects a field.

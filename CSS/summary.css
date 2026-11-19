@@ -75,7 +75,15 @@
     background: var(--color-surface);
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
     transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+}
+
+.summary-card:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
 }
 
 @media (hover: hover),

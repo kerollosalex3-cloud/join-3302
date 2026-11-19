@@ -4,7 +4,7 @@
  * @param {string} value - Entered value.
  * @returns {string} An error message or an empty string.
  */
-function getContactFieldError(field, value) {
+export function getContactFieldError(field, value) {
     const text = value.trim();
     if (!text) return 'This field is required.';
     if (field === 'name' && text.length > 120) return 'Please use no more than 120 characters.';
@@ -19,7 +19,7 @@ function getContactFieldError(field, value) {
  * @param {{name: string, email: string, phone: string}} contact - Form values.
  * @returns {{name: string, email: string, phone: string}} Field errors.
  */
-function getContactErrors(contact) {
+export function getContactErrors(contact) {
     return {
         name: getContactFieldError('name', contact.name),
         email: getContactFieldError('email', contact.email),

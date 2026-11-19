@@ -1,4 +1,4 @@
-import { escapeHtml } from "./firebase.js";
+import { escapeHtml } from "../script.js";
 
 /**
  * Returns the priority icon path based on the priority level.
@@ -65,7 +65,20 @@ export function createTaskCard(task) {
         : `<div class="task-assignees"></div>`;
 
     card.innerHTML = `
-        <span class="task-category ${categoryClass}">${categoryLabel}</span>
+        <div class="task-card-top">
+            <span class="task-category ${categoryClass}">${categoryLabel}</span>
+            <div class="task-move-menu">
+                <button class="task-move-toggle" type="button"
+                    aria-label="Move task" aria-expanded="false">↔</button>
+                <div class="task-move-options" hidden>
+                    <span>Move to</span>
+                    <button type="button" data-destination-status="todo">To do</button>
+                    <button type="button" data-destination-status="in-progress">In progress</button>
+                    <button type="button" data-destination-status="await-feedback">Await feedback</button>
+                    <button type="button" data-destination-status="done">Done</button>
+                </div>
+            </div>
+        </div>
         <h4>${escapeHtml(task.title)}</h4>
         <p class="task-description">${escapeHtml(task.description)}</p>
         ${subtaskHtml}
@@ -81,6 +94,7 @@ export function createTaskCard(task) {
 
     // Set dataset AFTER innerHTML to prevent it from being lost
     card.dataset.taskId = task.id;
+    card.dataset.taskStatus = task.status || "todo";
 
     return card;
 }

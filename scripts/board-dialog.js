@@ -1,6 +1,7 @@
 import { db } from "./firebase.js";
 import { ref, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { boardElements } from "./board-elements.js";
+import { isBackdropClick } from "../script.js";
 
 let getTasks = () => [];
 let currentTaskId = null;
@@ -334,7 +335,7 @@ function closeTaskDialog() {
  * @param {MouseEvent} event Dialog click event.
  */
 function closeTaskDialogOnBackdrop(event) {
-    if (event.target === boardElements.taskDialog) closeTaskDialog();
+    if (isBackdropClick(event, boardElements.taskDialog)) closeTaskDialog();
 }
 
 /**
