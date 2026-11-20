@@ -103,9 +103,11 @@ function handleSubtaskEditKey(event) {
 
 /** Adds a text-only row for a new or loaded subtask.
  * @param {string} text - Subtask title.
+ * @param {boolean} [completed] - Saved completion status.
  */
-function appendSubtask(text) {
+function appendSubtask(text, completed = false) {
     const row = document.getElementById('subtask-template').content.firstElementChild.cloneNode(true);
     row.querySelector('.subtask-text').textContent = text;
+    row.dataset.completed = String(completed);
     subtaskList.appendChild(row);
 }

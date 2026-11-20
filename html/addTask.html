@@ -135,27 +135,11 @@
                         <p class="task-required-note"><span class="task-required">*</span>This field is required</p>
                         <div class="task-form-buttons">
                             <button id="clear-task" class="btn secondary-btn" type="button">Clear</button>
-                            <button id="preview-task" class="btn" type="submit" disabled>Preview task</button>
+                            <button id="save-task" class="btn" type="submit" disabled>Save Task</button>
                         </div>
-                        <p id="task-save-note" class="task-save-note" role="status">Preview only. Tasks are not saved yet.</p>
+                        <p id="task-save-note" class="task-save-note" role="status"></p>
                     </div>
                 </form>
-                <section id="task-preview" tabindex="-1" aria-labelledby="task-preview-title" hidden>
-                    <h2 id="task-preview-title">Task preview</h2>
-                    <p>This task has not been saved.</p>
-                    <button id="edit-task-preview" class="btn secondary-btn" type="button">Edit preview</button>
-                    <button id="save-task" class="btn" type="button">Save Task</button>
-                    <dl>
-                        <dt>Title</dt><dd id="preview-task-title"></dd>
-                        <dt>Description</dt><dd id="preview-task-description"></dd>
-                        <dt>Due date</dt><dd id="preview-task-dueDate"></dd>
-                        <dt>Priority</dt><dd id="preview-task-priority"></dd>
-                        <dt>Category</dt><dd id="preview-task-category"></dd>
-                        <dt>Assigned to</dt><dd>No contacts selected.</dd>
-                    </dl>
-                    <h3>Subtasks</h3>
-                    <ul id="preview-task-subtasks"></ul>
-                </section>
             </main>
             <!-- end add task -->
         </div>
@@ -175,7 +159,6 @@
             </div>
         </li>
     </template>
-    <template id="preview-subtask-template"><li></li></template>
 
     <!-- start mobile navigation -->
     <nav class="add-task-mobile-nav" aria-label="Hauptnavigation">

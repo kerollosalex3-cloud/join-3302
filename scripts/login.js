@@ -82,7 +82,6 @@ function handleLoginFailure(error, action) {
     } else {
         showToast(authErrorMessage(error, action));
     }
-    console.error(`Firebase ${action} failed:`, error);
 }
 
 async function signInGuest() {

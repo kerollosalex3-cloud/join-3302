@@ -1,3 +1,13 @@
+/** Returns today's date using the browser's local time.
+ * @returns {string} Local date in YYYY-MM-DD format.
+ */
+export function getLocalDate() {
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${today.getFullYear()}-${month}-${day}`;
+}
+
 /**
  * Returns initials from a full name.
  * @param {string} name Full name.

@@ -1,7 +1,7 @@
 import { db, auth } from './firebase.js';
 import { ref, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getUrlSearchParam, setFieldError } from "../script.js";
+import { getLocalDate, getUrlSearchParam, setFieldError } from "../script.js";
 
 const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
 const requestedTaskStatus = getUrlSearchParam('status');
@@ -12,12 +12,13 @@ if (isOverlayMode) document.documentElement.classList.add('add-task-overlay-mode
 
 const taskAssignees = document.getElementById('task-assignees');
 const taskForm = document.getElementById('task-form');
-const taskPreview = document.getElementById('task-preview');
+const taskSaveButton = document.getElementById('save-task');
+const clearTaskButton = document.getElementById('clear-task');
 const taskSaveNote = document.getElementById('task-save-note');
 const taskFields = ['title', 'dueDate', 'category'];
-let previewTask = null;
-let currentUser = null;
-let editingTaskId = null;
+let editingTaskId = getUrlSearchParam('edit');
+let originalTask = null;
+let savingTask = false;
 
 document.addEventListener('click', closeTaskContacts);
 document.addEventListener('keydown', closeTaskContacts);
@@ -25,70 +26,78 @@ taskForm.addEventListener('input', updateTaskForm);
 taskForm.addEventListener('change', updateTaskForm);
 taskForm.addEventListener('click', updateTaskForm);
 taskForm.addEventListener('focusout', validateTaskField);
-taskForm.addEventListener('submit', previewTaskForm);
-document.getElementById('clear-task').addEventListener('click', clearTaskForm);
-document.getElementById('edit-task-preview').addEventListener('click', editTaskPreview);
-document.getElementById('save-task').addEventListener('click', saveTaskToFirebase);
-updateTaskPreviewButton();
+taskForm.addEventListener('submit', saveTaskForm);
+clearTaskButton.addEventListener('click', clearTaskForm);
+onAuthStateChanged(auth, handleTaskAuthChange);
 
 /**
- * Saves or updates the task in Firebase Realtime Database.
+ * Validates the form before saving.
+ * @param {SubmitEvent} event - Task form submission.
  */
-async function saveTaskToFirebase() {
-    if (!previewTask) return;
-    
-    const errors = getTaskErrors(previewTask, getLocalTaskDate());
-    if (taskFields.some(field => errors[field])) {
-        taskSaveNote.textContent = 'Cannot save task with validation errors.';
+async function saveTaskForm(event) {
+    event.preventDefault();
+    if (savingTask || !auth.currentUser || (editingTaskId && !originalTask)) return;
+    const task = readTaskForm();
+    const errors = validateTask(task);
+    taskFields.forEach(field => setTaskFieldError(field, errors[field]));
+    const firstError = taskFields.find(field => errors[field]);
+    if (firstError) return taskForm.elements[firstError].focus();
+    if (!hasPendingSubtasks()) await saveTaskToFirebase(task);
+}
+
+/**
+ * Saves the form and keeps its values if the database write fails.
+ * @param {object} task - Validated task form values.
+ */
+async function saveTaskToFirebase(task) {
+    setTaskSaving(true);
+    try {
+        await persistTask(task);
+    } catch {
+        taskSaveNote.textContent = 'Could not save the task. Please try again.';
+        return;
+    } finally {
+        setTaskSaving(false);
+    }
+    finishTaskSave();
+}
+
+/**
+ * Writes a new task or updates the fields from the edit form.
+ * @param {object} task - Task form values.
+ */
+async function persistTask(task) {
+    if (editingTaskId) {
+        const changes = { ...task, updatedAt: new Date().toISOString() };
+        if (JSON.stringify(task.subtasks) === JSON.stringify(originalTask.subtasks)) delete changes.subtasks;
+        await update(ref(db, `tasks/${editingTaskId}`), changes);
         return;
     }
+    await push(ref(db, 'tasks'), {
+        ...task, assignedTo: [], status: taskStatus,
+        createdBy: auth.currentUser.uid, createdAt: new Date().toISOString()
+    });
+}
 
-    try {
-        const taskData = {
-            title: previewTask.title,
-            description: previewTask.description,
-            dueDate: previewTask.dueDate,
-            priority: previewTask.priority,
-            category: previewTask.category === 'user-story' ? 'user-story' : 'technical-task',
-            subtasks: previewTask.subtasks.map(title => ({
-                title,
-                completed: false
-            })),
-            assignedTo: [],
-            createdBy: currentUser?.uid || 'unknown',
-            createdAt: new Date().toISOString()
-        };
+/** Clears the form and tells the user that Firebase confirmed the save. */
+function finishTaskSave() {
+    const message = editingTaskId ? 'Task updated.' : 'Task saved.';
+    if (editingTaskId) clearTaskEditMode();
+    clearTaskForm();
+    taskSaveNote.textContent = message;
+    notifyParentTaskSaved();
+}
 
-        if (editingTaskId) {
-            const taskRef = ref(db, `tasks/${editingTaskId}`);
-            await update(taskRef, {
-                ...taskData,
-                updatedAt: new Date().toISOString()
-            });
-            taskSaveNote.textContent = 'Task updated successfully!';
-            sessionStorage.removeItem('editingTaskId');
-            sessionStorage.removeItem('editingTask');
-            editingTaskId = null;
-        } else {
-            const tasksRef = ref(db, 'tasks');
-            await push(tasksRef, {
-                ...taskData,
-                status: taskStatus
-            });
-            taskSaveNote.textContent = 'Task saved successfully!';
-            notifyParentTaskSaved();
-        }
-
-        taskSaveNote.style.color = 'green';
-        clearTaskForm();
-        setTimeout(() => {
-            taskSaveNote.textContent = editingTaskId ? 'Task updated. Click "Save Task" to save changes.' : 'Preview only. Click "Save Task" to save it permanently.';
-            taskSaveNote.style.color = '';
-        }, 3000);
-    } catch (error) {
-        taskSaveNote.textContent = `Error saving task: ${error.message}`;
-        taskSaveNote.style.color = 'red';
-    }
+/**
+ * Locks the task fields while Firebase saves the task.
+ * @param {boolean} saving - Whether a save is pending.
+ */
+function setTaskSaving(saving) {
+    savingTask = saving;
+    clearTaskButton.disabled = saving;
+    taskForm.querySelectorAll('.task-fields').forEach(section => { section.inert = saving; });
+    if (saving) taskSaveNote.textContent = 'Saving task…';
+    updateTaskSaveButton();
 }
 
 /**
@@ -120,18 +129,30 @@ function readTaskForm() {
         dueDate: taskForm.elements.dueDate.value,
         priority: taskForm.elements.priority.value,
         category: taskForm.elements.category.value,
-        subtasks: Array.from(document.querySelectorAll('#subtask-list .subtask-text'), item => item.textContent)
+        subtasks: readTaskSubtasks()
     };
 }
 
-/** Returns today's date using the browser's local time.
- * @returns {string} Local date in YYYY-MM-DD format.
+/**
+ * Reads the subtask titles and their completion status.
+ * @returns {object[]} Current subtasks.
  */
-function getLocalTaskDate() {
-    const today = new Date();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${today.getFullYear()}-${month}-${day}`;
+function readTaskSubtasks() {
+    return Array.from(document.querySelectorAll('#subtask-list .subtask-item'), row => ({
+        title: row.querySelector('.subtask-text').textContent,
+        completed: row.dataset.completed === 'true'
+    }));
+}
+
+/**
+ * Checks task fields while allowing an existing due date to stay unchanged.
+ * @param {object} task - Task form values.
+ * @returns {object} Validation messages.
+ */
+function validateTask(task) {
+    const today = getLocalDate();
+    const unchangedDate = originalTask && task.dueDate === originalTask.dueDate;
+    return getTaskErrors(task, unchangedDate ? task.dueDate : today);
 }
 
 /** Shows or clears the error for one required field.
@@ -152,26 +173,25 @@ function setTaskFieldError(field, message) {
 function validateTaskField(event) {
     const field = event.target.name;
     if (!taskFields.includes(field)) return;
-    const errors = getTaskErrors(readTaskForm(), getLocalTaskDate());
-    setTaskFieldError(field, errors[field]);
+    setTaskFieldError(field, validateTask(readTaskForm())[field]);
 }
 
-/** Updates validation and hides an older preview after an edit.
+/** Updates the Save button when the task fields change.
  * @param {Event} event - Form input or change event.
  */
 function updateTaskForm(event) {
     if (taskFields.includes(event.target.name)) setTaskFieldError(event.target.name, '');
-    taskPreview.hidden = true;
-    updateTaskPreviewButton();
+    updateTaskSaveButton();
 }
 
-/** Enables preview only when the required fields are valid. */
-function updateTaskPreviewButton() {
-    const errors = getTaskErrors(readTaskForm(), getLocalTaskDate());
-    document.getElementById('preview-task').disabled = taskFields.some(field => errors[field]);
+/** Enables Save once the form and Firebase session are ready. */
+function updateTaskSaveButton() {
+    const errors = validateTask(readTaskForm());
+    taskSaveButton.disabled = savingTask || !auth.currentUser || Boolean(editingTaskId && !originalTask) ||
+        taskFields.some(field => errors[field]);
 }
 
-/** Asks the user to finish a pending subtask before previewing.
+/** Asks the user to finish a pending subtask before saving.
  * @returns {boolean} Whether a subtask is still being entered or edited.
  */
 function hasPendingSubtasks() {
@@ -183,134 +203,65 @@ function hasPendingSubtasks() {
     return true;
 }
 
-/** Validates the task and displays an unsaved preview.
- * @param {SubmitEvent} event - Form submit event.
- */
-function previewTaskForm(event) {
-    event.preventDefault();
-    const task = readTaskForm();
-    const errors = getTaskErrors(task, getLocalTaskDate());
-    taskFields.forEach(field => setTaskFieldError(field, errors[field]));
-    const firstError = taskFields.find(field => errors[field]);
-    if (firstError) return taskForm.elements[firstError].focus();
-    if (hasPendingSubtasks()) return;
-    taskSaveNote.textContent = 'Preview only. Click "Save Task" to save it permanently.';
-    showTaskPreview(task);
-}
-
-/** Displays task values as text without storing them.
- * @param {object} task - Validated task values.
- */
-function showTaskPreview(task) {
-    previewTask = task;
-    ['title', 'description', 'dueDate'].forEach(field => {
-        document.getElementById('preview-task-' + field).textContent = task[field] || 'No description.';
-    });
-    document.getElementById('preview-task-priority').textContent = task.priority[0].toUpperCase() + task.priority.slice(1);
-    document.getElementById('preview-task-category').textContent = task.category === 'user-story' ? 'User Story' : 'Technical Task';
-    showTaskSubtasks(task.subtasks);
-    taskPreview.hidden = false;
-    taskPreview.focus();
-}
-
-/** Displays the current subtask titles in the preview.
- * @param {string[]} subtasks - Subtask titles.
- */
-function showTaskSubtasks(subtasks) {
-    const list = document.getElementById('preview-task-subtasks');
-    list.replaceChildren();
-    subtasks.forEach(text => {
-        const item = document.getElementById('preview-subtask-template').content.firstElementChild.cloneNode(true);
-        item.textContent = text;
-        list.appendChild(item);
-    });
-}
-
-/** Resets fields, subtasks, validation messages and the preview. */
+/** Resets task fields, subtasks and validation messages. */
 function clearTaskForm() {
-    previewTask = null;
     taskForm.reset();
     document.getElementById('subtask-list').replaceChildren();
     updateSubtaskButton();
     taskAssignees.open = false;
     taskFields.forEach(field => setTaskFieldError(field, ''));
-    taskPreview.hidden = true;
-    taskSaveNote.textContent = 'Preview only. Click "Save Task" to save it permanently.';
-    updateTaskPreviewButton();
+    taskSaveNote.textContent = '';
+    updateTaskSaveButton();
     taskForm.elements.title.focus();
 }
 
-/** Loads unsaved preview values back into the same form.
- * @param {object} task - Values from the local preview, not database data.
+/**
+ * Loads editable fields for a task opened from the Board.
+ * @param {object} task - Saved task values.
  */
 function loadTaskForm(task) {
     clearTaskForm();
     ['title', 'description', 'dueDate', 'priority', 'category'].forEach(field => {
-        taskForm.elements[field].value = task[field];
+        taskForm.elements[field].value = task[field] ?? (field === 'priority' ? 'medium' : '');
     });
-    task.subtasks.forEach(appendSubtask);
-    updateTaskPreviewButton();
+    const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+    subtasks.forEach(item => appendSubtask(item.title ?? item, item.completed === true));
+    originalTask = readTaskForm();
+    updateTaskSaveButton();
     taskForm.elements.title.focus();
 }
 
-/** Returns to editing the current unsaved preview. */
-function editTaskPreview() {
-    if (!previewTask) return;
-    loadTaskForm(previewTask);
+/** Loads the task selected on the Board. */
+function loadEditingTask() {
+    try {
+        const task = JSON.parse(sessionStorage.getItem('editingTask'));
+        if (!task || sessionStorage.getItem('editingTaskId') !== editingTaskId) throw new Error('Missing task');
+        loadTaskForm(task);
+    } catch {
+        taskSaveNote.textContent = 'Could not open this task. Open it again from the Board.';
+    }
+}
+
+/** Leaves edit mode once the changes have been saved. */
+function clearTaskEditMode() {
+    editingTaskId = null;
+    originalTask = null;
+    sessionStorage.removeItem('editingTaskId');
+    sessionStorage.removeItem('editingTask');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('edit');
+    window.history.replaceState({}, document.title, url);
 }
 
 /**
- * Loads editing task when page is ready.
+ * Redirects signed-out visitors and starts the task form.
+ * @param {object|null} user - Current Firebase user.
  */
-function loadEditingTaskIfPresent() {
-    const editingId = getUrlSearchParam('edit');
-    if (!editingId) return;
-
-    editingTaskId = editingId;
-    const taskJson = sessionStorage.getItem('editingTask');
-    
-    if (!taskJson) {
-        console.warn('No editing task found in sessionStorage');
+function handleTaskAuthChange(user) {
+    if (!user) {
+        window.location.href = '../index.html';
         return;
     }
-
-    try {
-        const task = JSON.parse(taskJson);
-        console.log('Loading editing task:', task);
-        
-        if (typeof loadTaskForm === 'function') {
-            loadTaskForm({
-                title: task.title || '',
-                description: task.description || '',
-                dueDate: task.dueDate || '',
-                priority: task.priority || 'medium',
-                category: task.category || '',
-                subtasks: task.subtasks ? task.subtasks.map(st => st.title || st) : []
-            });
-            taskSaveNote.textContent = 'Editing task. Click "Save Task" to save changes.';
-            window.history.replaceState({}, document.title, 'addTask.html');
-        } else {
-            console.error('loadTaskForm is not available');
-        }
-    } catch (error) {
-        console.error('Error loading editing task:', error);
-    }
+    if (editingTaskId && !originalTask) loadEditingTask();
+    updateTaskSaveButton();
 }
-
-/**
- * Checks authentication state and loads editing task if present.
- */
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        
-        // Warte bis DOM ready ist, dann lade die Task
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadEditingTaskIfPresent);
-        } else {
-            loadEditingTaskIfPresent();
-        }
-    } else {
-        window.location.href = "../index.html";
-    }
-});
