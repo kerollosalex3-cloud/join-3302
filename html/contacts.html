@@ -26,8 +26,8 @@
                 <a class="sidebar-link active" href="contacts.html" aria-current="page"><img src="../assets/icons/contact.svg" alt=""><span>Contacts</span></a>
             </nav>
             <div class="sidebar-legal">
-                <a href="privacy-policy.html">Privacy Policy</a>
-                <a href="legal-notice.html">Legal notice</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="legal.html">Legal notice</a>
             </div>
         </aside>
         <!-- end sidebar -->
@@ -71,6 +71,10 @@
                     <div class="contacts-heading"><h1 id="contacts-title">Contacts</h1><p>Better with a team</p></div>
                     <section id="contact-details" aria-labelledby="contact-detail-name" hidden>
                         <h2 id="contact-detail-name" tabindex="-1"></h2>
+                        <div class="contact-detail-actions">
+                            <button id="edit-contact" type="button" class="btn secondary-btn">Edit</button>
+                            <button id="delete-contact" type="button" class="btn secondary-btn">Delete</button>
+                        </div>
                         <h3>Contact Information</h3>
                         <dl>
                             <dt>Email</dt><dd id="contact-detail-email"></dd>
@@ -80,7 +84,7 @@
                 </section>
             </main>
             <!-- end contacts -->
-            <footer class="contacts-mobile-legal"><a href="privacy-policy.html">Privacy Policy</a><a href="legal-notice.html">Legal notice</a></footer>
+            <footer class="contacts-mobile-legal"><a href="privacy.html">Privacy Policy</a><a href="legal.html">Legal notice</a></footer>
         </div>
     </div>
 

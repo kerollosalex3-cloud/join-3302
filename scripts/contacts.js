@@ -1,8 +1,9 @@
 import { auth, db } from './firebase.js';
-import { get, push, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import { get, push, ref, runTransaction, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getInitials, isBackdropClick, setFieldError } from "../script.js";
 import { getContactErrors } from "./contactValidation.js";
+import { getContactDeletion, readContactRecords } from './contactData.js';
 
 const contactDialog = document.getElementById('contact-dialog');
 const contactForm = document.getElementById('contact-form');
@@ -13,16 +14,22 @@ const contactStatus = document.getElementById('contact-status');
 const contactList = document.getElementById('contact-list');
 const contactListStatus = document.getElementById('contact-list-status');
 const contactDetails = document.getElementById('contact-details');
+const editContactButton = document.getElementById('edit-contact');
+const deleteContactButton = document.getElementById('delete-contact');
 
 const contactSearch = document.getElementById('contact-search');
 const contactSearchStatus = document.getElementById('contact-search-status');
 let contactLoadId = 0;
 let savedContacts = [];
+let selectedContact = null;
+let editingContactId = null;
 
 onAuthStateChanged(auth, handleContactAuthChange);
 contactSearch.addEventListener('input', filterContacts);
 
-document.getElementById('add-contact').addEventListener('click', openContactForm);
+document.getElementById('add-contact').addEventListener('click', () => openContactForm());
+editContactButton.addEventListener('click', () => openContactForm(selectedContact));
+deleteContactButton.addEventListener('click', deleteSelectedContact);
 document.getElementById('close-contact').addEventListener('click', closeContactForm);
 document.getElementById('cancel-contact').addEventListener('click', closeContactForm);
 contactForm.addEventListener('submit', saveContact);
@@ -36,9 +43,16 @@ contactDialog.addEventListener('close', () => document.body.classList.remove('co
 contactDialog.addEventListener('keydown', keepContactFormFocus);
 contactForm.addEventListener('input', clearContactFieldError);
 
-/** Opens a fresh contact form. */
-function openContactForm() {
+/**
+ * Opens the same form for a new or existing contact.
+ * @param {object|null} contact - Contact to edit, if selected.
+ */
+function openContactForm(contact = null) {
     resetContactForm();
+    editingContactId = contact?.id || null;
+    document.getElementById('contact-dialog-title').textContent = contact ? 'Edit contact' : 'Add contact';
+    contactSubmit.textContent = contact ? 'Save contact' : 'Create contact';
+    if (contact) contactFields.forEach(field => { contactForm.elements[field].value = contact[field] || ''; });
     contactStatus.textContent = '';
     contactDialog.showModal();
     document.body.classList.add('contact-dialog-open');
@@ -116,37 +130,95 @@ async function saveContact(event) {
     contactFields.forEach(field => setContactFieldError(field, errors[field]));
     const firstError = contactFields.find(field => errors[field]);
     if (firstError) return contactForm.elements[firstError].focus();
-    await writeNewContact(contact);
+    await writeContact(contact);
 }
 
 /**
  * Saves the contact and keeps the form open on failure.
  * @param {{name: string, email: string, phone: string}} contact - Valid contact values.
  */
-async function writeNewContact(contact) {
+async function writeContact(contact) {
     setContactSaving(true);
     try {
         await auth.authStateReady();
         const user = auth.currentUser;
         if (!user) throw new Error('Sign in before adding a contact.');
-        await push(ref(db, 'contacts'), contact);
-        if (auth.currentUser?.uid === user.uid) finishContactSave(user);
+        const id = await persistContact(contact);
+        if (auth.currentUser?.uid === user.uid) finishContactSave(user, id, contact);
     } catch {
         contactFormNote.textContent = 'Could not save the contact. Check your connection or sign in again.';
-        return;
     } finally {
         setContactSaving(false);
     }
 }
 
 /**
- * Returns to the list and reloads it after a successful save.
+ * Saves a contact and keeps edits from recreating a deleted record.
+ * @param {object} values - Validated contact values.
+ * @returns {Promise<string>} Saved contact key.
+ */
+async function persistContact(values) {
+    if (!editingContactId) return (await push(ref(db, 'contacts'), values)).key;
+    const id = editingContactId;
+    const result = await runTransaction(ref(db, `contacts/${id}`), current => {
+        return current ? { ...current, ...values } : null;
+    }, { applyLocally: false });
+    if (!result.committed || !result.snapshot.exists()) throw new Error('Contact no longer exists.');
+    return id;
+}
+
+/** Confirms deletion of the selected contact. */
+function deleteSelectedContact() {
+    if (!selectedContact || !auth.currentUser || deleteContactButton.disabled) return;
+    if (window.confirm(`Delete ${selectedContact.name}?`)) removeContact(selectedContact.id, auth.currentUser);
+}
+
+/**
+ * Deletes the contact and clears their task assignments together.
+ * @param {string} id - Contact key.
  * @param {object} user - Current Firebase user.
  */
-function finishContactSave(user) {
+async function removeContact(id, user) {
+    deleteContactButton.disabled = editContactButton.disabled = true;
+    try {
+        const tasks = await get(ref(db, 'tasks'));
+        await update(ref(db), getContactDeletion(id, tasks.val()));
+        if (auth.currentUser?.uid === user.uid) finishContactDeletion(id, user);
+    } catch {
+        contactStatus.textContent = 'Could not delete the contact.';
+    } finally {
+        deleteContactButton.disabled = editContactButton.disabled = false;
+    }
+}
+
+/**
+ * Updates the list after Firebase confirms deletion.
+ * @param {string} id - Deleted contact.
+ * @param {object} user - Current Firebase user.
+ */
+function finishContactDeletion(id, user) {
+    if (selectedContact?.id === id) {
+        selectedContact = null;
+        contactDetails.hidden = true;
+        document.getElementById('add-contact').focus();
+    }
+    savedContacts = savedContacts.filter(contact => contact.id !== id);
+    filterContacts();
+    contactStatus.textContent = 'Contact deleted.';
+    loadContacts(user);
+}
+
+/**
+ * Returns to the list and reloads it after a successful save.
+ * @param {object} user - Current Firebase user.
+ * @param {string} id - Saved contact key.
+ * @param {object} contact - Saved contact fields.
+ */
+function finishContactSave(user, id, contact) {
+    contactStatus.textContent = editingContactId ? 'Contact updated.' : 'Contact saved.';
+    if (editingContactId && selectedContact?.id === id) showContactDetails({ ...contact, id }, false);
     resetContactForm();
     contactDialog.close();
-    contactStatus.textContent = 'Contact saved.';
     loadContacts(user);
 }
 
@@ -168,6 +240,7 @@ function setContactSaving(saving) {
  */
 function handleContactAuthChange(user) {
     savedContacts = [];
+    selectedContact = null;
     contactSearch.value = '';
     filterContacts();
     contactDetails.hidden = true;
@@ -197,9 +270,7 @@ async function loadContacts(user) {
  * @param {object|null} records - Contacts returned by Firebase.
  */
 function showContacts(records) {
-    savedContacts = Object.values(records || {})
-        .filter(contact => typeof contact?.name === 'string' && contact.name.trim())
-        .sort((first, second) => first.name.localeCompare(second.name, undefined, { sensitivity: 'base' }));
+    savedContacts = readContactRecords(records);
     contactListStatus.textContent = savedContacts.length ? '' : 'No contacts yet.';
     filterContacts();
 }
@@ -257,12 +328,14 @@ function createContactRow(contact) {
 /**
  * Displays the saved details of the selected contact.
  * @param {object} contact - Saved contact.
+ * @param {boolean} [focus] - Whether to focus the detail heading.
  */
-function showContactDetails(contact) {
+function showContactDetails(contact, focus = true) {
+    selectedContact = contact;
     const name = document.getElementById('contact-detail-name');
     name.textContent = contact.name;
     document.getElementById('contact-detail-email').textContent = contact.email || '—';
     document.getElementById('contact-detail-phone').textContent = contact.phone || '—';
     contactDetails.hidden = false;
-    name.focus();
+    if (focus) name.focus();
 }
