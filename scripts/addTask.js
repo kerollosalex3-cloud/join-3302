@@ -1,8 +1,9 @@
 import { db, auth } from './firebase.js';
-import { ref, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { ref, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getLocalDate, getUrlSearchParam, setFieldError } from "../script.js";
 import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js';
+import { bindLogout } from './pageSession.js';
 
 const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
 const requestedTaskStatus = getUrlSearchParam('status');
@@ -29,6 +30,7 @@ taskForm.addEventListener('click', updateTaskForm);
 taskForm.addEventListener('focusout', validateTaskField);
 taskForm.addEventListener('submit', saveTaskForm);
 clearTaskButton.addEventListener('click', clearTaskForm);
+bindLogout(document.getElementById('task-logout'), taskSaveNote);
 onAuthStateChanged(auth, handleTaskAuthChange);
 
 /**
@@ -73,13 +75,24 @@ async function persistTask(task) {
         const changes = { ...task, updatedAt: new Date().toISOString() };
         if (assignedTo !== null) changes.assignedTo = assignedTo;
         if (JSON.stringify(task.subtasks) === JSON.stringify(originalTask.subtasks)) delete changes.subtasks;
-        await update(ref(db, `tasks/${editingTaskId}`), changes);
+        await updateExistingTask(changes);
         return;
     }
     await push(ref(db, 'tasks'), {
         ...task, assignedTo: assignedTo || [], status: taskStatus,
         createdBy: auth.currentUser.uid, createdAt: new Date().toISOString()
     });
+}
+
+/**
+ * Applies form changes only if the task still exists.
+ * @param {object} changes - Edited task fields.
+ */
+async function updateExistingTask(changes) {
+    const result = await runTransaction(ref(db, `tasks/${editingTaskId}`), task => {
+        return task ? { ...task, ...changes } : null;
+    }, { applyLocally: false });
+    if (!result.committed || !result.snapshot.exists()) throw new Error('Task no longer exists.');
 }
 
 /** Clears the form and tells the user that Firebase confirmed the save. */
@@ -232,6 +245,7 @@ function loadTaskForm(task) {
     subtasks.forEach(item => appendSubtask(item.title ?? item, item.completed === true));
     restoreTaskAssignees(task.assignedTo);
     originalTask = readTaskForm();
+    taskSaveButton.textContent = 'Save Task';
     updateTaskSaveButton();
     taskForm.elements.title.focus();
 }
@@ -251,6 +265,7 @@ function loadEditingTask() {
 function clearTaskEditMode() {
     editingTaskId = null;
     originalTask = null;
+    taskSaveButton.textContent = 'Create Task';
     sessionStorage.removeItem('editingTaskId');
     sessionStorage.removeItem('editingTask');
     const url = new URL(window.location.href);

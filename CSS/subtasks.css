@@ -24,6 +24,7 @@
 }
 
 .subtask-add,
+.subtask-clear,
 .subtask-actions button {
     display: flex;
     flex-shrink: 0;
@@ -84,6 +85,7 @@
 }
 
 .subtask-add:focus-visible,
+.subtask-clear:focus-visible,
 .subtask-actions button:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;

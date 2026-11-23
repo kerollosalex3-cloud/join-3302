@@ -56,8 +56,19 @@
                 </a>
                 <p>Kanban Project Management Tool</p>
                 <div class="header-actions">
-                    <img src="../assets/icons/help.svg" alt="Help">
-                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
+                    <a class="help-icon-link" href="help.html" aria-label="Help"><img src="../assets/icons/help.svg" alt=""></a>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <span class="header-avatar" aria-hidden="true">G</span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true" inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal.html">Legal Notice</a>
+                            <a href="./privacy.html">Privacy Policy</a>
+                            <a href="../index.html" id="task-logout">Log out</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
             <!-- end header -->
@@ -124,8 +135,11 @@
                             <label for="subtask-input">Subtasks</label>
                             <div class="subtask-entry">
                                 <input id="subtask-input" class="subtask-input" type="text" placeholder="Add new subtask" autocomplete="off">
-                                <button id="add-subtask" class="subtask-add" type="button" aria-label="Add subtask" disabled>
-                                    <img src="../assets/icons/add.svg" alt="">
+                                <button id="clear-subtask" class="subtask-clear" type="button" aria-label="Clear subtask input" hidden>
+                                    <img src="../assets/icons/close.svg" alt="">
+                                </button>
+                                <button id="add-subtask" class="subtask-add" type="button" aria-label="Add subtask" disabled hidden>
+                                    <img src="../assets/icons/check.svg" alt="">
                                 </button>
                             </div>
                             <ul id="subtask-list" aria-label="Subtasks"></ul>
@@ -136,7 +150,7 @@
                         <p class="task-required-note"><span class="task-required">*</span>This field is required</p>
                         <div class="task-form-buttons">
                             <button id="clear-task" class="btn secondary-btn" type="button">Clear</button>
-                            <button id="save-task" class="btn" type="submit" disabled>Save Task</button>
+                            <button id="save-task" class="btn" type="submit" disabled>Create Task</button>
                         </div>
                         <p id="task-save-note" class="task-save-note" role="status"></p>
                     </div>
@@ -187,6 +201,8 @@
         </a>
     </nav>
     <!-- end mobile navigation -->
+    <script src="../scripts/profile-menu.js" defer></script>
+    <script type="module" src="../scripts/header-avatar.js"></script>
 </body>
 
 </html>

@@ -1,9 +1,10 @@
-import { auth, db } from './firebase.js';
+import { auth, db, userPath } from './firebase.js';
 import { get, push, ref, runTransaction, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getInitials, isBackdropClick, setFieldError } from "../script.js";
 import { getContactErrors } from "./contactValidation.js";
-import { getContactDeletion, readContactRecords } from './contactData.js';
+import { getContactDeletion, readContactRecords, readOwnContact } from './contactData.js';
+import { bindLogout } from './pageSession.js';
 
 const contactDialog = document.getElementById('contact-dialog');
 const contactForm = document.getElementById('contact-form');
@@ -23,9 +24,11 @@ let contactLoadId = 0;
 let savedContacts = [];
 let selectedContact = null;
 let editingContactId = null;
+let ownContact = null;
 
 onAuthStateChanged(auth, handleContactAuthChange);
 contactSearch.addEventListener('input', filterContacts);
+bindLogout(document.getElementById('contacts-logout'), contactStatus);
 
 document.getElementById('add-contact').addEventListener('click', () => openContactForm());
 editContactButton.addEventListener('click', () => openContactForm(selectedContact));
@@ -94,7 +97,7 @@ function keepContactFormFocus(event) {
 function readContactForm() {
     return {
         name: contactForm.elements.name.value.trim(),
-        email: contactForm.elements.email.value.trim(),
+        email: contactForm.elements.email.value.trim().toLowerCase(),
         phone: contactForm.elements.phone.value.trim()
     };
 }
@@ -143,7 +146,7 @@ async function writeContact(contact) {
         await auth.authStateReady();
         const user = auth.currentUser;
         if (!user) throw new Error('Sign in before adding a contact.');
-        const id = await persistContact(contact);
+        const id = await persistContact(contact, user);
         if (auth.currentUser?.uid === user.uid) finishContactSave(user, id, contact);
     } catch {
         contactFormNote.textContent = 'Could not save the contact. Check your connection or sign in again.';
@@ -155,9 +158,23 @@ async function writeContact(contact) {
 /**
  * Saves a contact and keeps edits from recreating a deleted record.
  * @param {object} values - Validated contact values.
+ * @param {object} user - Signed-in account.
  * @returns {Promise<string>} Saved contact key.
  */
-async function persistContact(values) {
+async function persistContact(values, user) {
+    if (editingContactId === ownContact?.id) {
+        await update(ref(db, userPath(user.uid)), values);
+        return editingContactId;
+    }
+    return persistSharedContact(values);
+}
+
+/**
+ * Writes a contact from the shared list.
+ * @param {object} values - Validated contact values.
+ * @returns {Promise<string>} Saved contact key.
+ */
+async function persistSharedContact(values) {
     if (!editingContactId) return (await push(ref(db, 'contacts'), values)).key;
     const id = editingContactId;
     const result = await runTransaction(ref(db, `contacts/${id}`), current => {
@@ -169,7 +186,7 @@ async function persistContact(values) {
 
 /** Confirms deletion of the selected contact. */
 function deleteSelectedContact() {
-    if (!selectedContact || !auth.currentUser || deleteContactButton.disabled) return;
+    if (!selectedContact || selectedContact.id === ownContact?.id || !auth.currentUser || deleteContactButton.disabled) return;
     if (window.confirm(`Delete ${selectedContact.name}?`)) removeContact(selectedContact.id, auth.currentUser);
 }
 
@@ -240,11 +257,13 @@ function setContactSaving(saving) {
  */
 function handleContactAuthChange(user) {
     savedContacts = [];
-    selectedContact = null;
+    selectedContact = ownContact = null;
+    editingContactId = null;
     contactSearch.value = '';
     filterContacts();
     contactDetails.hidden = true;
     contactStatus.textContent = '';
+    if (!user) return window.location.replace('../index.html');
     return loadContacts(user);
 }
 
@@ -254,11 +273,10 @@ function handleContactAuthChange(user) {
  */
 async function loadContacts(user) {
     const loadId = ++contactLoadId;
-    contactListStatus.textContent = user ? 'Loading contacts…' : 'Sign in to view contacts.';
-    if (!user) return;
+    contactListStatus.textContent = 'Loading contacts…';
     try {
-        const snapshot = await get(ref(db, 'contacts'));
-        if (loadId === contactLoadId && auth.currentUser?.uid === user.uid) showContacts(snapshot.val());
+        const [snapshot, profile] = await Promise.all([get(ref(db, 'contacts')), readOwnContact(user)]);
+        if (loadId === contactLoadId && auth.currentUser?.uid === user.uid) showContacts(snapshot.val(), profile);
     } catch {
         if (loadId !== contactLoadId || auth.currentUser?.uid !== user.uid) return;
         contactListStatus.textContent = savedContacts.length ? 'Could not refresh contacts.' : 'Could not load contacts.';
@@ -268,9 +286,13 @@ async function loadContacts(user) {
 /**
  * Stores contacts in alphabetical order and updates the visible list.
  * @param {object|null} records - Contacts returned by Firebase.
+ * @param {object|null} profile - Private contact for the signed-in account.
  */
-function showContacts(records) {
-    savedContacts = readContactRecords(records);
+function showContacts(records, profile) {
+    ownContact = profile;
+    const contacts = { ...records };
+    if (profile) contacts[profile.id] = profile;
+    savedContacts = readContactRecords(contacts);
     contactListStatus.textContent = savedContacts.length ? '' : 'No contacts yet.';
     filterContacts();
 }
@@ -319,10 +341,23 @@ function addContactGroup(letter) {
 function createContactRow(contact) {
     const row = document.getElementById('contact-row-template').content.firstElementChild.cloneNode(true);
     row.querySelector('.contact-list-avatar').textContent = getInitials(contact.name);
-    row.querySelector('.contact-list-name').textContent = contact.name;
+    row.querySelector('.contact-list-name').textContent = contact.id === ownContact?.id ? contact.name + ' (You)' : contact.name;
     row.querySelector('.contact-list-email').textContent = contact.email || '';
-    row.querySelector('button').addEventListener('click', () => showContactDetails(contact));
+    const button = row.querySelector('button');
+    button.setAttribute('aria-pressed', String(contact.id === selectedContact?.id));
+    button.addEventListener('click', () => selectContact(contact, button));
     return row;
+}
+
+/**
+ * Highlights the selected contact and displays their details.
+ * @param {object} contact - Selected contact.
+ * @param {HTMLElement} button - Selected row button.
+ */
+function selectContact(contact, button) {
+    contactList.querySelector('[aria-pressed="true"]')?.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-pressed', 'true');
+    showContactDetails(contact);
 }
 
 /**
@@ -332,6 +367,7 @@ function createContactRow(contact) {
  */
 function showContactDetails(contact, focus = true) {
     selectedContact = contact;
+    deleteContactButton.hidden = contact.id === ownContact?.id;
     const name = document.getElementById('contact-detail-name');
     name.textContent = contact.name;
     document.getElementById('contact-detail-email').textContent = contact.email || '—';

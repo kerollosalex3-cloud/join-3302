@@ -105,6 +105,9 @@
     background: #f0f0f0;
 }
 
+.contact-row[aria-pressed="true"] { background: var(--color-primary); color: var(--color-surface); }
+.contact-row[aria-pressed="true"] .contact-list-email { color: var(--color-surface); }
+
 .contact-list-avatar {
     display: grid;
     flex: 0 0 40px;

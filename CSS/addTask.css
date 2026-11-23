@@ -21,7 +21,7 @@
     }
 
     .add-task-page .header > p,
-    .add-task-page .header-actions > img:first-child {
+    .add-task-page .header-actions > .help-icon-link {
         display: none;
     }
 }

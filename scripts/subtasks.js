@@ -1,16 +1,20 @@
 const subtaskInput = document.getElementById('subtask-input');
 const subtaskAddButton = document.getElementById('add-subtask');
+const subtaskClearButton = document.getElementById('clear-subtask');
 const subtaskList = document.getElementById('subtask-list');
 
 subtaskInput.addEventListener('input', updateSubtaskButton);
 subtaskInput.addEventListener('keydown', handleSubtaskEnter);
 subtaskAddButton.addEventListener('click', addSubtask);
+subtaskClearButton.addEventListener('click', clearSubtaskInput);
 subtaskList.addEventListener('click', handleSubtaskAction);
 subtaskList.addEventListener('keydown', handleSubtaskEditKey);
 
 /** Enables adding a subtask when text has been entered. */
 function updateSubtaskButton() {
     subtaskAddButton.disabled = !subtaskInput.value.trim();
+    subtaskAddButton.hidden = subtaskAddButton.disabled;
+    subtaskClearButton.hidden = !subtaskInput.value;
 }
 
 /** Adds one subtask without saving it to the database. */
@@ -18,6 +22,11 @@ function addSubtask() {
     const text = subtaskInput.value.trim();
     if (!text) return;
     appendSubtask(text);
+    clearSubtaskInput();
+}
+
+/** Clears the draft without adding a row. */
+function clearSubtaskInput() {
     subtaskInput.value = '';
     updateSubtaskButton();
     subtaskInput.focus();

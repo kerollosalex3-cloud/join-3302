@@ -1,3 +1,6 @@
+import { db, userPath } from './firebase.js';
+import { get, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
 /**
  * Returns named Firebase contacts with their keys in alphabetical order.
  * @param {object|null} records - Contacts snapshot value.
@@ -25,4 +28,35 @@ export function getContactDeletion(contactId, tasks) {
         if (remaining.length !== assignees.length) changes[`tasks/${taskId}/assignedTo`] = remaining;
     }
     return changes;
+}
+
+/**
+ * Reads the current registered user's own contact information.
+ * @param {object} user - Signed-in account.
+ * @returns {Promise<object|null>} Private contact details.
+ */
+export async function readOwnContact(user) {
+    if (user.isAnonymous) return null;
+    const path = userPath(user.uid);
+    try {
+        const snapshot = await get(ref(db, path));
+        return makeOwnContact(user, snapshot.val());
+    } catch {
+        return makeOwnContact(user);
+    }
+}
+
+/**
+ * Combines saved contact details and sign-in defaults.
+ * @param {object} user - Signed-in account.
+ * @param {object} [profile] - Saved contact details.
+ * @returns {object} Contact for the current user.
+ */
+function makeOwnContact(user, profile = {}) {
+    return {
+        id: `profile:${user.uid}`,
+        name: profile?.name || user.displayName || user.email || 'My contact',
+        email: profile?.email || user.email || '',
+        phone: profile?.phone || ''
+    };
 }
