@@ -290,6 +290,18 @@
     border-radius: 10px;
     background: var(--color-surface);
     box-shadow: 0 4px 8px #0000001a;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.task-contact-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+    cursor: pointer;
 }
 
 .task-contact-list p {

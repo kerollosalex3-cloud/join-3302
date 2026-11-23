@@ -2,6 +2,7 @@ import { db, auth } from './firebase.js';
 import { ref, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getLocalDate, getUrlSearchParam, setFieldError } from "../script.js";
+import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js';
 
 const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
 const requestedTaskStatus = getUrlSearchParam('status');
@@ -67,14 +68,16 @@ async function saveTaskToFirebase(task) {
  * @param {object} task - Task form values.
  */
 async function persistTask(task) {
+    const assignedTo = readTaskAssignees();
     if (editingTaskId) {
         const changes = { ...task, updatedAt: new Date().toISOString() };
+        if (assignedTo !== null) changes.assignedTo = assignedTo;
         if (JSON.stringify(task.subtasks) === JSON.stringify(originalTask.subtasks)) delete changes.subtasks;
         await update(ref(db, `tasks/${editingTaskId}`), changes);
         return;
     }
     await push(ref(db, 'tasks'), {
-        ...task, assignedTo: [], status: taskStatus,
+        ...task, assignedTo: assignedTo || [], status: taskStatus,
         createdBy: auth.currentUser.uid, createdAt: new Date().toISOString()
     });
 }
@@ -209,6 +212,7 @@ function clearTaskForm() {
     document.getElementById('subtask-list').replaceChildren();
     updateSubtaskButton();
     taskAssignees.open = false;
+    clearTaskAssignees();
     taskFields.forEach(field => setTaskFieldError(field, ''));
     taskSaveNote.textContent = '';
     updateTaskSaveButton();
@@ -226,6 +230,7 @@ function loadTaskForm(task) {
     });
     const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
     subtasks.forEach(item => appendSubtask(item.title ?? item, item.completed === true));
+    restoreTaskAssignees(task.assignedTo);
     originalTask = readTaskForm();
     updateTaskSaveButton();
     taskForm.elements.title.focus();
@@ -263,5 +268,6 @@ function handleTaskAuthChange(user) {
         return;
     }
     if (editingTaskId && !originalTask) loadEditingTask();
+    loadTaskAssignees(user);
     updateTaskSaveButton();
 }
