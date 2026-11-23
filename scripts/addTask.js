@@ -1,6 +1,14 @@
 import { db, auth } from './firebase.js';
-import { ref, push, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { ref, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getUrlSearchParam, setFieldError } from "../script.js";
+
+const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
+const requestedTaskStatus = getUrlSearchParam('status');
+const taskStatus = validTaskStatuses.has(requestedTaskStatus) ? requestedTaskStatus : 'todo';
+const isOverlayMode = getUrlSearchParam('overlay') === '1';
+
+if (isOverlayMode) document.documentElement.classList.add('add-task-overlay-mode');
 
 const taskAssignees = document.getElementById('task-assignees');
 const taskForm = document.getElementById('task-form');
@@ -65,9 +73,10 @@ async function saveTaskToFirebase() {
             const tasksRef = ref(db, 'tasks');
             await push(tasksRef, {
                 ...taskData,
-                status: 'todo'
+                status: taskStatus
             });
             taskSaveNote.textContent = 'Task saved successfully!';
+            notifyParentTaskSaved();
         }
 
         taskSaveNote.style.color = 'green';
@@ -80,6 +89,14 @@ async function saveTaskToFirebase() {
         taskSaveNote.textContent = `Error saving task: ${error.message}`;
         taskSaveNote.style.color = 'red';
     }
+}
+
+/**
+ * Notifies the board after a task is saved from its embedded form.
+ */
+function notifyParentTaskSaved() {
+    if (!isOverlayMode || window.parent === window) return;
+    window.parent.postMessage({ type: 'join-task-saved' }, window.location.origin);
 }
 
 /** Closes the contacts dropdown on an outside click or Escape.
@@ -122,8 +139,11 @@ function getLocalTaskDate() {
  * @param {string} message - Validation message.
  */
 function setTaskFieldError(field, message) {
-    taskForm.elements[field].setAttribute('aria-invalid', Boolean(message));
-    document.getElementById('task-' + field + '-error').textContent = message;
+    setFieldError(
+        taskForm.elements[field],
+        document.getElementById(`task-${field}-error`),
+        message
+    );
 }
 
 /** Checks a field when the user leaves it.
@@ -243,10 +263,10 @@ function editTaskPreview() {
  * Loads editing task when page is ready.
  */
 function loadEditingTaskIfPresent() {
-    const params = new URLSearchParams(window.location.search);
-    if (!params.get('edit')) return;
+    const editingId = getUrlSearchParam('edit');
+    if (!editingId) return;
 
-    editingTaskId = params.get('edit');
+    editingTaskId = editingId;
     const taskJson = sessionStorage.getItem('editingTask');
     
     if (!taskJson) {

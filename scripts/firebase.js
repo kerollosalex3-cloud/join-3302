@@ -27,28 +27,3 @@ export const db = getDatabase(app);
 export function userPath(uid, nestedPath = "") {
     return nestedPath ? `users/${uid}/${nestedPath}` : `users/${uid}`;
 }
-
-/**
- * Escapes HTML-sensitive characters in plain text.
- * @param {string} [value] Text to escape.
- * @returns {string} Safe HTML text.
- */
-export function escapeHtml(value = "") {
-    return String(value).replace(/[&<>"']/g, escapeHtmlCharacter);
-}
-
-/**
- * Converts one HTML-sensitive character to its entity representation.
- * @param {string} character Character matched by the HTML-sensitive pattern.
- * @returns {string} HTML entity or unchanged character.
- */
-function escapeHtmlCharacter(character) {
-    const entities = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-    };
-    return entities[character] || character;
-}
