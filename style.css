@@ -172,7 +172,6 @@ body {
 .profile-menu a:focus-visible {
     color: var(--color-surface);
     background: rgba(255, 255, 255, 0.08);
-    outline: none;
 }
 
 .header .header-avatar {

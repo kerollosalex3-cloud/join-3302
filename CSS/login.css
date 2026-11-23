@@ -49,6 +49,7 @@ body {
 }
 
 @media (min-width: 601px) {
+
     .login-page:not(.register-page) .login-header,
     .register-page .login-header {
         width: calc(100% - max(10vw, 48px));
@@ -246,6 +247,7 @@ html.skip-logo-intro .toast {
     border: 1px solid #d1d1d1;
     border-radius: 10px;
     outline: none;
+    border: 1px solid var(--color-border);
 }
 
 .auth-form input:focus {

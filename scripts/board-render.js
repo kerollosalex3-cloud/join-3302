@@ -5,6 +5,17 @@ import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 
 let renderedTasks = [];
 let taskSelectHandler = null;
+const boardStatusOrder = ["todo", "in-progress", "await-feedback", "done"];
+const moveDestinationsByStatus = {
+    todo: ["in-progress", "await-feedback"],
+    "in-progress": ["todo", "await-feedback"],
+    "await-feedback": ["in-progress", "done"],
+    done: ["in-progress", "await-feedback"]
+};
+
+function isMobileBoard() {
+    return window.matchMedia("(max-width: 767px)").matches;
+}
 
 /**
  * Checks whether a task title or description contains the query.
@@ -112,6 +123,15 @@ function closeMoveMenus() {
         .forEach(button => button.setAttribute("aria-expanded", "false"));
 }
 
+function closeMoveMenusOnEscape(event) {
+    if (event.key !== "Escape") return;
+    const openMenu = document.querySelector(".task-move-options:not([hidden])");
+    if (!openMenu) return;
+    const toggle = openMenu.closest(".task-move-menu")?.querySelector(".task-move-toggle");
+    closeMoveMenus();
+    toggle?.focus();
+}
+
 /**
  * Toggles the move menu without opening task details.
  * @param {MouseEvent} event Move button click.
@@ -177,9 +197,18 @@ async function moveTaskViaMenu(event) {
 function bindMoveMenu(card) {
     const toggle = card.querySelector(".task-move-toggle");
     const options = card.querySelectorAll(".task-move-options button");
+    const currentStatus = card.dataset.taskStatus;
+    const currentStatusIndex = boardStatusOrder.indexOf(currentStatus);
+    const allowedDestinations = moveDestinationsByStatus[currentStatus] || [];
     toggle.addEventListener("click", toggleMoveMenu);
     options.forEach(button => {
-        button.hidden = button.dataset.destinationStatus === card.dataset.taskStatus;
+        const destinationStatus = button.dataset.destinationStatus;
+        const destinationStatusIndex = boardStatusOrder.indexOf(destinationStatus);
+        const icon = button.querySelector(".task-move-option-icon");
+        button.hidden = !allowedDestinations.includes(destinationStatus);
+        icon.src = destinationStatusIndex < currentStatusIndex
+            ? "../assets/icons/arrow-up-mobile.svg"
+            : "../assets/icons/arrow-down-mobile.svg";
         button.addEventListener("click", moveTaskViaMenu);
     });
 }
@@ -201,6 +230,7 @@ function bindTaskCard(card) {
  */
 function renderTaskCard(container, task) {
     const card = createTaskCard(task);
+    card.draggable = !isMobileBoard();
     container.append(card);
     bindTaskCard(card);
 }
@@ -231,7 +261,7 @@ function getVisibleCards(container) {
  * @returns {number} Bottom spacing in pixels.
  */
 function getColumnBottomSpacing() {
-    return window.matchMedia("(max-width: 767px)").matches ? 80 : 24;
+    return 24;
 }
 
 /**
@@ -249,7 +279,7 @@ function getAvailableColumnHeight(container) {
  * @returns {number} Visible card limit.
  */
 function getVisibleCardLimit() {
-    return window.matchMedia("(max-width: 767px)").matches ? 3 : 4;
+    return 4;
 }
 
 /**
@@ -267,6 +297,10 @@ function getVisibleCardsHeight(cards, limit) {
  * @param {HTMLElement} container Column task container.
  */
 function updateColumnHeight(container) {
+    if (isMobileBoard()) {
+        container.style.maxHeight = "";
+        return;
+    }
     const cards = getVisibleCards(container);
     const limit = getVisibleCardLimit();
     if (cards.length <= limit) {
@@ -289,6 +323,14 @@ function updateColumnHeights() {
  */
 function scheduleColumnHeightUpdate() {
     requestAnimationFrame(updateColumnHeights);
+}
+
+function handleBoardResize() {
+    const cardsAreDraggable = !isMobileBoard();
+    boardElements.boardColumns.querySelectorAll(".task-card").forEach(card => {
+        card.draggable = cardsAreDraggable;
+    });
+    scheduleColumnHeightUpdate();
 }
 
 /**
@@ -352,5 +394,6 @@ export function updateEmptyColumnMessages(query) {
         updateColumnEmptyMessage(message, query));
 }
 
-window.addEventListener("resize", scheduleColumnHeightUpdate);
+window.addEventListener("resize", handleBoardResize);
 document.addEventListener("click", closeMoveMenus);
+document.addEventListener("keydown", closeMoveMenusOnEscape);

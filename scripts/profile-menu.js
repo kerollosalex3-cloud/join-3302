@@ -34,10 +34,9 @@ function closeProfileMenuOnOutsideClick(event) {
  * @param {KeyboardEvent} event Document keydown event.
  */
 function closeProfileMenuOnEscape(event) {
-    if (event.key === 'Escape') {
-        setProfileMenuOpen(false);
-        profileMenuTrigger.focus();
-    }
+    if (event.key !== 'Escape' || profileMenuTrigger.getAttribute('aria-expanded') !== 'true') return;
+    setProfileMenuOpen(false);
+    profileMenuTrigger.focus();
 }
 
 profileMenuTrigger.addEventListener('click', toggleProfileMenu);

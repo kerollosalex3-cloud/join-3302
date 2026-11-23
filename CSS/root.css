@@ -27,7 +27,7 @@
     --color-surface: #fff;
     --color-text: #000;
     --color-muted: #a8a8a8;
-    --color-border: #d1d1d1;
+    --color-border: #2a3647;
     --color-sidebar-active: #091931;
     --color-sidebar-text: #cdcdcd;
     --color-urgent: rgba(255, 61, 0, 1);
@@ -100,4 +100,9 @@ button {
     border-color: var(--color-accent);
     color: var(--color-accent);
     background: var(--color-surface);
+}
+
+:is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
 }

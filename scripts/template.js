@@ -34,7 +34,6 @@ export function createTaskCard(task) {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-haspopup", "dialog");
-    card.setAttribute("draggable", "true");
     if (task.dueDate) {
         card.dataset.dueDate = task.dueDate;
     }
@@ -69,13 +68,27 @@ export function createTaskCard(task) {
             <span class="task-category ${categoryClass}">${categoryLabel}</span>
             <div class="task-move-menu">
                 <button class="task-move-toggle" type="button"
-                    aria-label="Move task" aria-expanded="false">↔</button>
+                    aria-label="Move task" aria-expanded="false">
+                    <img src="../assets/icons/move-to-mobile.svg" alt="">
+                </button>
                 <div class="task-move-options" hidden>
                     <span>Move to</span>
-                    <button type="button" data-destination-status="todo">To do</button>
-                    <button type="button" data-destination-status="in-progress">In progress</button>
-                    <button type="button" data-destination-status="await-feedback">Await feedback</button>
-                    <button type="button" data-destination-status="done">Done</button>
+                    <button type="button" data-destination-status="todo">
+                        <img class="task-move-option-icon" src="../assets/icons/arrow-up-mobile.svg" alt="">
+                        <span>To do</span>
+                    </button>
+                    <button type="button" data-destination-status="in-progress">
+                        <img class="task-move-option-icon" src="../assets/icons/arrow-down-mobile.svg" alt="">
+                        <span>In progress</span>
+                    </button>
+                    <button type="button" data-destination-status="await-feedback">
+                        <img class="task-move-option-icon" src="../assets/icons/arrow-down-mobile.svg" alt="">
+                        <span>Await feedback</span>
+                    </button>
+                    <button type="button" data-destination-status="done">
+                        <img class="task-move-option-icon" src="../assets/icons/arrow-down-mobile.svg" alt="">
+                        <span>Done</span>
+                    </button>
                 </div>
             </div>
         </div>

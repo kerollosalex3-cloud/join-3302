@@ -42,8 +42,8 @@
                 </a>
             </nav>
             <div class="sidebar-legal">
-                <a href="privacy-policy.html">Privacy Policy</a>
-                <a href="legal-notice.html">Legal notice</a>
+                <a href="./legal.html">Legal Notice</a>
+                <a href="./privacy.html">Privacy Policy</a>
             </div>
         </aside>
         <!-- end sidebar -->
@@ -69,16 +69,19 @@
                     <div class="task-fields">
                         <div class="task-field">
                             <label for="task-title">Title<span class="task-required">*</span></label>
-                            <input id="task-title" name="title" type="text" placeholder="Enter a title" aria-required="true" aria-describedby="task-title-error">
+                            <input id="task-title" name="title" type="text" placeholder="Enter a title"
+                                aria-required="true" aria-describedby="task-title-error">
                             <small id="task-title-error" class="task-error"></small>
                         </div>
                         <div class="task-field">
                             <label for="task-description">Description</label>
-                            <textarea id="task-description" name="description" placeholder="Enter a Description" rows="4"></textarea>
+                            <textarea id="task-description" name="description" placeholder="Enter a Description"
+                                rows="4"></textarea>
                         </div>
                         <div class="task-field">
                             <label for="task-due-date">Due date<span class="task-required">*</span></label>
-                            <input id="task-due-date" name="dueDate" type="date" aria-required="true" aria-describedby="task-dueDate-error">
+                            <input id="task-due-date" name="dueDate" type="date" aria-required="true"
+                                aria-describedby="task-dueDate-error">
                             <small id="task-dueDate-error" class="task-error"></small>
                         </div>
                     </div>
@@ -88,15 +91,18 @@
                             <div class="priority-options">
                                 <div class="priority-option">
                                     <input id="priority-urgent" name="priority" type="radio" value="urgent">
-                                    <label for="priority-urgent">Urgent<img src="../assets/icons/boar-prio-urgent.svg" alt=""></label>
+                                    <label for="priority-urgent">Urgent<img src="../assets/icons/boar-prio-urgent.svg"
+                                            alt=""></label>
                                 </div>
                                 <div class="priority-option">
                                     <input id="priority-medium" name="priority" type="radio" value="medium" checked>
-                                    <label for="priority-medium">Medium<img src="../assets/icons/boar-prio-medium.svg" alt=""></label>
+                                    <label for="priority-medium">Medium<img src="../assets/icons/boar-prio-medium.svg"
+                                            alt=""></label>
                                 </div>
                                 <div class="priority-option">
                                     <input id="priority-low" name="priority" type="radio" value="low">
-                                    <label for="priority-low">Low<img src="../assets/icons/board-prio-low.svg" alt=""></label>
+                                    <label for="priority-low">Low<img src="../assets/icons/board-prio-low.svg"
+                                            alt=""></label>
                                 </div>
                             </div>
                         </fieldset>
@@ -111,7 +117,8 @@
                         </div>
                         <div class="task-field">
                             <label for="task-category">Category<span class="task-required">*</span></label>
-                            <select id="task-category" name="category" aria-required="true" aria-describedby="task-category-error">
+                            <select id="task-category" name="category" aria-required="true"
+                                aria-describedby="task-category-error">
                                 <option value="" disabled selected>Select task category</option>
                                 <option value="user-story">User Story</option>
                                 <option value="technical-task">Technical Task</option>
@@ -122,8 +129,10 @@
                         <div class="task-field task-subtasks">
                             <label for="subtask-input">Subtasks</label>
                             <div class="subtask-entry">
-                                <input id="subtask-input" class="subtask-input" type="text" placeholder="Add new subtask" autocomplete="off">
-                                <button id="add-subtask" class="subtask-add" type="button" aria-label="Add subtask" disabled>
+                                <input id="subtask-input" class="subtask-input" type="text"
+                                    placeholder="Add new subtask" autocomplete="off">
+                                <button id="add-subtask" class="subtask-add" type="button" aria-label="Add subtask"
+                                    disabled>
                                     <img src="../assets/icons/add.svg" alt="">
                                 </button>
                             </div>
@@ -137,7 +146,8 @@
                             <button id="clear-task" class="btn secondary-btn" type="button">Clear</button>
                             <button id="preview-task" class="btn" type="submit" disabled>Preview task</button>
                         </div>
-                        <p id="task-save-note" class="task-save-note" role="status">Preview only. Tasks are not saved yet.</p>
+                        <p id="task-save-note" class="task-save-note" role="status">Preview only. Tasks are not saved
+                            yet.</p>
                     </div>
                 </form>
                 <section id="task-preview" tabindex="-1" aria-labelledby="task-preview-title" hidden>
@@ -146,12 +156,18 @@
                     <button id="edit-task-preview" class="btn secondary-btn" type="button">Edit preview</button>
                     <button id="save-task" class="btn" type="button">Save Task</button>
                     <dl>
-                        <dt>Title</dt><dd id="preview-task-title"></dd>
-                        <dt>Description</dt><dd id="preview-task-description"></dd>
-                        <dt>Due date</dt><dd id="preview-task-dueDate"></dd>
-                        <dt>Priority</dt><dd id="preview-task-priority"></dd>
-                        <dt>Category</dt><dd id="preview-task-category"></dd>
-                        <dt>Assigned to</dt><dd>No contacts selected.</dd>
+                        <dt>Title</dt>
+                        <dd id="preview-task-title"></dd>
+                        <dt>Description</dt>
+                        <dd id="preview-task-description"></dd>
+                        <dt>Due date</dt>
+                        <dd id="preview-task-dueDate"></dd>
+                        <dt>Priority</dt>
+                        <dd id="preview-task-priority"></dd>
+                        <dt>Category</dt>
+                        <dd id="preview-task-category"></dd>
+                        <dt>Assigned to</dt>
+                        <dd>No contacts selected.</dd>
                     </dl>
                     <h3>Subtasks</h3>
                     <ul id="preview-task-subtasks"></ul>
@@ -169,13 +185,18 @@
                 <small class="subtask-error" hidden>Please enter a subtask.</small>
             </div>
             <div class="subtask-actions">
-                <button class="edit-subtask" type="button" aria-label="Edit subtask"><img src="../assets/icons/edit.svg" alt=""></button>
-                <button class="save-subtask" type="button" aria-label="Save subtask" hidden><img src="../assets/icons/check.svg" alt=""></button>
-                <button class="delete-subtask" type="button" aria-label="Delete subtask"><img src="../assets/icons/trasch.svg" alt=""></button>
+                <button class="edit-subtask" type="button" aria-label="Edit subtask"><img src="../assets/icons/edit.svg"
+                        alt=""></button>
+                <button class="save-subtask" type="button" aria-label="Save subtask" hidden><img
+                        src="../assets/icons/check.svg" alt=""></button>
+                <button class="delete-subtask" type="button" aria-label="Delete subtask"><img
+                        src="../assets/icons/trasch.svg" alt=""></button>
             </div>
         </li>
     </template>
-    <template id="preview-subtask-template"><li></li></template>
+    <template id="preview-subtask-template">
+        <li></li>
+    </template>
 
     <!-- start mobile navigation -->
     <nav class="add-task-mobile-nav" aria-label="Hauptnavigation">
