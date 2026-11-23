@@ -102,7 +102,11 @@ button {
     background: var(--color-surface);
 }
 
-:is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 3px solid var(--color-accent);
+:where(html:not([data-pointer-focus])) :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-border);
     outline-offset: 3px;
+}
+
+:where(html[data-pointer-focus]) :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: none;
 }

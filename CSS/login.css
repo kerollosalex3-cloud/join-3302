@@ -251,7 +251,7 @@ html.skip-logo-intro .toast {
 }
 
 .auth-form input:focus {
-    border-color: #29abe2;
+    border-color: var(--color-border);
 }
 
 .auth-form input[aria-invalid="true"] {

@@ -22,6 +22,7 @@ const passwordInput = getElement("#register-password");
 const confirmInput = getElement("#register-password-confirm");
 const privacyInput = getElement("#register-privacy");
 const submitButton = getElement("#register-submit");
+const nameError = getElement("#register-name-error");
 const emailError = getElement("#register-email-error");
 const passwordError = getElement("#register-password-error");
 const confirmError = getElement("#register-password-confirm-error");
@@ -38,6 +39,7 @@ function updateSubmitState() {
     const hasConfirmation = confirmInput.value.length > 0;
     const passwordMatch = passwordInput.value === confirmInput.value && hasConfirmation;
     const privacyOk = privacyInput.checked;
+    if (nameOk) setFieldError(nameInput, nameError, "");
     setFieldError(
         emailInput,
         emailError,
@@ -77,7 +79,7 @@ async function register(event) {
     const password = passwordInput.value;
 
     if (!name) {
-        showToast("Bitte gib deinen Namen ein.");
+        setFieldError(nameInput, nameError, "Bitte gib deinen Namen ein.");
         nameInput.focus();
         return;
     }
@@ -148,7 +150,10 @@ async function register(event) {
         return;
     }
 
-    location.href = "summary.html";
+    showToast("You Signed Up successfully");
+    window.setTimeout(() => {
+        location.href = "summary.html";
+    }, 2500);
 }
 
 function showRegistrationError(error) {

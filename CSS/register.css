@@ -9,6 +9,23 @@
     transform: none;
 }
 
+.register-page .login-box {
+    position: relative;
+}
+
+.register-page .toast:not(:empty) {
+    position: absolute;
+    z-index: 1;
+    top: auto;
+    right: auto;
+    bottom: calc(100% + 16px);
+    left: 50%;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    transform: translateX(-50%);
+}
+
 .register-title-row {
     position: relative;
     display: flex;
