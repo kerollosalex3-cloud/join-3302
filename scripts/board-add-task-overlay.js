@@ -21,6 +21,14 @@ function openColumnAddTask(event) {
         alert("The selected board column is invalid.");
         return;
     }
+    if (window.matchMedia("(max-width: 767px)").matches) {
+        window.location.href = "./addTask.html?status=" + encodeURIComponent(status);
+        return;
+    }
+    showAddTaskDialog(status);
+}
+
+function showAddTaskDialog(status) {
     boardElements.addTaskFrame.src =
         `./addTask.html?overlay=1&status=${encodeURIComponent(status)}`;
     boardElements.addTaskDialog.showModal();
@@ -71,6 +79,12 @@ function bindColumnAddButtons() {
  */
 export function initializeAddTaskOverlay() {
     bindColumnAddButtons();
+    document.getElementById("addTaskButton").addEventListener("click", event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        if (window.matchMedia("(max-width: 767px)").matches) return;
+        event.preventDefault();
+        showAddTaskDialog("todo");
+    });
     boardElements.addTaskCloseButton.addEventListener("click", closeAddTaskDialog);
     boardElements.addTaskDialog.addEventListener("click", closeAddTaskOnBackdrop);
     boardElements.addTaskDialog.addEventListener("close", resetAddTaskFrame);
