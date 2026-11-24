@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { get, onValue, ref } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { auth, db, userPath } from "./firebase.js";
-import { getInitials } from "../script.js";
+import { getInitials, getLocalDate } from "../script.js";
 
 const greetingName = document.querySelector("#greeting-name");
 const avatarInitials = document.querySelector(".header-avatar-initials");
@@ -102,12 +102,7 @@ function countStatus(tasks, status) {
  * @returns {string|null} Earliest future or current due date.
  */
 function findNextDeadline(tasks) {
-    const now = new Date();
-    const today = [
-        now.getFullYear(),
-        String(now.getMonth() + 1).padStart(2, "0"),
-        String(now.getDate()).padStart(2, "0")
-    ].join("-");
+    const today = getLocalDate();
     const dates = tasks
         .filter(task => task.status !== "done" && /^\d{4}-\d{2}-\d{2}$/.test(task.dueDate))
         .map(task => task.dueDate)
