@@ -1,6 +1,13 @@
 import { db, userPath } from './firebase.js';
 import { get, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
+const contactColors = ['#ff7a00', '#9327ff', '#6e52ff', '#d545dc', '#008f82', '#00a4ce'];
+
+export function getContactColor(id) {
+    const total = Array.from(id).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+    return contactColors[total % contactColors.length];
+}
+
 /**
  * Returns named Firebase contacts with their keys in alphabetical order.
  * @param {object|null} records - Contacts snapshot value.

@@ -3,7 +3,7 @@ import { get, push, ref, runTransaction, update } from 'https://www.gstatic.com/
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getInitials, isBackdropClick, setFieldError } from "../script.js";
 import { getContactErrors } from "./contactValidation.js";
-import { getContactDeletion, readContactRecords, readOwnContact } from './contactData.js';
+import { getContactColor, getContactDeletion, readContactRecords, readOwnContact } from './contactData.js?v=2';
 import { bindLogout } from './pageSession.js';
 
 const contactDialog = document.getElementById('contact-dialog');
@@ -17,6 +17,10 @@ const contactListStatus = document.getElementById('contact-list-status');
 const contactDetails = document.getElementById('contact-details');
 const editContactButton = document.getElementById('edit-contact');
 const deleteContactButton = document.getElementById('delete-contact');
+const contactBackButton = document.getElementById('contact-back');
+const contactMenuButton = document.getElementById('contact-actions-toggle');
+const cancelContactButton = document.getElementById('cancel-contact');
+const deleteFromFormButton = document.getElementById('delete-contact-from-form');
 
 const contactSearch = document.getElementById('contact-search');
 const contactSearchStatus = document.getElementById('contact-search-status');
@@ -34,7 +38,12 @@ document.getElementById('add-contact').addEventListener('click', () => openConta
 editContactButton.addEventListener('click', () => openContactForm(selectedContact));
 deleteContactButton.addEventListener('click', deleteSelectedContact);
 document.getElementById('close-contact').addEventListener('click', closeContactForm);
-document.getElementById('cancel-contact').addEventListener('click', closeContactForm);
+cancelContactButton.addEventListener('click', closeContactForm);
+deleteFromFormButton.addEventListener('click', deleteSelectedContact);
+contactBackButton.addEventListener('click', closeContactDetails);
+contactMenuButton.addEventListener('click', () => {
+    setContactMenu(contactMenuButton.getAttribute('aria-expanded') === 'false');
+});
 contactForm.addEventListener('submit', saveContact);
 contactDialog.addEventListener('click', event => {
     if (isBackdropClick(event, contactDialog)) closeContactForm();
@@ -46,20 +55,44 @@ contactDialog.addEventListener('close', () => document.body.classList.remove('co
 contactDialog.addEventListener('keydown', keepContactFormFocus);
 contactForm.addEventListener('input', clearContactFieldError);
 
-/**
- * Opens the same form for a new or existing contact.
- * @param {object|null} contact - Contact to edit, if selected.
- */
 function openContactForm(contact = null) {
     resetContactForm();
     editingContactId = contact?.id || null;
     document.getElementById('contact-dialog-title').textContent = contact ? 'Edit contact' : 'Add contact';
-    contactSubmit.textContent = contact ? 'Save contact' : 'Create contact';
+    updateContactFormAppearance(contact);
+    setContactMenu(false);
     if (contact) contactFields.forEach(field => { contactForm.elements[field].value = contact[field] || ''; });
     contactStatus.textContent = '';
     contactDialog.showModal();
     document.body.classList.add('contact-dialog-open');
     contactForm.elements.name.focus();
+}
+
+function updateContactFormAppearance(contact) {
+    const isEditing = Boolean(contact);
+    document.getElementById('contact-dialog-subtitle').hidden = isEditing;
+    document.getElementById('contact-submit-label').textContent = isEditing ? 'Save' : 'Create contact';
+    cancelContactButton.hidden = isEditing;
+    deleteFromFormButton.hidden = !isEditing || contact.id === ownContact?.id;
+    const initials = document.getElementById('contact-form-initials');
+    const avatar = initials.parentElement;
+    initials.hidden = !isEditing;
+    avatar.querySelector('img').hidden = isEditing;
+    initials.textContent = isEditing ? getInitials(contact.name) : '';
+    avatar.style.backgroundColor = isEditing ? getContactColor(contact.id) : '';
+}
+
+function setContactMenu(open) {
+    contactMenuButton.setAttribute('aria-expanded', String(open));
+}
+
+function closeContactDetails() {
+    const row = contactList.querySelector('[aria-pressed="true"]');
+    setContactMenu(false);
+    contactDetails.hidden = true;
+    selectedContact = null;
+    row?.setAttribute('aria-pressed', 'false');
+    (row || document.getElementById('add-contact')).focus();
 }
 
 /** Clears contact fields and their messages. */
@@ -79,7 +112,7 @@ function closeContactForm() {
  */
 function keepContactFormFocus(event) {
     if (event.key !== 'Tab') return;
-    const controls = contactDialog.querySelectorAll('button:not(:disabled), input');
+    const controls = contactDialog.querySelectorAll('button:not(:disabled):not([hidden]), input');
     const first = controls[0];
     const last = controls[controls.length - 1];
     if (!event.shiftKey && document.activeElement === last) {
@@ -187,6 +220,7 @@ async function persistSharedContact(values) {
 /** Confirms deletion of the selected contact. */
 function deleteSelectedContact() {
     if (!selectedContact || selectedContact.id === ownContact?.id || !auth.currentUser || deleteContactButton.disabled) return;
+    if (contactDialog.open && contactSubmit.disabled) return;
     if (window.confirm(`Delete ${selectedContact.name}?`)) removeContact(selectedContact.id, auth.currentUser);
 }
 
@@ -196,23 +230,22 @@ function deleteSelectedContact() {
  * @param {object} user - Current Firebase user.
  */
 async function removeContact(id, user) {
-    deleteContactButton.disabled = editContactButton.disabled = true;
+    deleteContactButton.disabled = editContactButton.disabled = deleteFromFormButton.disabled = true;
+    if (contactDialog.open) contactSubmit.disabled = true;
     try {
         const tasks = await get(ref(db, 'tasks'));
         await update(ref(db), getContactDeletion(id, tasks.val()));
-        if (auth.currentUser?.uid === user.uid) finishContactDeletion(id, user);
+        if (auth.currentUser?.uid !== user.uid) return;
+        if (contactDialog.open) contactDialog.close();
+        finishContactDeletion(id, user);
     } catch {
-        contactStatus.textContent = 'Could not delete the contact.';
+        (contactDialog.open ? contactFormNote : contactStatus).textContent = 'Could not delete the contact.';
     } finally {
+        contactSubmit.disabled = deleteFromFormButton.disabled = false;
         deleteContactButton.disabled = editContactButton.disabled = false;
     }
 }
 
-/**
- * Updates the list after Firebase confirms deletion.
- * @param {string} id - Deleted contact.
- * @param {object} user - Current Firebase user.
- */
 function finishContactDeletion(id, user) {
     if (selectedContact?.id === id) {
         selectedContact = null;
@@ -225,12 +258,6 @@ function finishContactDeletion(id, user) {
     loadContacts(user);
 }
 
-/**
- * Returns to the list and reloads it after a successful save.
- * @param {object} user - Current Firebase user.
- * @param {string} id - Saved contact key.
- * @param {object} contact - Saved contact fields.
- */
 function finishContactSave(user, id, contact) {
     contactStatus.textContent = editingContactId ? 'Contact updated.' : 'Contact saved.';
     if (editingContactId && selectedContact?.id === id) showContactDetails({ ...contact, id }, false);
@@ -323,24 +350,17 @@ function renderContactRows(contacts) {
     }
 }
 
-/**
- * Adds a letter heading above its contact rows.
- * @param {string} letter - First letter of the name.
- */
 function addContactGroup(letter) {
     const group = document.getElementById('contact-group-template').content.firstElementChild.cloneNode(true);
     group.textContent = letter;
     contactList.append(group);
 }
 
-/**
- * Creates a list row from the saved name and email.
- * @param {object} contact - Saved contact.
- * @returns {HTMLElement} Contact list row.
- */
 function createContactRow(contact) {
     const row = document.getElementById('contact-row-template').content.firstElementChild.cloneNode(true);
-    row.querySelector('.contact-list-avatar').textContent = getInitials(contact.name);
+    const avatar = row.querySelector('.contact-list-avatar');
+    avatar.textContent = getInitials(contact.name);
+    avatar.style.backgroundColor = getContactColor(contact.id);
     row.querySelector('.contact-list-name').textContent = contact.id === ownContact?.id ? contact.name + ' (You)' : contact.name;
     row.querySelector('.contact-list-email').textContent = contact.email || '';
     const button = row.querySelector('button');
@@ -349,28 +369,25 @@ function createContactRow(contact) {
     return row;
 }
 
-/**
- * Highlights the selected contact and displays their details.
- * @param {object} contact - Selected contact.
- * @param {HTMLElement} button - Selected row button.
- */
 function selectContact(contact, button) {
     contactList.querySelector('[aria-pressed="true"]')?.setAttribute('aria-pressed', 'false');
     button.setAttribute('aria-pressed', 'true');
     showContactDetails(contact);
 }
 
-/**
- * Displays the saved details of the selected contact.
- * @param {object} contact - Saved contact.
- * @param {boolean} [focus] - Whether to focus the detail heading.
- */
 function showContactDetails(contact, focus = true) {
     selectedContact = contact;
     deleteContactButton.hidden = contact.id === ownContact?.id;
     const name = document.getElementById('contact-detail-name');
     name.textContent = contact.name;
-    document.getElementById('contact-detail-email').textContent = contact.email || '—';
+    setContactMenu(false);
+    const avatar = document.getElementById('contact-detail-avatar');
+    avatar.textContent = getInitials(contact.name);
+    avatar.style.backgroundColor = getContactColor(contact.id);
+    const email = document.getElementById('contact-detail-email');
+    email.textContent = contact.email || '—';
+    if (contact.email) email.href = 'mailto:' + contact.email;
+    else email.removeAttribute('href');
     document.getElementById('contact-detail-phone').textContent = contact.phone || '—';
     contactDetails.hidden = false;
     if (focus) name.focus();
