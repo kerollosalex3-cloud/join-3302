@@ -3,7 +3,7 @@
  * @param {string} today - Current local date in YYYY-MM-DD format.
  * @returns {{title: string, dueDate: string, category: string}} Field errors.
  */
-function getTaskErrors(task, today) {
+export function getTaskErrors(task, today) {
     return {
         title: task.title.trim() ? '' : 'This field is required.',
         dueDate: getTaskDateError(task.dueDate, today),

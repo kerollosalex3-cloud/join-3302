@@ -9,12 +9,10 @@
     <link rel="stylesheet" href="../CSS/root.css">
     <script src="../scripts/focus-input.js" defer></script>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../CSS/addTask.css">
+    <link rel="stylesheet" href="../CSS/addTask.css?v=2">
     <link rel="stylesheet" href="../CSS/subtasks.css">
-    <link rel="stylesheet" href="../CSS/taskForm.css">
-    <script src="../scripts/taskValidation.js" defer></script>
-    <script src="../scripts/addTask.js" defer type="module"></script>
-    <script src="../scripts/subtasks.js" defer></script>
+    <link rel="stylesheet" href="../CSS/taskForm.css?v=2">
+    <script src="../scripts/addTask.js?v=2" defer type="module"></script>
 </head>
 
 <body class="add-task-page">
@@ -92,8 +90,11 @@
                         </div>
                         <div class="task-field">
                             <label for="task-due-date">Due date<span class="task-required">*</span></label>
-                            <input id="task-due-date" name="dueDate" type="date" aria-required="true"
-                                aria-describedby="task-dueDate-error">
+                            <div class="task-date-field">
+                                <input id="task-due-date" name="dueDate" type="date" required
+                                    aria-describedby="task-dueDate-error">
+                                <span aria-hidden="true">dd/mm/yyyy</span>
+                            </div>
                             <small id="task-dueDate-error" class="task-error"></small>
                         </div>
                     </div>
@@ -120,13 +121,18 @@
                         </fieldset>
                         <div class="task-field">
                             <span id="task-assignees-label" class="task-field-label">Assigned to</span>
-                            <details id="task-assignees" class="task-assignees" aria-labelledby="task-assignees-label">
-                                <summary>Select contacts to assign</summary>
-                                <div class="task-contact-list">
+                            <div id="task-assignees" class="task-assignees" aria-labelledby="task-assignees-label">
+                                <div class="task-contact-field">
+                                    <input id="task-contact-search" type="search" placeholder="Select contacts to assign"
+                                        aria-label="Search contacts to assign" autocomplete="off">
+                                    <button id="task-contact-toggle" type="button" aria-label="Show or hide contacts"
+                                        aria-controls="task-contact-list" aria-expanded="false"></button>
+                                </div>
+                                <div id="task-contact-list" class="task-contact-list" hidden>
                                     <p id="task-contact-status" role="status">Loading contacts…</p>
                                     <div id="task-contact-options"></div>
                                 </div>
-                            </details>
+                            </div>
                         </div>
                         <div class="task-field">
                             <label for="task-category">Category<span class="task-required">*</span></label>
@@ -157,8 +163,12 @@
                     <div class="task-form-actions">
                         <p class="task-required-note"><span class="task-required">*</span>This field is required</p>
                         <div class="task-form-buttons">
-                            <button id="clear-task" class="btn secondary-btn" type="button">Clear</button>
-                            <button id="save-task" class="btn" type="submit" disabled>Create Task</button>
+                            <button id="clear-task" class="btn secondary-btn" type="button">
+                                <span id="clear-task-label">Clear</span><img src="../assets/icons/close.svg" alt="">
+                            </button>
+                            <button id="save-task" class="btn" type="submit" disabled>
+                                <span id="save-task-label">Create Task</span><img src="../assets/icons/check.svg" alt="">
+                            </button>
                         </div>
                         <p id="task-save-note" class="task-save-note" role="status"></p>
                     </div>
@@ -170,8 +180,9 @@
 
     <template id="task-contact-template">
         <label class="task-contact-option">
+            <span class="task-contact-avatar" aria-hidden="true"></span>
+            <span class="task-contact-name"></span>
             <input type="checkbox">
-            <span></span>
         </label>
     </template>
     <template id="subtask-template">

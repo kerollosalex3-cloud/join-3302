@@ -11,7 +11,7 @@
 
 @media (max-width: 700px) {
     .add-task-page .header {
-        height: 56px;
+        height: 80px;
         padding: 0 16px;
     }
 
@@ -30,7 +30,7 @@
 /* start add task */
 .add-task-main {
     max-width: 1208px;
-    padding: 64px 72px;
+    padding: clamp(56px, 12.5vh, 128px) clamp(32px, 6.65vw, 96px) 72px;
     box-sizing: border-box;
 }
 
@@ -40,7 +40,7 @@
 
 @media (max-width: 700px) {
     .add-task-main {
-        padding: 28px 16px 88px;
+        padding: 40px 16px 180px;
     }
 
     .add-task-main h1 {
@@ -53,8 +53,8 @@
 .task-form {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 48px;
-    margin-top: 40px;
+    gap: clamp(42px, 10vh, 96px) clamp(45px, 6.65vw, 96px);
+    margin-top: 44px;
 }
 
 .task-fields {
@@ -81,13 +81,13 @@
     color: var(--color-urgent);
 }
 
-.task-field input,
+.task-field input:not([type="checkbox"]),
 .task-field textarea,
 .task-field select {
     width: 100%;
     min-width: 0;
     padding: 12px 16px;
-    border: 1px solid var(--color-border);
+    border: 1px solid #a8a8a8;
     border-radius: 10px;
     box-sizing: border-box;
     background: var(--color-surface);
@@ -103,7 +103,7 @@
 
 .task-field input::placeholder,
 .task-field textarea::placeholder {
-    color: var(--color-muted);
+    color: #6b6b6b;
 }
 
 .task-field input:focus,
@@ -111,6 +111,39 @@
 .task-field select:focus {
     border-color: var(--color-accent);
     outline: 1px solid var(--color-accent);
+}
+
+.task-date-field {
+    position: relative;
+    font-size: 20px;
+}
+
+.task-date-field span {
+    display: none;
+}
+
+@supports selector(input::-webkit-datetime-edit) {
+    #task-due-date:invalid:not(:focus)::-webkit-datetime-edit {
+        opacity: 0;
+    }
+
+    #task-due-date:invalid:not(:focus) + span {
+        position: absolute;
+        top: 50%;
+        left: 16px;
+        display: block;
+        transform: translateY(-50%);
+        color: #6b6b6b;
+        pointer-events: none;
+    }
+
+    #task-due-date::-webkit-calendar-picker-indicator {
+        background-image: url("../assets/icons/calendar.svg");
+    }
+}
+
+.task-date-field input {
+    display: block;
 }
 
 @media (max-width: 1200px) {
@@ -126,8 +159,9 @@
     }
 
     .task-field label,
+    .task-date-field,
     .task-field-label,
-    .task-field input,
+    .task-field input:not([type="checkbox"]),
     .task-field textarea,
     .task-field select {
         font-size: 16px;
@@ -139,8 +173,18 @@
 .task-options {
     width: auto;
     min-width: 0;
-    padding-left: 24px;
-    border-left: 1px solid var(--color-border);
+    position: relative;
+}
+
+@media (min-width: 1201px) {
+    .task-options::before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(clamp(45px, 6.65vw, 96px) / -2);
+        border-left: 1px solid #a8a8a8;
+        content: "";
+    }
 }
 
 .task-priority {
@@ -246,77 +290,6 @@
 }
 /* end task options */
 
-/* start assigned contacts */
-.task-assignees {
-    position: relative;
-    font-size: 20px;
-}
-
-.task-assignees summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 12px 16px;
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    background: var(--color-surface);
-    list-style: none;
-    cursor: pointer;
-}
-
-.task-assignees summary::-webkit-details-marker {
-    display: none;
-}
-
-.task-assignees summary::after {
-    content: "▾";
-}
-
-.task-assignees[open] summary,
-.task-assignees summary:focus-visible {
-    border-color: var(--color-accent);
-    outline: 1px solid var(--color-accent);
-}
-
-.task-contact-list {
-    position: absolute;
-    z-index: 2;
-    top: calc(100% + 4px);
-    right: 0;
-    left: 0;
-    padding: 16px;
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    background: var(--color-surface);
-    box-shadow: 0 4px 8px #0000001a;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.task-contact-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    font-size: 16px;
-    overflow-wrap: anywhere;
-    cursor: pointer;
-}
-
-.task-contact-list p {
-    margin: 0;
-    color: var(--color-primary);
-    font-size: 16px;
-}
-
-@media (max-width: 700px) {
-    .task-assignees {
-        font-size: 16px;
-    }
-}
-/* end assigned contacts */
-
 /* start navigation */
 .add-task-mobile-nav {
     display: none;
@@ -333,7 +306,9 @@
         bottom: 0;
         left: 0;
         display: flex;
-        min-height: 56px;
+        z-index: 5;
+        min-height: 80px;
+        box-sizing: border-box;
         padding: 4px 8px;
         background: var(--color-primary);
     }
@@ -344,10 +319,10 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 2px;
-        border-radius: 8px;
+        gap: 5px;
+        border-radius: 16px;
         color: var(--color-sidebar-text);
-        font-size: 10px;
+        font-size: 13px;
         text-decoration: none;
     }
 
@@ -356,42 +331,32 @@
     }
 
     .add-task-mobile-nav img {
-        width: 16px;
-        height: 16px;
+        width: 24px;
+        height: 24px;
+    }
+
+    html:not(.add-task-overlay-mode) .task-form-actions {
+        position: fixed;
+        inset: auto 0 80px;
+        z-index: 3;
+        justify-content: flex-end;
+        gap: 6px;
+        padding: 8px 16px 12px;
+        background: var(--color-background);
+    }
+
+    html:not(.add-task-overlay-mode) .task-form-actions .task-required-note {
+        display: none;
+    }
+
+    html:not(.add-task-overlay-mode) .task-form-buttons {
+        width: auto;
+    }
+
+    html:not(.add-task-overlay-mode) .task-form-buttons .btn {
+        flex: none;
+        min-height: 48px;
+        padding-inline: 12px;
     }
 }
 /* end navigation */
-
-html.add-task-overlay-mode,
-html.add-task-overlay-mode body {
-    height: 100%;
-    overflow: hidden;
-}
-
-html.add-task-overlay-mode .app-layout {
-    display: block;
-    height: 100%;
-    min-height: 100%;
-}
-
-html.add-task-overlay-mode .sidebar,
-html.add-task-overlay-mode .header,
-html.add-task-overlay-mode .add-task-mobile-nav {
-    display: none;
-}
-
-html.add-task-overlay-mode .app-content {
-    height: 100%;
-    overflow-y: auto;
-}
-
-html.add-task-overlay-mode .add-task-main {
-    width: 100%;
-    max-width: 1208px;
-    margin: 0 auto;
-    padding: 32px;
-}
-
-html.add-task-overlay-mode .task-form {
-    margin-top: 24px;
-}

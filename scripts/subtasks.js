@@ -11,7 +11,7 @@ subtaskList.addEventListener('click', handleSubtaskAction);
 subtaskList.addEventListener('keydown', handleSubtaskEditKey);
 
 /** Enables adding a subtask when text has been entered. */
-function updateSubtaskButton() {
+export function updateSubtaskButton() {
     subtaskAddButton.disabled = !subtaskInput.value.trim();
     subtaskAddButton.hidden = subtaskAddButton.disabled;
     subtaskClearButton.hidden = !subtaskInput.value;
@@ -114,7 +114,7 @@ function handleSubtaskEditKey(event) {
  * @param {string} text - Subtask title.
  * @param {boolean} [completed] - Saved completion status.
  */
-function appendSubtask(text, completed = false) {
+export function appendSubtask(text, completed = false) {
     const row = document.getElementById('subtask-template').content.firstElementChild.cloneNode(true);
     row.querySelector('.subtask-text').textContent = text;
     row.dataset.completed = String(completed);
