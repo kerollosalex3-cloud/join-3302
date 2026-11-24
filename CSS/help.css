@@ -37,7 +37,7 @@
 }
 
 .help-back-link {
-    display: inline-flex;
+    display: none;
     width: 32px;
     height: 32px;
     flex: 0 0 32px;
@@ -264,5 +264,9 @@
 
     .help-note {
         padding: 16px;
+    }
+
+    .help-back-link {
+        display: inline-flex;
     }
 }
