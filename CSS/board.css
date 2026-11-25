@@ -120,10 +120,10 @@
 }
 
 .board-add-task-dialog {
-    width: min(100% - 32px, 1208px);
-    max-width: 1208px;
-    height: min(90vh, 900px);
-    max-height: calc(100vh - 32px);
+    width: min(100% - 32px, 1116px);
+    max-width: 1116px;
+    height: min(100dvh - 32px, 870px);
+    border-radius: 30px;
     padding: 0;
     overflow: hidden;
     border: 0;
@@ -132,7 +132,7 @@
 }
 
 .board-add-task-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.28);
 }
 
 .board-add-task-dialog-content {
@@ -151,8 +151,8 @@
 .board-add-task-close {
     position: absolute;
     z-index: 1;
-    top: 12px;
-    right: 16px;
+    top: clamp(16px, 7.4vh, 64px);
+    right: clamp(16px, 3.3vw, 36px);
     display: grid;
     width: 36px;
     height: 36px;

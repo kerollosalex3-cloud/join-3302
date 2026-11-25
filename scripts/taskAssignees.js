@@ -1,73 +1,126 @@
 import { auth, db } from './firebase.js';
 import { get, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
-import { getInitials } from '../script.js';
-import { readContactRecords } from './contactData.js';
+import { getAssigneeColors, getInitials } from '../script.js?v=3';
+import { readContactRecords, readOwnContact } from './contactData.js?v=3';
 
+const contactPicker = document.getElementById('task-assignees');
+const contactSearch = document.getElementById('task-contact-search');
+const contactToggle = document.getElementById('task-contact-toggle');
+const contactList = document.getElementById('task-contact-list');
 const contactOptions = document.getElementById('task-contact-options');
 const contactStatus = document.getElementById('task-contact-status');
 const contactTemplate = document.getElementById('task-contact-template');
-const contactSummary = document.querySelector('#task-assignees summary');
 let contacts = [];
+let contactMessage = 'Loading contacts…';
 let previousAssignees = [];
 let selectionChanged = false;
 
+contactSearch.addEventListener('click', openTaskContacts);
+contactSearch.addEventListener('input', openTaskContacts);
+contactToggle.addEventListener('click', () => {
+    if (!contactList.hidden) return closeTaskContacts();
+    openTaskContacts();
+    contactSearch.focus();
+});
 contactOptions.addEventListener('change', () => {
     selectionChanged = true;
-    updateContactSummary();
+    updateContactPlaceholder();
+});
+contactPicker.addEventListener('keydown', handleContactKeys);
+contactPicker.addEventListener('focusout', event => {
+    if (event.relatedTarget && !contactPicker.contains(event.relatedTarget)) closeTaskContacts();
+});
+document.addEventListener('click', event => {
+    if (!contactPicker.contains(event.target)) closeTaskContacts();
 });
 
-/**
- * Loads the contacts available to the current account.
- * @param {object} user - Current Firebase user.
- */
+function openTaskContacts() {
+    contactList.hidden = false;
+    contactToggle.setAttribute('aria-expanded', 'true');
+    updateContactPlaceholder();
+    filterTaskContacts();
+}
+
+function closeTaskContacts() {
+    if (contactList.hidden) return;
+    contactList.hidden = true;
+    contactToggle.setAttribute('aria-expanded', 'false');
+    contactSearch.value = '';
+    updateContactPlaceholder();
+}
+
+function handleContactKeys(event) {
+    if (event.key === 'Escape' && !contactList.hidden) {
+        event.preventDefault();
+        closeTaskContacts();
+        contactToggle.focus();
+    }
+    if (event.target !== contactSearch) return;
+    if (event.key === 'Enter') event.preventDefault();
+    if (event.key !== 'ArrowDown') return;
+    event.preventDefault();
+    openTaskContacts();
+    contactOptions.querySelector('.task-contact-option:not([hidden]) input')?.focus();
+}
+
+function filterTaskContacts() {
+    const query = contactSearch.value.trim().toLocaleLowerCase();
+    let matches = 0;
+    for (const row of contactOptions.children) {
+        row.hidden = !row.querySelector('.task-contact-name').textContent.toLocaleLowerCase().includes(query);
+        if (!row.hidden) matches++;
+    }
+    contactStatus.textContent = contactMessage || (matches ? '' : 'No matching contacts.');
+    contactStatus.hidden = !contactStatus.textContent;
+}
+
 export async function loadTaskAssignees(user) {
     try {
-        const snapshot = await get(ref(db, 'contacts'));
+        const [snapshot, ownContact] = await Promise.all([get(ref(db, 'contacts')), readOwnContact(user)]);
         if (auth.currentUser?.uid !== user.uid) return;
         contacts = readContactRecords(snapshot.val());
-        contactStatus.textContent = contacts.length ? '' : 'No contacts yet.';
-        contactStatus.hidden = Boolean(contacts.length);
+        if (ownContact) contacts.unshift({ ...ownContact, own: true });
+        contactMessage = contacts.length ? '' : 'No contacts yet.';
         renderTaskAssignees();
     } catch {
-        if (auth.currentUser?.uid === user.uid) contactStatus.textContent = 'Could not load contacts.';
+        if (auth.currentUser?.uid !== user.uid) return;
+        contactMessage = 'Could not load contacts.';
+        filterTaskContacts();
     }
 }
 
-/**
- * Restores the saved selection when editing a task.
- * @param {object[]} assignments - Existing task assignments.
- */
 export function restoreTaskAssignees(assignments = []) {
     previousAssignees = Array.isArray(assignments) ? assignments : [];
     selectionChanged = false;
     renderTaskAssignees();
 }
 
-/** Clears the selected contacts when the form is cleared. */
 export function clearTaskAssignees() {
+    closeTaskContacts();
     restoreTaskAssignees();
     selectionChanged = true;
 }
 
-/** Builds checkbox rows for the available contacts. */
 function renderTaskAssignees() {
     const selected = new Set(previousAssignees.map(assignee => assignee?.id));
     contactOptions.replaceChildren();
-    for (const contact of contacts) {
+    contacts.forEach(contact => {
         const row = contactTemplate.content.firstElementChild.cloneNode(true);
         const checkbox = row.querySelector('input');
+        const avatar = row.querySelector('.task-contact-avatar');
         checkbox.value = contact.id;
         checkbox.checked = selected.has(contact.id);
-        row.querySelector('span').textContent = contact.name;
+        avatar.textContent = getInitials(contact.name);
+        const colors = getAssigneeColors(contact);
+        avatar.style.backgroundColor = colors.background;
+        avatar.style.color = colors.text;
+        row.querySelector('.task-contact-name').textContent = contact.name + (contact.own ? ' (You)' : '');
         contactOptions.append(row);
-    }
-    updateContactSummary();
+    });
+    filterTaskContacts();
+    updateContactPlaceholder();
 }
 
-/**
- * Reads the selected contacts while preserving unknown older assignments.
- * @returns {object[]|null} Changed assignments or null for an unchanged selection.
- */
 export function readTaskAssignees() {
     if (!selectionChanged) return null;
     const checked = new Set(Array.from(contactOptions.querySelectorAll('input:checked'), input => input.value));
@@ -81,8 +134,8 @@ export function readTaskAssignees() {
     return [...retained, ...selected];
 }
 
-/** Shows how many contacts are assigned. */
-function updateContactSummary() {
+function updateContactPlaceholder() {
     const count = (readTaskAssignees() || previousAssignees).length;
-    contactSummary.textContent = count ? `${count} selected` : 'Select contacts to assign';
+    contactSearch.placeholder = count ? count + ' selected' : 'Select contacts to assign';
+    if (!contactList.hidden) contactSearch.placeholder = '';
 }

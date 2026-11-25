@@ -2,8 +2,10 @@ import { db, auth } from './firebase.js';
 import { ref, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getLocalDate, getUrlSearchParam, setFieldError } from "../script.js";
-import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js';
+import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js?v=3';
 import { bindLogout } from './pageSession.js';
+import { getTaskErrors } from './taskValidation.js?v=2';
+import { appendSubtask, updateSubtaskButton } from './subtasks.js?v=2';
 
 const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
 const requestedTaskStatus = getUrlSearchParam('status');
@@ -12,24 +14,22 @@ const isOverlayMode = getUrlSearchParam('overlay') === '1';
 
 if (isOverlayMode) document.documentElement.classList.add('add-task-overlay-mode');
 
-const taskAssignees = document.getElementById('task-assignees');
 const taskForm = document.getElementById('task-form');
 const taskSaveButton = document.getElementById('save-task');
+const taskSaveLabel = document.getElementById('save-task-label');
 const clearTaskButton = document.getElementById('clear-task');
+if (isOverlayMode) document.getElementById('clear-task-label').textContent = 'Cancel';
 const taskSaveNote = document.getElementById('task-save-note');
 const taskFields = ['title', 'dueDate', 'category'];
 let editingTaskId = getUrlSearchParam('edit');
 let originalTask = null;
 let savingTask = false;
 
-document.addEventListener('click', closeTaskContacts);
-document.addEventListener('keydown', closeTaskContacts);
 taskForm.addEventListener('input', updateTaskForm);
 taskForm.addEventListener('change', updateTaskForm);
-taskForm.addEventListener('click', updateTaskForm);
 taskForm.addEventListener('focusout', validateTaskField);
 taskForm.addEventListener('submit', saveTaskForm);
-clearTaskButton.addEventListener('click', clearTaskForm);
+clearTaskButton.addEventListener('click', cancelOrClearTask);
 bindLogout(document.getElementById('task-logout'), taskSaveNote);
 onAuthStateChanged(auth, handleTaskAuthChange);
 
@@ -97,11 +97,16 @@ async function updateExistingTask(changes) {
 
 /** Clears the form and tells the user that Firebase confirmed the save. */
 function finishTaskSave() {
-    const message = editingTaskId ? 'Task updated.' : 'Task saved.';
+    const message = editingTaskId ? 'Task updated.' : 'Task added to board';
     if (editingTaskId) clearTaskEditMode();
     clearTaskForm();
     taskSaveNote.textContent = message;
-    notifyParentTaskSaved();
+    taskSaveNote.classList.add('task-save-success');
+    taskSaveButton.disabled = clearTaskButton.disabled = true;
+    window.setTimeout(() => {
+        if (isOverlayMode && window.parent !== window) notifyParentTaskSaved();
+        else window.location.assign('board.html');
+    }, 750);
 }
 
 /**
@@ -124,15 +129,13 @@ function notifyParentTaskSaved() {
     window.parent.postMessage({ type: 'join-task-saved' }, window.location.origin);
 }
 
-/** Closes the contacts dropdown on an outside click or Escape.
- * @param {MouseEvent|KeyboardEvent} event - Click or keyboard event.
- */
-function closeTaskContacts(event) {
-    if (!taskAssignees.open) return;
-    if (event.type === 'click' && taskAssignees.contains(event.target)) return;
-    if (event.type === 'keydown' && event.key !== 'Escape') return;
-    taskAssignees.open = false;
-    if (event.key === 'Escape') taskAssignees.querySelector('summary').focus();
+function cancelOrClearTask() {
+    const dialog = isOverlayMode ? window.frameElement?.closest('dialog') : null;
+    if (dialog) {
+        dialog.close();
+        return;
+    }
+    clearTaskForm();
 }
 
 /** Reads the current task and added subtask entries.
@@ -192,19 +195,14 @@ function validateTaskField(event) {
     setTaskFieldError(field, validateTask(readTaskForm())[field]);
 }
 
-/** Updates the Save button when the task fields change.
- * @param {Event} event - Form input or change event.
- */
+/** Clears a field error as the user corrects it. */
 function updateTaskForm(event) {
     if (taskFields.includes(event.target.name)) setTaskFieldError(event.target.name, '');
-    updateTaskSaveButton();
 }
 
-/** Enables Save once the form and Firebase session are ready. */
+/** Enables Save while the signed-in user can work on the form. */
 function updateTaskSaveButton() {
-    const errors = validateTask(readTaskForm());
-    taskSaveButton.disabled = savingTask || !auth.currentUser || Boolean(editingTaskId && !originalTask) ||
-        taskFields.some(field => errors[field]);
+    taskSaveButton.disabled = savingTask || !auth.currentUser || Boolean(editingTaskId && !originalTask);
 }
 
 /** Asks the user to finish a pending subtask before saving.
@@ -224,7 +222,6 @@ function clearTaskForm() {
     taskForm.reset();
     document.getElementById('subtask-list').replaceChildren();
     updateSubtaskButton();
-    taskAssignees.open = false;
     clearTaskAssignees();
     taskFields.forEach(field => setTaskFieldError(field, ''));
     taskSaveNote.textContent = '';
@@ -245,7 +242,7 @@ function loadTaskForm(task) {
     subtasks.forEach(item => appendSubtask(item.title ?? item, item.completed === true));
     restoreTaskAssignees(task.assignedTo);
     originalTask = readTaskForm();
-    taskSaveButton.textContent = 'Save Task';
+    taskSaveLabel.textContent = 'Save Task';
     updateTaskSaveButton();
     taskForm.elements.title.focus();
 }
@@ -265,7 +262,7 @@ function loadEditingTask() {
 function clearTaskEditMode() {
     editingTaskId = null;
     originalTask = null;
-    taskSaveButton.textContent = 'Create Task';
+    taskSaveLabel.textContent = 'Create Task';
     sessionStorage.removeItem('editingTaskId');
     sessionStorage.removeItem('editingTask');
     const url = new URL(window.location.href);
