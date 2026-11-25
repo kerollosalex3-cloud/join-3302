@@ -24,24 +24,12 @@ function getPriorityLabel(priority) {
 }
 
 /**
- * Creates a task card element from task data.
- * @param {Object} task - Task object with id, title, description, category, priority, dueDate, subtasks, assignedTo.
- * @returns {HTMLArticleElement} A task card element.
+ * Builds subtask progress markup for a task card.
+ * @param {Object} task Task data.
+ * @returns {string} Subtask markup or an empty string.
  */
-export function createTaskCard(task) {
-    const card = document.createElement("article");
-    card.className = "task-card";
-    card.setAttribute("role", "button");
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("aria-haspopup", "dialog");
-    if (task.dueDate) {
-        card.dataset.dueDate = task.dueDate;
-    }
-
-    const categoryClass = task.category === "technical-task" ? "task-category-technical" : "";
-    const categoryLabel = task.category === "technical-task" ? "Technical Task" : "User Story";
-
-    const subtaskHtml = task.subtasks && task.subtasks.length > 0
+function getTaskSubtasksHtml(task) {
+    return task.subtasks && task.subtasks.length > 0
         ? `<ul class="task-subtask-data" hidden>
             ${task.subtasks.map(st => `<li data-completed="${st.completed}">${escapeHtml(st.title)}</li>`).join("")}
            </ul>
@@ -52,8 +40,15 @@ export function createTaskCard(task) {
                <span class="task-subtask-count">${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length} Subtasks</span>
            </div>`
         : "";
+}
 
-    const assigneesHtml = task.assignedTo && task.assignedTo.length > 0
+/**
+ * Builds assigned-contact markup for a task card.
+ * @param {Object} task Task data.
+ * @returns {string} Assigned-contact markup.
+ */
+function getTaskAssigneesHtml(task) {
+    return task.assignedTo && task.assignedTo.length > 0
         ? `<div class="task-assignees" aria-label="Assigned to ${task.assignedTo.map(a => a.name).join(", ")}">
             ${task.assignedTo.slice(0, 3).map(assignee => {
                 const colors = getAssigneeColors(assignee);
@@ -63,8 +58,19 @@ export function createTaskCard(task) {
             }).join("")}
            </div>`
         : `<div class="task-assignees"></div>`;
+}
 
-    card.innerHTML = `
+/**
+ * Builds the task card's contents.
+ * @param {Object} task Task data.
+ * @returns {string} Task card markup.
+ */
+function getTaskCardHtml(task) {
+    const categoryClass = task.category === "technical-task" ? "task-category-technical" : "";
+    const categoryLabel = task.category === "technical-task" ? "Technical Task" : "User Story";
+    const subtaskHtml = getTaskSubtasksHtml(task);
+    const assigneesHtml = getTaskAssigneesHtml(task);
+    return `
         <div class="task-card-top">
             <span class="task-category ${categoryClass}">${categoryLabel}</span>
             <div class="task-move-menu">
@@ -102,13 +108,23 @@ export function createTaskCard(task) {
                 src="${getPriorityIcon(task.priority)}" alt="${getPriorityLabel(task.priority)} priority">
         </div>
     `;
+}
 
-    const ariaLabel = `View task: ${task.title}`;
-    card.setAttribute("aria-label", ariaLabel);
-    
-    // Set dataset AFTER innerHTML to prevent it from being lost
+/**
+ * Creates a task card element from task data.
+ * @param {Object} task Task data.
+ * @returns {HTMLArticleElement} A task card element.
+ */
+export function createTaskCard(task) {
+    const card = document.createElement("article");
+    card.className = "task-card";
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-haspopup", "dialog");
+    if (task.dueDate) card.dataset.dueDate = task.dueDate;
+    card.innerHTML = getTaskCardHtml(task);
+    card.setAttribute("aria-label", `View task: ${task.title}`);
     card.dataset.taskId = task.id;
     card.dataset.taskStatus = task.status || "todo";
-
     return card;
 }

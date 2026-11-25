@@ -3,6 +3,7 @@ import { ref, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/
 import { boardElements } from "./board-elements.js";
 import { getAssigneeColors, isBackdropClick } from "../script.js";
 
+/** @type {() => object[]} */
 let getTasks = () => [];
 let currentTaskId = null;
 let subtaskUpdateInProgress = false;

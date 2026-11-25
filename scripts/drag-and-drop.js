@@ -17,7 +17,7 @@ let nativeDragImage = null;
  * @param {string} message Error message.
  */
 function showDropError(message) {
-    window.alert(`Die Aufgabe konnte nicht verschoben werden: ${message}`);
+    window.alert(`Could not move the task: ${message}`);
 }
 
 /**
@@ -43,7 +43,7 @@ function createTaskUpdates(taskIds, status) {
  */
 async function handleTaskDrop(taskId, status, orderedTaskIds) {
     if (!taskId || !validStatuses.has(status) || !orderedTaskIds.includes(taskId)) {
-        showDropError("Ungültiges Ablageziel.");
+        showDropError("Invalid drop target.");
         return;
     }
     try {
@@ -133,7 +133,7 @@ function getOrderedTaskIds(taskList) {
 function completeDrop(event, column) {
     const taskList = column?.querySelector(".board-column-tasks");
     const taskId = event.dataTransfer?.getData("text/plain") || draggedTaskId;
-    if (!taskList || !dropPlaceholder) return showDropError("Kein gültiges Ablageziel.");
+    if (!taskList || !dropPlaceholder) return showDropError("No valid drop target.");
     if (dropPlaceholder.parentElement !== taskList) taskList.append(dropPlaceholder);
     const orderedTaskIds = getOrderedTaskIds(taskList);
     taskList.insertBefore(draggedCard, dropPlaceholder);
@@ -317,6 +317,16 @@ function createNativeDragImage(event) {
 }
 
 /**
+ * Hides the source card once its drag preview has been created.
+ * @param {HTMLElement} card Dragged task card.
+ */
+function hideDragSource(card) {
+    requestAnimationFrame(() => {
+        if (draggedCard === card) card.classList.add("drag-source-hidden");
+    });
+}
+
+/**
  * Starts dragging a task and creates its drag visuals.
  * @param {DragEvent} event Drag-start event.
  */
@@ -332,9 +342,7 @@ function handleDragStart(event) {
         createDragImages(event, card);
     }
     createDropPlaceholder(card);
-    requestAnimationFrame(() => {
-        if (draggedCard === card) card.classList.add("drag-source-hidden");
-    });
+    hideDragSource(card);
 }
 
 /**

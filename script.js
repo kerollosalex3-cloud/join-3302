@@ -180,6 +180,7 @@ export function bindPasswordVisibility(input, toggle) {
         hidden: toggle.dataset.hiddenIcon,
         visible: toggle.dataset.visibleIcon
     };
+    /** Refreshes the password visibility control. */
     const refresh = () => updatePasswordToggle(input, toggle, icon, icons);
     input.addEventListener("input", refresh);
     toggle.addEventListener("click", () => togglePasswordVisibility(input, toggle, icon, icons));
