@@ -1,7 +1,7 @@
 import { auth, db } from './firebase.js';
 import { get, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
-import { getInitials } from '../script.js';
-import { getContactColor, readContactRecords, readOwnContact } from './contactData.js?v=2';
+import { getAssigneeColors, getInitials } from '../script.js?v=3';
+import { readContactRecords, readOwnContact } from './contactData.js?v=3';
 
 const contactPicker = document.getElementById('task-assignees');
 const contactSearch = document.getElementById('task-contact-search');
@@ -111,7 +111,9 @@ function renderTaskAssignees() {
         checkbox.value = contact.id;
         checkbox.checked = selected.has(contact.id);
         avatar.textContent = getInitials(contact.name);
-        avatar.style.backgroundColor = getContactColor(contact.id);
+        const colors = getAssigneeColors(contact);
+        avatar.style.backgroundColor = colors.background;
+        avatar.style.color = colors.text;
         row.querySelector('.task-contact-name').textContent = contact.name + (contact.own ? ' (You)' : '');
         contactOptions.append(row);
     });

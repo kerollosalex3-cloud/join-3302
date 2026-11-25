@@ -1,9 +1,9 @@
 import { auth, db, userPath } from './firebase.js';
 import { get, push, ref, runTransaction, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getInitials, isBackdropClick, setFieldError } from "../script.js";
+import { getAssigneeColors, getInitials, isBackdropClick, setFieldError } from "../script.js?v=3";
 import { getContactErrors } from "./contactValidation.js";
-import { getContactColor, getContactDeletion, readContactRecords, readOwnContact } from './contactData.js?v=2';
+import { getContactDeletion, readContactRecords, readOwnContact } from './contactData.js?v=3';
 import { bindLogout } from './pageSession.js';
 
 const contactDialog = document.getElementById('contact-dialog');
@@ -79,7 +79,9 @@ function updateContactFormAppearance(contact) {
     initials.hidden = !isEditing;
     avatar.querySelector('img').hidden = isEditing;
     initials.textContent = isEditing ? getInitials(contact.name) : '';
-    avatar.style.backgroundColor = isEditing ? getContactColor(contact.id) : '';
+    const colors = isEditing ? getAssigneeColors(contact) : null;
+    avatar.style.backgroundColor = colors?.background || '';
+    avatar.style.color = colors?.text || '';
 }
 
 function setContactMenu(open) {
@@ -359,8 +361,10 @@ function addContactGroup(letter) {
 function createContactRow(contact) {
     const row = document.getElementById('contact-row-template').content.firstElementChild.cloneNode(true);
     const avatar = row.querySelector('.contact-list-avatar');
+    const colors = getAssigneeColors(contact);
     avatar.textContent = getInitials(contact.name);
-    avatar.style.backgroundColor = getContactColor(contact.id);
+    avatar.style.backgroundColor = colors.background;
+    avatar.style.color = colors.text;
     row.querySelector('.contact-list-name').textContent = contact.id === ownContact?.id ? contact.name + ' (You)' : contact.name;
     row.querySelector('.contact-list-email').textContent = contact.email || '';
     const button = row.querySelector('button');
@@ -383,7 +387,9 @@ function showContactDetails(contact, focus = true) {
     setContactMenu(false);
     const avatar = document.getElementById('contact-detail-avatar');
     avatar.textContent = getInitials(contact.name);
-    avatar.style.backgroundColor = getContactColor(contact.id);
+    const colors = getAssigneeColors(contact);
+    avatar.style.backgroundColor = colors.background;
+    avatar.style.color = colors.text;
     const email = document.getElementById('contact-detail-email');
     email.textContent = contact.email || '—';
     if (contact.email) email.href = 'mailto:' + contact.email;

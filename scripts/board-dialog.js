@@ -1,7 +1,7 @@
 import { db } from "./firebase.js";
 import { ref, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { boardElements } from "./board-elements.js";
-import { isBackdropClick } from "../script.js";
+import { getAssigneeColors, isBackdropClick } from "../script.js";
 
 let getTasks = () => [];
 let currentTaskId = null;
@@ -74,6 +74,10 @@ function createAssigneeItem(assignee) {
     const item = document.createElement("li");
     const avatar = document.createElement("span");
     const name = document.createElement("span");
+    const colors = getAssigneeColors(assignee);
+    avatar.className = "task-assignee";
+    avatar.style.backgroundColor = colors.background;
+    avatar.style.color = colors.text;
     avatar.textContent = assignee.initials;
     name.textContent = assignee.name;
     item.append(avatar, name);

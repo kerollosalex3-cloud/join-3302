@@ -500,7 +500,7 @@
         align-items: flex-start;
         flex-direction: column;
         gap: 2px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
     .summary-heading h2 {
@@ -512,7 +512,7 @@
         position: relative;
         padding: 0 0 10px;
         border: 0;
-        font-size: 16px;
+        font-size: clamp(12px, 10vw - 20px, 16px);
         line-height: 1.4;
     }
 
@@ -622,6 +622,13 @@
         line-height: 1.2;
     }
 
+}
+
+@media (width < 768px) {
+    .summary-heading {
+        max-width: calc(100% - 150px);
+        min-height: 160px;
+    }
 }
 
 @media (max-width: 340px) {

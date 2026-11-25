@@ -2,7 +2,7 @@ import { db, auth } from './firebase.js';
 import { ref, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getLocalDate, getUrlSearchParam, setFieldError } from "../script.js";
-import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js?v=2';
+import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js?v=3';
 import { bindLogout } from './pageSession.js';
 import { getTaskErrors } from './taskValidation.js?v=2';
 import { appendSubtask, updateSubtaskButton } from './subtasks.js?v=2';

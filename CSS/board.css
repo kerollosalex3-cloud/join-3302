@@ -398,15 +398,15 @@
     margin-left: 0;
 }
 
-.task-assignee-one {
+.task-assignee-1 {
     background: #ff7a00;
 }
 
-.task-assignee-two {
+.task-assignee-2 {
     background: #1fd7c1;
 }
 
-.task-assignee-three {
+.task-assignee-3 {
     background: #462f8a;
 }
 
@@ -537,7 +537,7 @@
     gap: 12px;
     min-height: 28px;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .task-dialog-assignees .task-assignee {

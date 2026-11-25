@@ -34,6 +34,18 @@
     --color-medium: rgba(255, 168, 0, 1);
     --color-low: rgba(122, 226, 41, 1);
     --color-greeting: #124658;
+    --color-assignee-1: rgba(151, 71, 255, 1);
+    --color-assignee-2: rgba(0, 190, 232, 1);
+    --color-assignee-3: rgba(31, 215, 193, 1);
+    --color-assignee-4: rgba(255, 116, 94, 1);
+    --color-assignee-5: rgba(255, 163, 94, 1);
+    --color-assignee-6: rgba(252, 113, 255, 1);
+    --color-assignee-7: rgba(255, 199, 1, 1);
+    --color-assignee-8: rgba(0, 56, 255, 1);
+    --color-assignee-9: rgba(195, 255, 43, 1);
+    --color-assignee-10: rgba(255, 230, 43, 1);
+    --color-assignee-11: rgba(255, 70, 70, 1);
+    --color-assignee-12: rgba(255, 187, 43, 1);
 }
 
 body {
