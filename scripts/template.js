@@ -1,4 +1,4 @@
-import { escapeHtml } from "../script.js";
+import { escapeHtml, getAssigneeColors } from "../script.js";
 
 /**
  * Returns the priority icon path based on the priority level.
@@ -55,11 +55,12 @@ export function createTaskCard(task) {
 
     const assigneesHtml = task.assignedTo && task.assignedTo.length > 0
         ? `<div class="task-assignees" aria-label="Assigned to ${task.assignedTo.map(a => a.name).join(", ")}">
-            ${task.assignedTo.slice(0, 3).map((assignee, idx) => `
-                <span class="task-assignee task-assignee-${idx + 1}" data-name="${escapeHtml(assignee.name)}">
+            ${task.assignedTo.slice(0, 3).map(assignee => {
+                const colors = getAssigneeColors(assignee);
+                return `<span class="task-assignee" style="background-color: ${colors.background}; color: ${colors.text}" data-name="${escapeHtml(assignee.name)}">
                     ${escapeHtml(assignee.initials)}
-                </span>
-            `).join("")}
+                </span>`;
+            }).join("")}
            </div>`
         : `<div class="task-assignees"></div>`;
 

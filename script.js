@@ -22,6 +22,27 @@ export function getInitials(name, fallback = "G") {
     return parts[0]?.slice(0, 2).toUpperCase() || fallback;
 }
 
+const assigneeColorCount = 12;
+
+/**
+ * Returns stable, readable avatar colors for an assigned contact.
+ * @param {Object} assignee Assigned contact.
+ * @returns {{background: string, text: string}} Avatar colors.
+ */
+export function getAssigneeColors(assignee) {
+    const identity = assignee.id || assignee.name;
+    let hash = 2166136261;
+    for (let index = 0; index < identity.length; index++) {
+        hash = Math.imul(hash ^ identity.charCodeAt(index), 16777619);
+    }
+    hash = (hash ^ (hash >>> 16)) >>> 0;
+    const index = hash % assigneeColorCount;
+    return {
+        background: `var(--color-assignee-${index + 1})`,
+        text: index === 0 || index === 7 ? "#fff" : "#000"
+    };
+}
+
 /**
  * Sets a field's validation state and message.
  * @param {HTMLInputElement|HTMLSelectElement} input Form control.

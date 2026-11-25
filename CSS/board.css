@@ -537,7 +537,7 @@
     gap: 12px;
     min-height: 28px;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .task-dialog-assignees .task-assignee {

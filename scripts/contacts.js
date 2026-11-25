@@ -1,7 +1,7 @@
 import { auth, db, userPath } from './firebase.js';
 import { get, push, ref, runTransaction, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getInitials, isBackdropClick, setFieldError } from "../script.js";
+import { getAssigneeColors, getInitials, isBackdropClick, setFieldError } from "../script.js";
 import { getContactErrors } from "./contactValidation.js";
 import { getContactDeletion, readContactRecords, readOwnContact } from './contactData.js';
 import { bindLogout } from './pageSession.js';
@@ -340,7 +340,11 @@ function addContactGroup(letter) {
  */
 function createContactRow(contact) {
     const row = document.getElementById('contact-row-template').content.firstElementChild.cloneNode(true);
-    row.querySelector('.contact-list-avatar').textContent = getInitials(contact.name);
+    const avatar = row.querySelector('.contact-list-avatar');
+    const colors = getAssigneeColors(contact);
+    avatar.textContent = getInitials(contact.name);
+    avatar.style.backgroundColor = colors.background;
+    avatar.style.color = colors.text;
     row.querySelector('.contact-list-name').textContent = contact.id === ownContact?.id ? contact.name + ' (You)' : contact.name;
     row.querySelector('.contact-list-email').textContent = contact.email || '';
     const button = row.querySelector('button');
