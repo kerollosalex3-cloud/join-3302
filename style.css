@@ -98,6 +98,7 @@ body {
     height: 96px;
     padding: 20px 40px 20px 96px;
     box-sizing: border-box;
+    overflow-x: clip;
     opacity: 1;
 }
 
@@ -136,29 +137,32 @@ body {
 .profile-menu {
     position: absolute;
     z-index: 20;
-    top: calc(100% + 8px);
+    top: calc(100% + 20px);
     right: 0;
     display: flex;
-    width: 164px;
+    box-sizing: border-box;
+    width: 150px;
+    height: 204px;
     flex-direction: column;
-    padding: 8px 0;
-    border-radius: 16px;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 20px 0 20px 20px;
     background: rgba(42, 54, 71, 1);
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-6px);
-    transition: opacity 100ms ease, transform 100ms ease, visibility 100ms ease;
+    transform: translateX(100%);
+    transition: opacity 250ms ease, transform 250ms ease, visibility 250ms ease;
 }
 
 .profile-menu.is-open {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateX(0);
 }
 
 .profile-menu a {
-    padding: 10px 20px;
+    padding: 10px;
     color: rgba(205, 205, 205, 1);
     font-family: var(--font-main);
     font-size: 16px;
@@ -168,10 +172,20 @@ body {
     white-space: nowrap;
 }
 
+.profile-menu a[href$="help.html"] {
+    display: none;
+}
+
 .profile-menu a:hover,
 .profile-menu a:focus-visible {
     color: var(--color-surface);
     background: rgba(255, 255, 255, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-menu {
+        transition: none;
+    }
 }
 
 .header .header-avatar {
@@ -190,6 +204,7 @@ body {
 }
 
 @media (max-width: 900px) {
+
     .header .header-avatar,
     .header .header-avatar-trigger {
         width: 32px;
@@ -200,5 +215,25 @@ body {
 
     .header .header-actions {
         gap: 8px;
+    }
+}
+
+@media (width < 768px) {
+    .header .header-actions>.help-icon-link {
+        display: none;
+    }
+
+    .profile-menu {
+        top: 100%;
+        right: -8px;
+    }
+
+    .profile-menu a {
+        padding: 11px 10px;
+        font-size: 16px;
+    }
+
+    .profile-menu a[href$="help.html"] {
+        display: block;
     }
 }

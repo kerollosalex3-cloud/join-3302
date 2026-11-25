@@ -20,8 +20,7 @@
         align-items: center;
     }
 
-    .add-task-page .header > p,
-    .add-task-page .header-actions > .help-icon-link {
+    .add-task-page .header > p {
         display: none;
     }
 }
