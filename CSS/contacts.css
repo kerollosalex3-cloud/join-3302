@@ -20,6 +20,16 @@
     display: none;
 }
 
+@media (min-width: 901px) {
+    .contacts-page .sidebar {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        height: 100dvh;
+        min-height: 0;
+    }
+}
+
 .contacts-main {
     display: flex;
     flex: 1;
