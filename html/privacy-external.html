@@ -42,116 +42,120 @@
                 <article class="help-content">
                     <h1>Privacy Policy</h1>
                     <p class="help-intro">
-                        This Privacy Policy explains what personal data is processed when you use Join and the rights
-                        you have in relation to that data.
+                        Join is a learning project intended for demo use. Please do not enter real or confidential
+                        information. This policy explains what personal data is processed when you use Join and the
+                        rights you have in relation to that data.
                     </p>
 
                     <section class="help-section">
                         <h2>1. Data controller</h2>
                         <p>
-                            The controller responsible for data processing is:<br>
-                            <strong>[Full name or legal name of the operator]</strong><br>
-                            [Street address]<br>
-                            [Postal code, city, country]<br>
-                            Email: [Contact email address]
-                        </p>
-                        <p>
-                            Before publishing this policy, replace these placeholders with the controller's complete
-                            and accurate contact details.
+                            The controller responsible for processing personal data is:<br>
+                            <strong>Stefan Friggemann</strong><br>
+                            Stadtlohnerstraße 45<br>
+                            48683 Ahaus<br>
+                            Email: honky.sf@gmail.com
                         </p>
                     </section>
 
                     <section class="help-section">
-                        <h2>2. Hosting and server logs</h2>
+                        <h2>2. Hosting and access data</h2>
                         <p>
-                            When you access the website, the hosting provider processes technical connection data.
-                            This may include your IP address, the time of access, the page requested, the referrer URL,
-                            and information about your browser, operating system, and HTTP status. This processing is
-                            necessary to provide, maintain, and secure the website.
+                            The website is provided using Firebase Hosting by Google. When you visit the website,
+                            technical access data may be processed, such as your IP address, the time and address
+                            requested, and technical information about your browser and request. This is necessary
+                            to operate and provide the website.
                         </p>
                         <p>
-                            Hosting provider: <strong>[Add the hosting provider's name and address]</strong>. Where
-                            applicable, the legal basis is Article 6(1)(f) GDPR (legitimate interests in operating a
-                            secure and reliable website). The specific retention period for server logs depends on the
-                            hosting provider's settings and must be confirmed and added before publication.
+                            The legal basis for processing hosting and access data is Article 6(1)(f) GDPR. The
+                            legitimate interest is operating and providing the website.
                         </p>
                     </section>
 
                     <section class="help-section">
-                        <h2>3. Account and usage data</h2>
+                        <h2>3. Account and app data</h2>
                         <p>
-                            If account and project features are provided and used, the data entered through those
-                            features may be processed. This may include your name and email address, login credentials,
-                            and content you create in the application, such as tasks and contact details. This data is
-                            used to provide the relevant features and manage your account.
+                            Firebase Authentication is used for email-and-password sign-in and anonymous guest
+                            sign-in. Firebase Authentication processes the sign-in credentials. Passwords are
+                            processed through Firebase Authentication and are not stored in the profile in the
+                            Realtime Database. A profile may contain a name and email address. Guest accounts are
+                            anonymous.
                         </p>
                         <p>
-                            The specific storage and deletion practices depend on which Firebase services are enabled
-                            in the deployed version. The repository contains a Firebase configuration, but this alone
-                            does not establish the full implementation of account or database features or their
-                            retention periods. Before publication, confirm and specify the services actually used,
-                            storage locations, and deletion periods.
+                            Tasks and contacts you enter in the app are also app data. The Firebase Realtime
+                            Database is configured for the <strong>europe-west1</strong> region. According to the
+                            operator, the legal basis for account and app data is Article 6(1)(a) GDPR (consent).
+                            You may withdraw your consent at any time with effect for the future.
                         </p>
                     </section>
 
                     <section class="help-section">
-                        <h2>4. Firebase Analytics</h2>
+                        <h2>4. Tasks, contacts, and access permissions</h2>
                         <p>
-                            The current project code includes Firebase Analytics and initializes it when the Firebase
-                            application loads. If Analytics is active in the deployed version, usage and event data,
-                            technical information, and online identifiers may be processed. The provider is Google
-                            through its Firebase services. For more information, see Google's
-                            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
-                                Privacy Policy</a>
-                            and
-                            <a href="https://firebase.google.com/support/privacy" target="_blank"
-                                rel="noopener noreferrer">
-                                Firebase privacy information</a>.
+                            Tasks are stored in a shared <code>tasks</code> collection and contacts in a shared
+                            <code>contacts</code> collection. Tasks contain the UID of the account that created
+                            them; contacts do not contain a creator UID. When a task is opened for editing, the
+                            task and its ID are temporarily stored in the browser's <code>sessionStorage</code>.
                         </p>
                         <p>
-                            The applicable legal basis and any storage on your device must be assessed before use.
-                            Where consent is required, Analytics must only be enabled after valid consent has been
-                            obtained. You may withdraw your consent at any time with effect for the future. No consent
-                            mechanism is evident in the current repository. Add one before making the application
-                            publicly available, or disable Analytics.
+                            Under the currently active database rules confirmed by the operator, all signed-in
+                            accounts, including guest accounts, can read all user profiles and read and modify all
+                            tasks and contacts. An account can modify only its own user profile. Tasks and contacts
+                            are therefore not protected on a per-account basis: other signed-in accounts can view
+                            and modify them. For this reason, do not enter real or confidential information.
                         </p>
                     </section>
 
                     <section class="help-section">
                         <h2>5. Recipients and transfers to third countries</h2>
                         <p>
-                            The hosting provider and, if enabled, Google/Firebase may receive data to the extent
-                            necessary to provide their services. Whether and to what extent data is processed outside
-                            the European Union or European Economic Area depends on the services used and their
-                            configuration. Before publication, review the applicable agreements and safeguards, such
-                            as an adequacy decision or standard contractual clauses, for the providers actually used
-                            and specify them here.
+                            Google and Firebase process data to the extent necessary to provide hosting,
+                            authentication, and database services. According to the operator, the
+                            <a href="https://cloud.google.com/terms" target="_blank" rel="noopener noreferrer">
+                                Google Cloud Platform Terms of Service</a>
+                            and the
+                            <a href="https://firebase.google.com/terms/data-processing-terms" target="_blank"
+                                rel="noopener noreferrer">Firebase Data Processing Addendum</a>.
+                        </p>
+                        <p>
+                            Where a relevant transfer to a third country takes place and the transfer falls within
+                            the applicable scope, Google relies, according to information reviewed by the operator,
+                            on the EU Standard Contractual Clauses and the EU-U.S. Data Privacy Framework.
                         </p>
                     </section>
 
                     <section class="help-section">
-                        <h2>6. Data retention</h2>
+                        <h2>6. Deletion and retention</h2>
                         <p>
-                            Personal data is stored only for as long as necessary for the relevant purposes or as
-                            required by statutory retention obligations. The specific retention and deletion periods
-                            for hosting logs, accounts, application content, and Analytics data must be determined
-                            based on the services in use and added here.
+                            Account deletion requests are handled manually. Tasks associated with an account are
+                            checked using the stored creator UID. Since shared contacts do not contain a creator UID,
+                            they are reviewed manually as part of the request. Please identify any relevant contacts
+                            in your request. Privacy requests are received through Gmail at the email address above
+                            and are deleted after they have been handled, unless a legal retention obligation
+                            applies.
+                        </p>
+                        <p>
+                            No specific project-level retention period for hosting access logs has been confirmed.
+                            According to the current screenshot, Cloud Logging is not linked to the project. Firebase
+                            specifies 30 days as the default for Hosting web request logs exported to Cloud Logging;
+                            this does not establish the current retention period for this project. No specific
+                            provider-level retention period is stated here.
                         </p>
                     </section>
 
                     <section class="help-section">
                         <h2>7. Your rights</h2>
                         <p>
-                            Subject to the applicable legal requirements, you have the right to access your data,
-                            request its rectification or erasure, restrict its processing, and receive it in a
-                            portable format. You may object to processing based on legitimate interests for reasons
-                            relating to your particular situation. You may withdraw any consent you have given at any
-                            time with effect for the future.
+                            Subject to the applicable legal requirements, you have the right to access your personal
+                            data and request its rectification or erasure, restriction of processing, and
+                            portability. Where processing is based on legitimate interests, you may object for
+                            reasons relating to your particular situation. You may withdraw consent at any time with
+                            effect for the future.
                         </p>
                         <p>
-                            You also have the right to lodge a complaint with a data protection supervisory authority,
-                            particularly in the country of your habitual residence, place of work, or the place of the
-                            alleged infringement.
+                            You also have the right to lodge a complaint with a data protection supervisory
+                            authority, particularly in the country of your habitual residence, place of work, or the
+                            place of the alleged infringement.
                         </p>
                         <p>
                             For privacy-related requests, please contact the controller listed above.
@@ -161,8 +165,8 @@
                     <section class="help-section">
                         <h2>8. Updates</h2>
                         <p>
-                            This Privacy Policy must be updated if the features, providers, or purposes of processing
-                            change.
+                            This Privacy Policy will be updated if the features, providers, or purposes of
+                            processing change.
                         </p>
                         <p>Last updated: November 2026</p>
                     </section>
