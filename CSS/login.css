@@ -10,10 +10,11 @@ body {
 }
 
 .login-page {
+    --intro-duration: 1.3s;
     display: flex;
     min-height: 100dvh;
     flex-direction: column;
-    animation: intro-background 3s ease-in-out;
+    animation: intro-background var(--intro-duration) ease-in-out;
 }
 
 .login-header {
@@ -26,18 +27,19 @@ body {
 .login-logo {
     --logo-size: 100px;
     --logo-position-x: max(5vw, 24px);
-    --logo-position-y: 48px;
+    --logo-position-y: 40px;
     --logo-half-width: 50px;
     --logo-half-height: 60.4px;
     width: var(--logo-size);
     height: auto;
-    animation: logo-intro 3s ease-in-out, logo-normal-reveal 3s ease-in-out both;
+    animation: logo-intro var(--intro-duration) ease-in-out,
+        logo-normal-reveal var(--intro-duration) ease-in-out both;
 }
 
 .login-logo-intro {
     --logo-size: 100px;
     --logo-position-x: max(5vw, 24px);
-    --logo-position-y: 48px;
+    --logo-position-y: 40px;
     --logo-half-width: 50px;
     --logo-half-height: 60.4px;
     position: absolute;
@@ -45,7 +47,9 @@ body {
     left: var(--logo-position-x);
     width: var(--logo-size);
     height: auto;
-    animation: logo-intro 3s ease-in-out, logo-intro-hide 3s ease-in-out both;
+    pointer-events: none;
+    animation: logo-intro var(--intro-duration) ease-in-out,
+        logo-intro-hide var(--intro-duration) ease-in-out both;
 }
 
 @media (min-width: 601px) {
@@ -71,7 +75,7 @@ body {
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
-    animation: page-reveal 400ms ease 3s both;
+    animation: page-reveal 200ms ease var(--intro-duration) both;
 }
 
 html.skip-logo-intro .login-page {
@@ -115,7 +119,7 @@ html.skip-logo-intro .toast {
 
     0%,
     95% {
-        opacity: 0;
+        opacity: var(--intro-dark-logo-opacity, 0);
     }
 
     100% {
@@ -127,7 +131,7 @@ html.skip-logo-intro .toast {
 
     0%,
     95% {
-        opacity: 1;
+        opacity: var(--intro-light-logo-opacity, 1);
     }
 
     100% {
@@ -139,35 +143,11 @@ html.skip-logo-intro .toast {
 
     0%,
     95% {
-        background: rgba(42, 54, 71, 1);
+        background: var(--intro-background-color, var(--color-primary));
     }
 
     100% {
-        background: #f6f7f8;
-    }
-}
-
-@keyframes intro-background-mobile {
-
-    0%,
-    95% {
-        background: rgba(42, 54, 71, 1);
-    }
-
-    100% {
-        background: #f6f7f8;
-    }
-}
-
-@keyframes intro-background-desktop {
-
-    0%,
-    95% {
-        background: #fff;
-    }
-
-    100% {
-        background: #f6f7f8;
+        background: var(--color-background);
     }
 }
 
@@ -364,10 +344,6 @@ html.skip-logo-intro .toast {
 }
 
 @media (max-width: 600px) {
-    .login-page:not(.register-page) {
-        animation-name: intro-background-mobile;
-    }
-
     .login-header {
         display: contents;
     }
@@ -473,16 +449,9 @@ html.skip-logo-intro .toast {
 
 @media (min-width: 768px) {
     .login-page:not(.register-page) {
-        animation-name: intro-background-desktop;
-    }
-
-    .login-page:not(.register-page) .login-logo {
-        animation-name: logo-intro;
-        opacity: 1;
-    }
-
-    .login-page:not(.register-page) .login-logo-intro {
-        display: none;
+        --intro-background-color: var(--color-surface);
+        --intro-dark-logo-opacity: 1;
+        --intro-light-logo-opacity: 0;
     }
 }
 
