@@ -4,7 +4,7 @@
 }
 
 body {
-    min-height: 100vh;
+    min-height: 100dvh;
     color: var(--color-primary);
     background: var(--color-background);
 }
@@ -13,13 +13,14 @@ body {
     display: flex;
     min-height: 100dvh;
     flex-direction: column;
+    animation: intro-background 3s ease-in-out;
 }
 
 .login-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 48px max(5vw, 24px);
+    padding: 40px max(5vw, 24px);
 }
 
 .login-logo {
@@ -30,7 +31,37 @@ body {
     --logo-half-height: 60.4px;
     width: var(--logo-size);
     height: auto;
-    animation: logo-intro 3s ease-in-out;
+    animation: logo-intro 3s ease-in-out, logo-normal-reveal 3s ease-in-out both;
+}
+
+.login-logo-intro {
+    --logo-size: 100px;
+    --logo-position-x: max(5vw, 24px);
+    --logo-position-y: 48px;
+    --logo-half-width: 50px;
+    --logo-half-height: 60.4px;
+    position: absolute;
+    top: var(--logo-position-y);
+    left: var(--logo-position-x);
+    width: var(--logo-size);
+    height: auto;
+    animation: logo-intro 3s ease-in-out, logo-intro-hide 3s ease-in-out both;
+}
+
+@media (min-width: 601px) {
+
+    .login-page:not(.register-page) .login-header,
+    .register-page .login-header {
+        width: calc(100% - max(10vw, 48px));
+        max-width: 1440px;
+        margin-inline: auto;
+        padding: 40px 0;
+    }
+
+    .login-page:not(.register-page) .login-logo,
+    .login-page:not(.register-page) .login-logo-intro {
+        --logo-position-x: max(max(5vw, 24px), calc((100vw - 1440px) / 2));
+    }
 }
 
 .register-prompt,
@@ -43,9 +74,18 @@ body {
     animation: page-reveal 400ms ease 3s both;
 }
 
+html.skip-logo-intro .login-page {
+    animation: none;
+}
+
 html.skip-logo-intro .login-logo {
     animation: none;
     transform: none;
+    opacity: 1;
+}
+
+html.skip-logo-intro .login-logo-intro {
+    display: none;
 }
 
 html.skip-logo-intro .register-prompt,
@@ -68,6 +108,66 @@ html.skip-logo-intro .toast {
 
     100% {
         transform: translate(0, 0) scale(1);
+    }
+}
+
+@keyframes logo-normal-reveal {
+
+    0%,
+    95% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes logo-intro-hide {
+
+    0%,
+    95% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes intro-background {
+
+    0%,
+    95% {
+        background: rgba(42, 54, 71, 1);
+    }
+
+    100% {
+        background: #f6f7f8;
+    }
+}
+
+@keyframes intro-background-mobile {
+
+    0%,
+    95% {
+        background: rgba(42, 54, 71, 1);
+    }
+
+    100% {
+        background: #f6f7f8;
+    }
+}
+
+@keyframes intro-background-desktop {
+
+    0%,
+    95% {
+        background: #fff;
+    }
+
+    100% {
+        background: #f6f7f8;
     }
 }
 
@@ -110,7 +210,6 @@ html.skip-logo-intro .toast {
     display: grid;
     flex: 1;
     place-items: center;
-    padding: 24px;
 }
 
 .login-box {
@@ -130,7 +229,6 @@ html.skip-logo-intro .toast {
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 24px;
 }
 
 .auth-form label {
@@ -149,10 +247,11 @@ html.skip-logo-intro .toast {
     border: 1px solid #d1d1d1;
     border-radius: 10px;
     outline: none;
+    border: 1px solid var(--color-border);
 }
 
 .auth-form input:focus {
-    border-color: #29abe2;
+    border-color: var(--color-border);
 }
 
 .auth-form input[aria-invalid="true"] {
@@ -161,21 +260,57 @@ html.skip-logo-intro .toast {
 
 .field-error {
     display: block;
+    height: 14px;
     color: #e60026;
-    font-size: 13px;
+    font-size: 11px;
+    line-height: 14px;
     text-align: left;
+    visibility: hidden;
+    white-space: nowrap;
+    overflow: visible;
 }
 
-.field-error:empty {
-    display: none;
+.field-error:not(:empty) {
+    visibility: visible;
 }
 
 .input-with-icon .input-icon {
     position: absolute;
     top: 14px;
     right: 16px;
+    display: grid;
     width: 20px;
     height: 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    place-items: center;
+}
+
+.password-toggle:disabled {
+    pointer-events: none;
+}
+
+.password-toggle .input-icon {
+    position: static;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    display: grid;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    place-items: center;
+}
+
+.password-toggle:disabled {
     pointer-events: none;
 }
 
@@ -194,8 +329,13 @@ html.skip-logo-intro .toast {
     justify-content: center;
     gap: 32px;
     padding: 24px;
-    color: var(--color-primary);
-    font-size: 14px;
+    color: rgba(18, 70, 88, 1);
+    font-size: 16px;
+}
+
+.login-footer a {
+    color: rgba(104, 104, 104, 1);
+    text-decoration: none;
 }
 
 .toast:not(:empty) {
@@ -224,37 +364,166 @@ html.skip-logo-intro .toast {
 }
 
 @media (max-width: 600px) {
+    .login-page:not(.register-page) {
+        animation-name: intro-background-mobile;
+    }
+
     .login-header {
-        align-items: center;
-        padding: 24px;
+        display: contents;
     }
 
     .login-logo {
         --logo-size: 64px;
-        --logo-position-x: 24px;
-        --logo-position-y: 24px;
+        --logo-position-x: 32px;
+        --logo-position-y: 40px;
+        --logo-half-width: 32px;
+        --logo-half-height: 38.65px;
+        position: absolute;
+        top: 40px;
+        left: 32px;
+    }
+
+    .login-logo-intro {
+        --logo-position-x: 32px;
+        --logo-position-y: 40px;
+        --logo-size: 64px;
         --logo-half-width: 32px;
         --logo-half-height: 38.65px;
     }
 
     .register-prompt {
-        gap: 8px;
-        padding-top: 0;
-        font-size: 14px;
+        order: 2;
+        position: relative;
+        z-index: 1;
+        align-self: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 0;
+        margin-block: auto;
     }
 
-    .register-link {
-        padding: 10px;
+    .login-main {
+        order: 1;
+        flex: 1 0 auto;
+        padding: 102px 16px 0;
     }
 
     .login-box {
-        padding: 32px 24px;
+        display: flex;
+        width: min(100%, 396px);
+        height: 400px;
+        flex-direction: column;
+        gap: 32px;
+        border-radius: 30px;
+    }
+
+    .auth-title {
+        margin-bottom: 0;
+        font-size: 32px;
+    }
+
+    .auth-form input {
+        min-height: 40px;
+        padding: 8px 42px 8px 14px;
+        border-radius: 8px;
+    }
+
+    .input-with-icon>.input-icon {
+        top: 10px;
+        right: 12px;
+    }
+
+    .password-toggle {
+        top: 10px;
+        right: 12px;
+    }
+
+    .login-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .login-actions .btn {
+        flex: none;
+        width: min(100%, 160px);
+        min-height: 48px;
+        padding: 6px 12px;
+        white-space: nowrap;
+    }
+
+    .register-link {
+        padding: 12px 16px;
+        white-space: nowrap;
+    }
+
+    .login-footer {
+        order: 3;
+        padding: 16px 12px 24px;
+    }
+
+    .login-footer a {
+        font-size: 16px;
+    }
+
+    .toast:not(:empty) {
+        bottom: 80px;
+    }
+}
+
+@media (min-width: 768px) {
+    .login-page:not(.register-page) {
+        animation-name: intro-background-desktop;
+    }
+
+    .login-page:not(.register-page) .login-logo {
+        animation-name: logo-intro;
+        opacity: 1;
+    }
+
+    .login-page:not(.register-page) .login-logo-intro {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) and (max-height: 700px) {
+    .login-main {
+        padding-top: 130px;
+    }
+
+    .login-box {
+        height: 360px;
+    }
+
+    .register-prompt {
+        margin-block: 16px;
+    }
+}
+
+@media (max-width: 600px) and (min-height: 701px) {
+    .login-main {
+        padding-top: 59px;
+    }
+
+    .register-prompt {
+        position: absolute;
+        top: calc(75vh + 68px);
+        margin: 0;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .login-page {
+        animation: none;
+    }
+
     .login-logo {
         animation: none;
+        opacity: 1;
+    }
+
+    .login-logo-intro {
+        display: none;
     }
 
     .register-prompt,

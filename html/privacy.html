@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy – Join</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
+    <link rel="stylesheet" href="../CSS/root.css">
+    <script src="../scripts/focus-input.js" defer></script>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../CSS/help.css">
+</head>
+
+<body class="privacy-page">
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a class="sidebar-logo" href="./summary.html" aria-label="Home">
+                <img src="../assets/icons/join-logo-white.svg" alt="Join">
+            </a>
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <a class="sidebar-link" href="summary.html">
+                    <img src="../assets/icons/summary.svg" alt="">
+                    <span>Summary</span>
+                </a>
+                <a class="sidebar-link" href="addTask.html">
+                    <img src="../assets/icons/addTask.svg" alt="">
+                    <span>Add Task</span>
+                </a>
+                <a class="sidebar-link" href="board.html">
+                    <img src="../assets/icons/board.svg" alt="">
+                    <span>Board</span>
+                </a>
+                <a class="sidebar-link" href="contacts.html">
+                    <img src="../assets/icons/contact.svg" alt="">
+                    <span>Contacts</span>
+                </a>
+            </nav>
+            <div class="sidebar-legal">
+                <a href="./privacy.html">Privacy Policy</a>
+                <a href="./legal.html">Legal notice</a>
+            </div>
+        </aside>
+
+        <div class="app-content">
+            <header class="header">
+                <a class="board-mobile-logo" href="../index.html" aria-label="Join home page">
+                    <img src="../assets/icons/logo.svg" alt="Join">
+                </a>
+                <p class="board-project-name">Kanban Project Management</p>
+                <div class="header-actions">
+                    <a class="help-icon-link" href="./help.html" aria-label="Help">
+                        <img src="../assets/icons/help.svg" alt="">
+                    </a>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <span class="header-avatar" aria-hidden="true">G</span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true" inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal.html">Legal Notice</a>
+                            <a href="./privacy.html">Privacy Policy</a>
+                            <a href="../index.html">Log out</a>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+
+            <main class="help-main">
+                <article class="help-content">
+                    <div class="help-heading">
+                        <h1>Privacy Policy</h1>
+                        <a class="help-back-link" href="./summary.html" aria-label="Back to summary">
+                            <img src="../assets/icons/arrow-back.svg" alt="">
+                        </a>
+                    </div>
+                    <p class="help-intro">
+                        Join is a learning project intended for demo use. Please do not enter real or confidential
+                        information. This policy explains what personal data is processed when you use Join and the
+                        rights you have in relation to that data.
+                    </p>
+
+                    <section class="help-section">
+                        <h2>1. Data controller</h2>
+                        <p>
+                            The controller responsible for processing personal data is:<br>
+                            <strong>Stefan Friggemann</strong><br>
+                            Stadtlohnerstraße 45<br>
+                            48683 Ahaus<br>
+                            Email: honky.sf@gmail.com
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>2. Hosting and access data</h2>
+                        <p>
+                            The website is provided using Firebase Hosting by Google. When you visit the website,
+                            technical access data may be processed, such as your IP address, the time and address
+                            requested, and technical information about your browser and request. This is necessary
+                            to operate and provide the website.
+                        </p>
+                        <p>
+                            The legal basis for processing hosting and access data is Article 6(1)(f) GDPR. The
+                            legitimate interest is operating and providing the website.
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>3. Account and app data</h2>
+                        <p>
+                            Firebase Authentication is used for email-and-password sign-in and anonymous guest
+                            sign-in. Firebase Authentication processes the sign-in credentials. Passwords are
+                            processed through Firebase Authentication and are not stored in the profile in the
+                            Realtime Database. A profile may contain a name and email address. Guest accounts are
+                            anonymous.
+                        </p>
+                        <p>
+                            Tasks and contacts you enter in the app are also app data. The Firebase Realtime
+                            Database is configured for the <strong>europe-west1</strong> region. According to the
+                            operator, the legal basis for account and app data is Article 6(1)(a) GDPR (consent).
+                            You may withdraw your consent at any time with effect for the future.
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>4. Tasks, contacts, and access permissions</h2>
+                        <p>
+                            Tasks are stored in a shared <code>tasks</code> collection and contacts in a shared
+                            <code>contacts</code> collection. Tasks contain the UID of the account that created
+                            them; contacts do not contain a creator UID. When a task is opened for editing, the
+                            task and its ID are temporarily stored in the browser's <code>sessionStorage</code>.
+                        </p>
+                        <p>
+                            Under the currently active database rules confirmed by the operator, all signed-in
+                            accounts, including guest accounts, can read all user profiles and read and modify all
+                            tasks and contacts. An account can modify only its own user profile. Tasks and contacts
+                            are therefore not protected on a per-account basis: other signed-in accounts can view
+                            and modify them. For this reason, do not enter real or confidential information.
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>5. Recipients and transfers to third countries</h2>
+                        <p>
+                            Google and Firebase process data to the extent necessary to provide hosting,
+                            authentication, and database services. According to the operator, the
+                            <a href="https://cloud.google.com/terms" target="_blank" rel="noopener noreferrer">
+                                Google Cloud Platform Terms of Service</a>
+                            and the
+                            <a href="https://firebase.google.com/terms/data-processing-terms" target="_blank"
+                                rel="noopener noreferrer">Firebase Data Processing Addendum</a>.
+                        </p>
+                        <p>
+                            Where a relevant transfer to a third country takes place and the transfer falls within
+                            the applicable scope, Google relies, according to information reviewed by the operator,
+                            on the EU Standard Contractual Clauses and the EU-U.S. Data Privacy Framework.
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>6. Deletion and retention</h2>
+                        <p>
+                            Account deletion requests are handled manually. Tasks associated with an account are
+                            checked using the stored creator UID. Since shared contacts do not contain a creator UID,
+                            they are reviewed manually as part of the request. Please identify any relevant contacts
+                            in your request. Privacy requests are received through Gmail at the email address above
+                            and are deleted after they have been handled, unless a legal retention obligation
+                            applies.
+                        </p>
+                        <p>
+                            No specific project-level retention period for hosting access logs has been confirmed.
+                            According to the current screenshot, Cloud Logging is not linked to the project. Firebase
+                            specifies 30 days as the default for Hosting web request logs exported to Cloud Logging;
+                            this does not establish the current retention period for this project. No specific
+                            provider-level retention period is stated here.
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>7. Your rights</h2>
+                        <p>
+                            Subject to the applicable legal requirements, you have the right to access your personal
+                            data and request its rectification or erasure, restriction of processing, and
+                            portability. Where processing is based on legitimate interests, you may object for
+                            reasons relating to your particular situation. You may withdraw consent at any time with
+                            effect for the future.
+                        </p>
+                        <p>
+                            You also have the right to lodge a complaint with a data protection supervisory
+                            authority, particularly in the country of your habitual residence, place of work, or the
+                            place of the alleged infringement.
+                        </p>
+                        <p>
+                            For privacy-related requests, please contact the controller listed above.
+                        </p>
+                    </section>
+
+                    <section class="help-section">
+                        <h2>8. Updates</h2>
+                        <p>
+                            This Privacy Policy will be updated if the features, providers, or purposes of
+                            processing change.
+                        </p>
+                        <p>Last updated: November 2026</p>
+                    </section>
+                </article>
+            </main>
+        </div>
+    </div>
+    <nav class="board-mobile-nav" aria-label="Main navigation">
+        <a href="./summary.html">
+            <img src="../assets/icons/summary.svg" alt="">
+            <span>Summary</span>
+        </a>
+        <a href="./addTask.html">
+            <img src="../assets/icons/addTask.svg" alt="">
+            <span>Add Task</span>
+        </a>
+        <a href="./board.html">
+            <img src="../assets/icons/board.svg" alt="">
+            <span>Board</span>
+        </a>
+        <a href="./contacts.html">
+            <img src="../assets/icons/contact.svg" alt="">
+            <span>Contacts</span>
+        </a>
+    </nav>
+    <script src="../scripts/profile-menu.js" defer></script>
+    <script type="module" src="../scripts/header-avatar.js"></script>
+</body>
+
+</html>

@@ -1,256 +1,169 @@
+import { auth, db } from "./firebase.js";
+import { onValue, ref } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+    initializeBoardDialog,
+    refreshOpenTaskSubtasks,
+    showTaskDetails,
+    updateSubtaskDisplay
+} from "./board-dialog.js";
+import { renderTasks } from "./board-render.js";
+import {
+    applyBoardSearchQuery,
+    getActiveSearchQuery,
+    initializeBoardSearch
+} from "./board-search.js";
+import { initializeAddTaskOverlay } from "./board-add-task-overlay.js";
+
+let allTasks = [];
+
 /**
- * Finds a required element and throws when the page markup is incomplete.
- * @param {string} selector CSS selector for the element.
- * @param {typeof Element} elementType Expected DOM element type.
- * @param {ParentNode} root Search root.
- * @returns {Element} The matching element.
+ * Returns a provider for the current board tasks.
+ * @returns {Object[]} Current tasks.
  */
-function requireElement(selector, elementType, root = document) {
-    const element = root.querySelector(selector);
-    if (!(element instanceof elementType)) {
-        throw new Error(`Required board element is missing: ${selector}`);
+function getTasks() {
+    return allTasks;
+}
+
+/**
+ * Compares task fields without their subtasks.
+ * @param {Object} previousTask Previous task data.
+ * @param {Object} updatedTask Updated task data.
+ * @returns {boolean} Whether non-subtask fields match.
+ */
+function haveMatchingTaskFields(previousTask, updatedTask) {
+    const { subtasks: previousSubtasks, ...previousFields } = previousTask;
+    const { subtasks: updatedSubtasks, ...updatedFields } = updatedTask;
+    return JSON.stringify(previousFields) === JSON.stringify(updatedFields);
+}
+
+/**
+ * Compares two subtasks while ignoring completion state.
+ * @param {Object} previousSubtask Previous subtask.
+ * @param {Object} updatedSubtask Updated subtask.
+ * @returns {boolean} Whether non-completion fields match.
+ */
+function haveMatchingSubtaskFields(previousSubtask, updatedSubtask) {
+    const { completed: previousCompleted, ...previousFields } = previousSubtask;
+    const { completed: updatedCompleted, ...updatedFields } = updatedSubtask;
+    return JSON.stringify(previousFields) === JSON.stringify(updatedFields);
+}
+
+/**
+ * Checks whether only subtask completion states changed.
+ * @param {Object} previousTask Previous task.
+ * @param {Object} updatedTask Updated task.
+ * @returns {boolean} Whether this is a valid subtask-only change.
+ */
+function isSubtaskOnlyChange(previousTask, updatedTask) {
+    if (!haveMatchingTaskFields(previousTask, updatedTask)) return false;
+    const previousSubtasks = previousTask.subtasks;
+    const updatedSubtasks = updatedTask.subtasks;
+    if (!Array.isArray(previousSubtasks) || !Array.isArray(updatedSubtasks)) return false;
+    if (previousSubtasks.length !== updatedSubtasks.length) return false;
+    let completionChanged = false;
+    for (let index = 0; index < updatedSubtasks.length; index += 1) {
+        if (!haveMatchingSubtaskFields(previousSubtasks[index], updatedSubtasks[index])) return false;
+        completionChanged ||= Boolean(previousSubtasks[index].completed) !==
+            Boolean(updatedSubtasks[index].completed);
     }
-    return element;
-}
-
-const taskDialog = requireElement(".task-dialog", HTMLDialogElement);
-const dialogCategory = requireElement(".task-dialog-category", HTMLElement, taskDialog);
-const dialogTitle = requireElement(".task-dialog-title", HTMLElement, taskDialog);
-const dialogDescription = requireElement(".task-dialog-description", HTMLElement, taskDialog);
-const dialogDueDate = requireElement(".task-dialog-due-date", HTMLElement, taskDialog);
-const dialogPriorityLabel = requireElement(".task-dialog-priority-label", HTMLElement, taskDialog);
-const dialogPriorityIcon = requireElement(".task-dialog-priority-icon", HTMLImageElement, taskDialog);
-const dialogAssignees = requireElement(".task-dialog-assignees", HTMLUListElement, taskDialog);
-const dialogSubtasks = requireElement(".task-dialog-subtasks", HTMLUListElement, taskDialog);
-const closeButton = requireElement(".task-dialog-close", HTMLButtonElement, taskDialog);
-const boardSearchInput = requireElement("#boardSearchInput", HTMLInputElement);
-const boardSearchEmpty = requireElement("#boardSearchEmpty", HTMLElement);
-const taskCards = [...document.querySelectorAll(".task-card")];
-const emptyColumnMessages = [...document.querySelectorAll(".board-empty")];
-
-/**
- * Reads the required fields from a task card.
- * @param {Element} card Task card element.
- * @returns {{category: Element, title: Element, description: Element, priority: HTMLImageElement}}
- */
-function getTaskDetails(card) {
-    return {
-        category: requireElement(".task-category", HTMLElement, card),
-        title: requireElement("h4", HTMLElement, card),
-        description: requireElement(".task-description", HTMLElement, card),
-        priority: requireElement(".task-priority", HTMLImageElement, card)
-    };
+    return completionChanged;
 }
 
 /**
- * Copies the task's main details into the dialog.
- * @param {Element} card Task card element.
- * @param {ReturnType<typeof getTaskDetails>} details Required task fields.
+ * Classifies one task update.
+ * @param {Object} updatedTask Updated task.
+ * @param {Object[]} previousTasks Previous tasks.
+ * @returns {{changed: boolean, invalid: boolean, task: Object|null}} Update classification.
  */
-function populateTaskSummary(card, details) {
-    dialogCategory.textContent = details.category.textContent.trim();
-    dialogCategory.classList.toggle("task-category-technical", details.category.classList.contains("task-category-technical"));
-    dialogTitle.textContent = details.title.textContent.trim();
-    dialogDescription.textContent = details.description.textContent.trim();
-    dialogDueDate.textContent = card.dataset.dueDate || "Not set";
-    dialogPriorityLabel.textContent = details.priority.alt.replace(/\s+priority$/i, "");
-    dialogPriorityIcon.src = details.priority.src;
-    dialogPriorityIcon.alt = details.priority.alt;
-}
-
-/**
- * Creates one assigned-contact row for the task dialog.
- * @param {Element} assignee Assigned contact badge.
- * @returns {HTMLLIElement} Dialog row with avatar and contact name.
- */
-function createAssigneeItem(assignee) {
-    const item = document.createElement("li");
-    const avatar = document.createElement("span");
-    const name = document.createElement("span");
-    avatar.className = assignee.className;
-    avatar.textContent = assignee.textContent.trim();
-    name.textContent = assignee.dataset.name || assignee.textContent.trim();
-    item.append(avatar, name);
-    return item;
-}
-
-/**
- * Copies assigned contacts from the card into the dialog.
- * @param {Element} card Task card element.
- */
-function populateAssignees(card) {
-    dialogAssignees.replaceChildren();
-    for (const assignee of card.querySelectorAll(".task-assignees .task-assignee")) {
-        appendAssigneeItem(assignee);
+function classifyTaskUpdate(updatedTask, previousTasks) {
+    const previousTask = previousTasks.find(task => task.id === updatedTask.id);
+    if (!previousTask) return { changed: false, invalid: true, task: null };
+    if (JSON.stringify(previousTask) === JSON.stringify(updatedTask)) {
+        return { changed: false, invalid: false, task: null };
     }
+    const isValid = isSubtaskOnlyChange(previousTask, updatedTask);
+    return { changed: isValid, invalid: !isValid, task: isValid ? updatedTask : null };
 }
 
 /**
- * Appends an assigned contact row to the dialog list.
- * @param {Element} assignee Assigned contact badge.
+ * Returns the only task with a subtask-only completion change.
+ * @param {Object[]} previousTasks Previously loaded tasks.
+ * @param {Object[]} updatedTasks Latest tasks.
+ * @returns {Object|null} Changed task or null.
  */
-function appendAssigneeItem(assignee) {
-    dialogAssignees.append(createAssigneeItem(assignee));
+function findSubtaskOnlyChange(previousTasks, updatedTasks) {
+    if (previousTasks.length !== updatedTasks.length) return null;
+    let changedTask = null;
+    for (const updatedTask of updatedTasks) {
+        const change = classifyTaskUpdate(updatedTask, previousTasks);
+        if (change.invalid || (change.changed && changedTask)) return null;
+        if (change.changed) changedTask = change.task;
+    }
+    return changedTask;
 }
 
 /**
- * Creates one subtask row with its completed state.
- * @param {Element} subtask Subtask source element.
- * @returns {HTMLLIElement} Dialog row for the subtask.
+ * Converts a Firebase snapshot into task data.
+ * @param {import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js").DataSnapshot} snapshot Task snapshot.
+ * @returns {Object[]} Task data.
  */
-function createSubtaskItem(subtask) {
-    const item = document.createElement("li");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = subtask.dataset.completed === "true";
-    checkbox.disabled = true;
-    item.append(checkbox, document.createTextNode(subtask.textContent.trim()));
-    return item;
+function readTasksFromSnapshot(snapshot) {
+    if (!snapshot.exists()) return [];
+    return Object.entries(snapshot.val()).map(([id, task]) => ({ id, ...task }));
 }
 
 /**
- * Copies subtasks from the card into the dialog.
- * @param {Element} card Task card element.
+ * Renders a complete task update and refreshes the active search.
  */
-function populateSubtasks(card) {
-    const subtasks = card.querySelectorAll(".task-subtask-data li");
-    dialogSubtasks.replaceChildren();
-    if (subtasks.length === 0) {
-        dialogSubtasks.append(createEmptySubtaskItem());
+function renderFullTaskUpdate() {
+    renderTasks(allTasks, showTaskDetails);
+    applyBoardSearchQuery(getActiveSearchQuery());
+    refreshOpenTaskSubtasks();
+}
+
+/**
+ * Applies a Firebase task snapshot.
+ * @param {import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js").DataSnapshot} snapshot Task snapshot.
+ */
+function handleTasksSnapshot(snapshot) {
+    const previousTasks = allTasks;
+    allTasks = readTasksFromSnapshot(snapshot);
+    const changedTask = findSubtaskOnlyChange(previousTasks, allTasks);
+    if (changedTask) {
+        updateSubtaskDisplay(changedTask);
         return;
     }
-    for (const subtask of subtasks) appendSubtaskItem(subtask);
+    renderFullTaskUpdate();
 }
 
 /**
- * Creates the empty-state row when a task has no subtask details.
- * @returns {HTMLLIElement} Empty subtask row.
+ * Loads tasks from Firebase Realtime Database.
  */
-function createEmptySubtaskItem() {
-    const item = document.createElement("li");
-    item.textContent = "No subtasks";
-    return item;
+function loadTasksFromFirebase() {
+    onValue(ref(db, "tasks"), handleTasksSnapshot);
 }
 
 /**
- * Appends a subtask row to the dialog list.
- * @param {Element} subtask Subtask source element.
+ * Initializes board modules and task loading.
  */
-function appendSubtaskItem(subtask) {
-    dialogSubtasks.append(createSubtaskItem(subtask));
+function initializeBoard() {
+    initializeBoardDialog(getTasks);
+    initializeBoardSearch();
+    initializeAddTaskOverlay();
+    loadTasksFromFirebase();
 }
 
 /**
- * Opens the dialog with details from the selected card.
- * @param {Element} card Selected task card.
+ * Initializes the board for authenticated users.
+ * @param {import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js").User|null} user Current user.
  */
-function showTaskDetails(card) {
-    const details = getTaskDetails(card);
-    populateTaskSummary(card, details);
-    populateAssignees(card);
-    populateSubtasks(card);
-    taskDialog.showModal();
-    closeButton.focus();
-}
-
-/**
- * Opens a task card when clicked.
- * @param {MouseEvent} event Card click event.
- */
-function handleTaskCardClick(event) {
-    showTaskDetails(event.currentTarget);
-}
-
-/**
- * Opens a task card with Enter or Space.
- * @param {KeyboardEvent} event Card keyboard event.
- */
-function handleTaskCardKeydown(event) {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    showTaskDetails(event.currentTarget);
-}
-
-/**
- * Attaches pointer and keyboard handlers to a task card.
- * @param {Element} card Task card element.
- */
-function bindTaskCard(card) {
-    card.addEventListener("click", handleTaskCardClick);
-    card.addEventListener("keydown", handleTaskCardKeydown);
-}
-
-/**
- * Checks whether a task title or description contains the query.
- * @param {Element} card Task card element.
- * @param {string} query Normalized search query.
- * @returns {boolean} Whether the task matches.
- */
-function taskMatchesQuery(card, query) {
-    const title = card.querySelector("h4")?.textContent || "";
-    const description = card.querySelector(".task-description")?.textContent || "";
-    return title.toLocaleLowerCase().includes(query) ||
-        description.toLocaleLowerCase().includes(query);
-}
-
-/**
- * Applies the current query to every task card.
- * @param {string} query Normalized search query.
- * @returns {number} Number of visible task cards.
- */
-function filterTaskCards(query) {
-    let visibleTaskCount = 0;
-    for (const card of taskCards) {
-        const matches = !query || taskMatchesQuery(card, query);
-        card.hidden = !matches;
-        if (matches) visibleTaskCount += 1;
+function handleAuthStateChanged(user) {
+    if (user) {
+        initializeBoard();
+        return;
     }
-    return visibleTaskCount;
+    window.location.href = "../index.html";
 }
 
-/**
- * Shows empty-column hints only when the search field is empty.
- * @param {string} query Normalized search query.
- */
-function updateEmptyColumnMessages(query) {
-    for (const message of emptyColumnMessages) message.hidden = query.length > 0;
-}
-
-/**
- * Updates the search no-results message.
- * @param {string} query Normalized search query.
- * @param {number} visibleTaskCount Number of matching cards.
- */
-function updateSearchMessage(query, visibleTaskCount) {
-    boardSearchEmpty.hidden = query.length === 0 || visibleTaskCount > 0;
-}
-
-/**
- * Filters tasks as the user types.
- */
-function handleBoardSearchInput() {
-    const query = boardSearchInput.value.trim().toLocaleLowerCase();
-    const visibleTaskCount = filterTaskCards(query);
-    updateEmptyColumnMessages(query);
-    updateSearchMessage(query, visibleTaskCount);
-}
-
-/**
- * Closes the dialog when the close button is activated.
- */
-function closeTaskDialog() {
-    taskDialog.close();
-}
-
-/**
- * Closes the dialog when the backdrop itself is clicked.
- * @param {MouseEvent} event Dialog click event.
- */
-function closeTaskDialogOnBackdrop(event) {
-    if (event.target === taskDialog) taskDialog.close();
-}
-
-taskCards.forEach(bindTaskCard);
-boardSearchInput.addEventListener("input", handleBoardSearchInput);
-closeButton.addEventListener("click", closeTaskDialog);
-taskDialog.addEventListener("click", closeTaskDialogOnBackdrop);
+onAuthStateChanged(auth, handleAuthStateChanged);

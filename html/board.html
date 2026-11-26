@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Board - Join</title>
     <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg">
-    <link rel="stylesheet" href="../CSS/root.css">
+    <link rel="stylesheet" href="../CSS/root.css?v=2">
+    <script src="../scripts/focus-input.js" defer></script>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../CSS/board.css">
 </head>
@@ -14,7 +15,7 @@
 <body class="board-page">
     <div class="app-layout">
         <aside class="sidebar">
-            <a class="sidebar-logo" href="../index.html" aria-label="Join Startseite">
+            <a class="sidebar-logo" href="./summary.html" aria-label="Join Startseite">
                 <img src="../assets/icons/join-logo-white.svg" alt="Join">
             </a>
             <nav class="sidebar-nav" aria-label="Hauptnavigation">
@@ -36,8 +37,8 @@
                 </a>
             </nav>
             <div class="sidebar-legal">
-                <a href="./privacy-policy.html">Privacy Policy</a>
-                <a href="./legal-notice.html">Legal notice</a>
+                <a href="./privacy.html">Privacy Policy</a>
+                <a href="./legal.html">Legal notice</a>
             </div>
         </aside>
         <div class="app-content">
@@ -47,9 +48,21 @@
                 </a>
                 <p class="board-project-name">Kanban Project Management Tool</p>
                 <div class="header-actions">
-                    <img src="../assets/icons/help.svg" alt="Help">
-                    <img class="header-avatar" src="../assets/icons/avatar-header.svg" alt="User profile">
-                    <span class="board-mobile-avatar" aria-label="Stefan Müller"></span>
+                    <a class="help-icon-link" href="./help.html" aria-label="Help">
+                        <img src="../assets/icons/help.svg" alt="">
+                    </a>
+                    <div class="profile-menu-wrapper">
+                        <button class="header-avatar-trigger" type="button" aria-label="Open profile menu"
+                            aria-expanded="false" aria-controls="profile-menu">
+                            <span class="header-avatar" aria-hidden="true">G</span>
+                        </button>
+                        <nav class="profile-menu" id="profile-menu" aria-label="Profile menu" aria-hidden="true" inert>
+                            <a href="./help.html">Help</a>
+                            <a href="./legal.html">Legal Notice</a>
+                            <a href="./privacy.html">Privacy Policy</a>
+                            <a href="../index.html">Log out</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
             <main>
@@ -57,17 +70,26 @@
                     <div class="main-headline-top">
                         <h2>Board</h2>
                         <div class="board-controls">
-                            <label class="board-search">
-                                <input id="boardSearchInput" type="search" placeholder="Find Task"
-                                    aria-label="Find Task">
-                                <span class="board-search-icon" aria-hidden="true">
-                                    <img src="../assets/icons/search.svg" alt="">
-                                </span>
-                            </label>
-                            <button class="btn board-add-task" id="addTaskButton" type="button">
+                            <div class="board-search-wrapper">
+                                <form class="board-search" id="boardSearchForm">
+                                    <input id="boardSearchInput" type="search" placeholder="Find Task"
+                                        aria-label="Find Task">
+                                    <button class="board-search-icon" type="submit"
+                                        aria-label="Search tasks. Double-click to show all tasks."
+                                        title="Double-click to show all tasks">
+                                        <img src="../assets/icons/search.svg" alt="">
+                                    </button>
+                                </form>
+                                <p class="board-search-empty" id="boardSearchEmpty" role="status" aria-live="polite"
+                                    hidden>
+                                    No matching tasks found.
+                                </p>
+                            </div>
+                            <a class="btn board-add-task" id="addTaskButton" href="./addTask.html"
+                                aria-label="Add task">
                                 <span>Add task</span>
                                 <img src="../assets/icons/add-white.svg" alt="">
-                            </button>
+                            </a>
                         </div>
                     </div>
                     <section class="board-columns" aria-label="Task board">
@@ -78,33 +100,8 @@
                                     <img src="../assets/icons/add.svg" alt="">
                                 </button>
                             </div>
-                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
-                                aria-label="View task: Kochwelt Page and Recipe Recommender" data-due-date="10/05/2023">
-                                <span class="task-category">User Story</span>
-                                <h4>Kochwelt Page &amp; Recipe Recommender</h4>
-                                <p class="task-description">Build start page with recipe recommendation.</p>
-                                <ul class="task-subtask-data" hidden>
-                                    <li data-completed="true">Implement Recipe Recommendation</li>
-                                    <li data-completed="false">Start Page Layout</li>
-                                </ul>
-                                <div class="task-subtasks">
-                                    <span class="task-progress" aria-label="1 of 2 subtasks completed">
-                                        <span style="width: 50%"></span>
-                                    </span>
-                                    <span>1/2 Subtasks</span>
-                                </div>
-                                <div class="task-card-footer">
-                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
-                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
-                                        <span class="task-assignee task-assignee-two"
-                                            data-name="Emmanuel Mauer">EM</span>
-                                        <span class="task-assignee task-assignee-three"
-                                            data-name="Marcel Bauer">MB</span>
-                                    </div>
-                                    <img class="task-priority task-priority-medium"
-                                        src="../assets/icons/boar-prio-medium.svg" alt="Medium priority">
-                                </div>
-                            </article>
+                            <div class="board-column-tasks" data-status="todo"></div>
+                            <p class="board-empty">No tasks To do</p>
                         </section>
                         <section class="board-column" aria-labelledby="in-progress-heading">
                             <div class="board-column-heading">
@@ -113,40 +110,8 @@
                                     <img src="../assets/icons/add.svg" alt="">
                                 </button>
                             </div>
-                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
-                                aria-label="View task: HTML Base Template Creation">
-                                <span class="task-category task-category-technical">Technical Task</span>
-                                <h4>HTML Base Template Creation</h4>
-                                <p class="task-description">Create reusable HTML base templates...</p>
-                                <div class="task-card-footer">
-                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
-                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
-                                        <span class="task-assignee task-assignee-two"
-                                            data-name="Emmanuel Mauer">EM</span>
-                                        <span class="task-assignee task-assignee-three"
-                                            data-name="Marcel Bauer">MB</span>
-                                    </div>
-                                    <img class="task-priority task-priority-low"
-                                        src="../assets/icons/board-prio-low.svg" alt="Low priority">
-                                </div>
-                            </article>
-                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
-                                aria-label="View task: Daily Kochwelt Recipe">
-                                <span class="task-category">User Story</span>
-                                <h4>Daily Kochwelt Recipe</h4>
-                                <p class="task-description">Implement daily recipe and portion calculator...</p>
-                                <div class="task-card-footer">
-                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
-                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
-                                        <span class="task-assignee task-assignee-two"
-                                            data-name="Emmanuel Mauer">EM</span>
-                                        <span class="task-assignee task-assignee-three"
-                                            data-name="Marcel Bauer">MB</span>
-                                    </div>
-                                    <img class="task-priority task-priority-medium"
-                                        src="../assets/icons/boar-prio-medium.svg" alt="Medium priority">
-                                </div>
-                            </article>
+                            <div class="board-column-tasks" data-status="in-progress"></div>
+                            <p class="board-empty">No tasks In progress</p>
                         </section>
                         <section class="board-column" aria-labelledby="await-feedback-heading">
                             <div class="board-column-heading">
@@ -155,29 +120,8 @@
                                     <img src="../assets/icons/add.svg" alt="">
                                 </button>
                             </div>
-                            <article class="task-card" role="button" tabindex="0" aria-haspopup="dialog"
-                                aria-label="View task: CSS Architecture Planning">
-                                <span class="task-category task-category-technical">Technical Task</span>
-                                <h4>CSS Architecture Planning</h4>
-                                <p class="task-description">Define CSS naming conventions and structure...</p>
-                                <div class="task-subtasks">
-                                    <span class="task-progress" aria-label="2 of 2 subtasks completed">
-                                        <span style="width: 100%"></span>
-                                    </span>
-                                    <span>2/2 Subtasks</span>
-                                </div>
-                                <div class="task-card-footer">
-                                    <div class="task-assignees" aria-label="Assigned to Alex, Emma and Michael">
-                                        <span class="task-assignee task-assignee-one" data-name="Anton Mayer">AM</span>
-                                        <span class="task-assignee task-assignee-two"
-                                            data-name="Emmanuel Mauer">EM</span>
-                                        <span class="task-assignee task-assignee-three"
-                                            data-name="Marcel Bauer">MB</span>
-                                    </div>
-                                    <img class="task-priority task-priority-urgent"
-                                        src="../assets/icons/boar-prio-urgent.svg" alt="Urgent priority">
-                                </div>
-                            </article>
+                            <div class="board-column-tasks" data-status="await-feedback"></div>
+                            <p class="board-empty">No tasks Await feedback</p>
                         </section>
                         <section class="board-column" aria-labelledby="done-heading">
                             <div class="board-column-heading">
@@ -186,12 +130,10 @@
                                     <img src="../assets/icons/add.svg" alt="">
                                 </button>
                             </div>
+                            <div class="board-column-tasks" data-status="done"></div>
                             <p class="board-empty">No tasks Done</p>
                         </section>
                     </section>
-                    <p class="board-search-empty" id="boardSearchEmpty" role="status" aria-live="polite" hidden>
-                        Keine passende Task gefunden. Bitte prüfe Titel oder Beschreibung.
-                    </p>
                 </div>
             </main>
         </div>
@@ -214,6 +156,14 @@
             <span>Contacts</span>
         </a>
     </nav>
+    <dialog class="board-add-task-dialog" aria-label="Add task">
+        <div class="board-add-task-dialog-content">
+            <button class="board-add-task-close" type="button" aria-label="Close add task form">
+                <img src="../assets/icons/close.svg" alt="">
+            </button>
+            <iframe class="board-add-task-frame" title="Add task form" src="about:blank"></iframe>
+        </div>
+    </dialog>
     <dialog class="task-dialog" aria-labelledby="task-dialog-title">
         <div class="task-dialog-content">
             <div class="task-dialog-top">
@@ -244,19 +194,22 @@
                 <ul class="task-dialog-subtasks"></ul>
             </section>
             <div class="task-dialog-actions">
-                <button class="task-dialog-action" type="button">
+                <button class="task-dialog-action task-dialog-delete" type="button" aria-label="Delete task">
                     <img src="../assets/icons/trasch.svg" alt="">
                     <span>Delete</span>
                 </button>
                 <span class="task-dialog-action-separator" aria-hidden="true"></span>
-                <button class="task-dialog-action" type="button">
+                <button class="task-dialog-action task-dialog-edit" type="button" aria-label="Edit task">
                     <img src="../assets/icons/edit.svg" alt="">
                     <span>Edit</span>
                 </button>
             </div>
         </div>
     </dialog>
-    <script src="../scripts/board.js" defer></script>
+    <script src="../scripts/board.js" defer type="module"></script>
+    <script src="../scripts/drag-and-drop.js" defer type="module"></script>
+    <script src="../scripts/profile-menu.js" defer></script>
+    <script type="module" src="../scripts/header-avatar.js"></script>
 </body>
 
 </html>
