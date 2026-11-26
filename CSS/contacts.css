@@ -236,6 +236,7 @@
 
 .contacts-heading {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 30px;
     margin-bottom: 32px;
@@ -252,7 +253,7 @@
     border-left: 3px solid var(--color-accent);
     color: var(--color-primary);
     font-size: 27px;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 /* end contacts */
 
