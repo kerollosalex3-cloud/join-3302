@@ -28,15 +28,13 @@ function clearLoginErrors() {
 }
 
 /**
- * Validates the email and displays the existing login error message.
- * @param {boolean} allowEmpty Whether an empty field is allowed during editing.
- * @returns {boolean} Whether the email is valid or allowed to be empty.
+ * Validates the email and displays its error message.
+ * @returns {boolean} Whether the email is valid.
  */
-function validateEmail(allowEmpty = false) {
-    const value = emailInput.value.trim();
-    const invalid = !(allowEmpty && !value) && Boolean(getContactFieldError("email", value));
-    setFieldError(emailInput, emailError, invalid ? "Please enter a valid email address." : "");
-    return !invalid;
+function validateEmail() {
+    const message = getContactFieldError("email", emailInput.value);
+    setFieldError(emailInput, emailError, message);
+    return !message;
 }
 
 /**
@@ -62,16 +60,23 @@ function validateLogin() {
     return emailValid && passwordValid;
 }
 
-/** Clears credential errors and checks the email as it is edited. */
+/** Clears email errors while the user edits the field. */
 function handleEmailInput() {
     if (credentialErrorShown) clearLoginErrors();
-    validateEmail(true);
+    else setFieldError(emailInput, emailError, "");
 }
 
-/** Clears password errors when the password is edited. */
+/** Clears password errors while the user edits the field. */
 function handlePasswordInput() {
     if (credentialErrorShown) clearLoginErrors();
     else setFieldError(passwordInput, passwordError, "");
+}
+
+/** Checks the field when the user leaves it. */
+function handleFieldBlur(event) {
+    if (credentialErrorShown) return;
+    if (event.target === emailInput) validateEmail();
+    else validatePassword();
 }
 
 /** Displays the existing generic message for invalid login credentials. */
@@ -171,4 +176,6 @@ async function signIn(event) {
 loginForm.addEventListener("submit", signIn);
 emailInput.addEventListener("input", handleEmailInput);
 passwordInput.addEventListener("input", handlePasswordInput);
+emailInput.addEventListener("blur", handleFieldBlur);
+passwordInput.addEventListener("blur", handleFieldBlur);
 guestButton.addEventListener("click", signInGuest);
