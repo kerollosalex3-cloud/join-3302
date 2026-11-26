@@ -25,6 +25,17 @@ body {
     opacity: 1;
 }
 
+@media (min-width: 768px) {
+    .board-page .sidebar,
+    .add-task-page .sidebar {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        height: 100dvh;
+        min-height: 0;
+    }
+}
+
 .sidebar-logo {
     display: flex;
     justify-content: center;
