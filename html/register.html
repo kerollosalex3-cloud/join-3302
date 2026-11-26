@@ -32,14 +32,14 @@
 
             <form id="register-form" class="auth-form" novalidate>
                 <label class="input-with-icon">
-                    <input id="register-name" type="text" name="name" placeholder="Name" autocomplete="name"
+                    <input id="register-name" type="text" name="name" placeholder="Name" autocomplete="name" required
                         aria-describedby="register-name-error" />
                     <img class="input-icon" src="../assets/icons/person-signup.svg" alt="" />
                     <small id="register-name-error" class="field-error" aria-live="polite"></small>
                 </label>
 
                 <label class="input-with-icon">
-                    <input id="register-email" type="email" name="email" placeholder="Email" autocomplete="email"
+                    <input id="register-email" type="email" name="email" placeholder="Email" autocomplete="email" required
                         aria-describedby="register-email-error" />
                     <img class="input-icon" src="../assets/icons/mail.svg" alt="" />
                     <small id="register-email-error" class="field-error" aria-live="polite"></small>
@@ -47,7 +47,7 @@
 
                 <label class="input-with-icon">
                     <input id="register-password" type="password" name="password" placeholder="Password"
-                        autocomplete="new-password" />
+                        autocomplete="new-password" required aria-describedby="register-password-error" />
                     <button class="password-toggle" type="button" aria-label="Show password" disabled
                         data-visible-icon="../assets/icons/visibility.svg"
                         data-hidden-icon="../assets/icons/visibility_off.svg">
@@ -58,7 +58,7 @@
 
                 <label class="input-with-icon">
                     <input id="register-password-confirm" type="password" name="password-confirmation"
-                        placeholder="Confirm Password" autocomplete="new-password"
+                        placeholder="Confirm Password" autocomplete="new-password" required
                         aria-describedby="register-password-confirm-error" />
                     <button class="password-toggle" type="button" aria-label="Show password" disabled
                         data-visible-icon="../assets/icons/visibility.svg"
@@ -69,7 +69,7 @@
                 </label>
 
                 <label class="privacy-consent">
-                    <input id="register-privacy" type="checkbox" name="privacy-consent"
+                    <input id="register-privacy" type="checkbox" name="privacy-consent" required
                         aria-describedby="register-privacy-error" />
                     <span>I accept the Privacy policy</span>
                     <small id="register-privacy-error" class="field-error" aria-live="polite"></small>

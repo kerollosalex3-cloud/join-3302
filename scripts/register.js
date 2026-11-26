@@ -1,5 +1,6 @@
 import {
     createUserWithEmailAndPassword,
+    signOut,
     updateProfile,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -28,44 +29,90 @@ const passwordError = getElement("#register-password-error");
 const confirmError = getElement("#register-password-confirm-error");
 const privacyError = getElement("#register-privacy-error");
 
+const confirmationField = { input: confirmInput, error: confirmError, getError: getConfirmationError };
+const registrationFields = [
+    { input: nameInput, error: nameError, getError: getNameError },
+    { input: emailInput, error: emailError, getError: getEmailError },
+    { input: passwordInput, error: passwordError, getError: getPasswordError },
+    confirmationField,
+    { input: privacyInput, error: privacyError, getError: getConsentError },
+];
+let registering = false;
+
 bindPasswordVisibility(passwordInput, passwordInput.closest(".input-with-icon").querySelector(".password-toggle"));
 bindPasswordVisibility(confirmInput, confirmInput.closest(".input-with-icon").querySelector(".password-toggle"));
 
 /**
- * Reads the current registration form validity.
- * @returns {{nameOk: boolean, emailOk: boolean, passwordMatch: boolean, privacyOk: boolean, passwordOk: boolean, hasConfirmation: boolean}} Form state.
+ * Checks the registration name.
+ * @returns {string} The name error, if any.
  */
-function getRegistrationState() {
-    const nameOk = nameInput.value.trim().length > 0;
-    const emailHasAt = emailInput.value.trim().includes("@");
-    const emailOk = emailHasAt && emailInput.validity.valid;
-    const passwordOk = passwordInput.value.length >= 6;
-    const hasConfirmation = confirmInput.value.length > 0;
-    const passwordMatch = passwordInput.value === confirmInput.value && hasConfirmation;
-    const privacyOk = privacyInput.checked;
-    return { nameOk, emailOk, passwordOk, hasConfirmation, passwordMatch, privacyOk };
+function getNameError() {
+    const name = nameInput.value.trim();
+    if (!name) return "Please enter your name.";
+    return /\p{L}.*\p{L}/u.test(name) ? "" : "Please enter at least 2 letters.";
 }
 
 /**
- * Refreshes registration errors without submitting the form.
- * @param {object} state Current form validity.
+ * Checks the email address.
+ * @returns {string} The email error, if any.
  */
-function updateRegistrationErrors(state) {
-    if (state.nameOk) setFieldError(nameInput, nameError, "");
-    setFieldError(emailInput, emailError, emailInput.value.length === 0 || state.emailOk
-        ? "" : "Please enter a valid email address.");
-    setFieldError(confirmInput, confirmError, state.hasConfirmation && !state.passwordMatch
-        ? "Your passwords don't match. Please try again." : "");
-    setFieldError(privacyInput, privacyError,
-        !state.privacyOk && state.nameOk && state.emailOk && state.passwordOk && state.passwordMatch
-            ? "Please accept the privacy policy." : "");
+function getEmailError() {
+    return emailInput.value.trim() && emailInput.validity.valid ? "" : "Please enter a valid email address.";
 }
 
-/** Updates field messages and the registration button. */
+/**
+ * Checks the minimum password length.
+ * @returns {string} The password error, if any.
+ */
+function getPasswordError() {
+    return passwordInput.value.length >= 6 ? "" : "Password must be at least 6 characters.";
+}
+
+/**
+ * Checks the password confirmation.
+ * @returns {string} The confirmation error, if any.
+ */
+function getConfirmationError() {
+    if (!confirmInput.value) return "Please confirm your password.";
+    return confirmInput.value === passwordInput.value ? "" : "Your passwords don't match. Please try again.";
+}
+
+/**
+ * Checks privacy policy consent.
+ * @returns {string} The consent error, if any.
+ */
+function getConsentError() {
+    return privacyInput.checked ? "" : "Please accept the privacy policy.";
+}
+
+/**
+ * Updates the validation message for one field.
+ * @param {{input: HTMLInputElement, error: HTMLElement, getError: Function}} field Registration field.
+ * @returns {boolean} Whether the field is valid.
+ */
+function validateRegistrationField({ input, error, getError }) {
+    const message = getError();
+    setFieldError(input, error, message);
+    return !message;
+}
+
+/** Enables registration when all required fields are filled. */
 function updateSubmitState() {
-    const state = getRegistrationState();
-    updateRegistrationErrors(state);
-    submitButton.disabled = !state.privacyOk;
+    submitButton.disabled = registering || !nameInput.value.trim() ||
+        !emailInput.value.trim() || !passwordInput.value || !confirmInput.value || !privacyInput.checked;
+}
+
+/**
+ * Binds input and blur behavior for one registration field.
+ * @param {{input: HTMLInputElement, error: HTMLElement, getError: Function}} field Registration field.
+ */
+function bindRegistrationField(field) {
+    field.input.addEventListener("input", () => {
+        setFieldError(field.input, field.error, "");
+        updateSubmitState();
+    });
+    field.input.addEventListener("change", updateSubmitState);
+    field.input.addEventListener("blur", () => validateRegistrationField(field));
 }
 
 /**
@@ -83,67 +130,6 @@ async function saveUserProfile(uid, name, email) {
 }
 
 /**
- * Validates the registration name.
- * @param {string} name Trimmed name.
- * @returns {boolean} Whether the name is valid.
- */
-function validateRegistrationName(name) {
-    if (!name) {
-        setFieldError(nameInput, nameError, "Please enter your name.");
-        nameInput.focus();
-        return false;
-    }
-    return true;
-}
-
-/**
- * Validates the registration email.
- * @param {string} email Trimmed email.
- * @returns {boolean} Whether the email is valid.
- */
-function validateRegistrationEmail(email) {
-    if (!email || !emailInput.validity.valid) {
-        setFieldError(emailInput, emailError, "Please enter a valid email address.");
-        emailInput.focus();
-        return false;
-    }
-    return true;
-}
-
-/**
- * Validates the registration password and its confirmation.
- * @param {string} password Entered password.
- * @returns {boolean} Whether both passwords are valid.
- */
-function validateRegistrationPassword(password) {
-    if (password.length < 6) {
-        setFieldError(passwordInput, passwordError, "Password must be at least 6 characters.");
-        showToast("Password must be at least 6 characters.");
-        passwordInput.focus();
-        return false;
-    }
-    if (password !== confirmInput.value) {
-        setFieldError(confirmInput, confirmError, "Your passwords don't match. Please try again.");
-        confirmInput.focus();
-        return false;
-    }
-    return true;
-}
-
-/**
- * Checks whether the privacy policy was accepted.
- * @returns {boolean} Whether consent was given.
- */
-function validateRegistrationConsent() {
-    if (!privacyInput.checked) {
-        setFieldError(privacyInput, privacyError, "Please accept the privacy policy.");
-        privacyInput.focus();
-        return false;
-    }
-    return true;
-}
-
-/**
  * Creates an authentication account and reports failures.
  * @param {string} email Email address.
  * @param {string} password Password.
@@ -153,6 +139,7 @@ async function createRegistrationAccount(email, password) {
     try {
         return await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
+        registering = false;
         updateSubmitState();
         showRegistrationError(error);
         return null;
@@ -191,9 +178,9 @@ async function saveRegistrationDatabaseProfile(uid, name, email) {
     }
 }
 
-/** Redirects to the summary after registration. */
+/** Redirects to the login page after registration. */
 function redirectAfterRegistration() {
-    location.href = "summary.html";
+    location.href = "../index.html?skipIntro=1";
 }
 
 /**
@@ -206,6 +193,12 @@ function redirectAfterRegistration() {
 async function finishRegistration(user, name, email) {
     const authWarning = await saveRegistrationDisplayName(user, name);
     const databaseWarning = await saveRegistrationDatabaseProfile(user.uid, name, email);
+    try {
+        await signOut(auth);
+    } catch {
+        showToast("Account created, but the session could not be closed. Please log out before signing in again.");
+        return;
+    }
     showToast(databaseWarning || authWarning || "You Signed Up successfully");
     if (!databaseWarning) window.setTimeout(redirectAfterRegistration, 2500);
 }
@@ -217,12 +210,19 @@ async function finishRegistration(user, name, email) {
  */
 async function register(event) {
     event.preventDefault();
+    if (registering) return;
+
+    const invalidFields = registrationFields.filter(field => !validateRegistrationField(field));
+    if (invalidFields.length) {
+        invalidFields[0].input.focus();
+        return;
+    }
+
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
-    if (!validateRegistrationName(name) || !validateRegistrationEmail(email) ||
-        !validateRegistrationPassword(password) || !validateRegistrationConsent()) return;
-    submitButton.disabled = true;
+    registering = true;
+    updateSubmitState();
     const credential = await createRegistrationAccount(email, password);
     if (credential) await finishRegistration(credential.user, name, email);
 }
@@ -242,12 +242,9 @@ function showRegistrationError(error) {
     }
 }
 
-[nameInput, emailInput, passwordInput, confirmInput, privacyInput].forEach((field) => {
-    field.addEventListener("input", updateSubmitState);
-    field.addEventListener("change", updateSubmitState);
+registrationFields.forEach(bindRegistrationField);
+passwordInput.addEventListener("blur", () => {
+    if (confirmInput.value) validateRegistrationField(confirmationField);
 });
-
-emailInput.addEventListener("input", updateSubmitState);
-passwordInput.addEventListener("input", () => setFieldError(passwordInput, passwordError, ""));
 updateSubmitState();
 registerForm.addEventListener("submit", register);
