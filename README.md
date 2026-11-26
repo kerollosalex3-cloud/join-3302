@@ -69,5 +69,6 @@ Die Firebase-Konfiguration befindet sich in `scripts/firebase.js`. Für eine eig
 
 ## Hinweis
 
-Join ist ein Lernprojekt und nicht für den produktiven Einsatz in Unternehmen vorgesehen.
+> Dieses Projekt ist ein reines Übungsprojekt und ist zu Lernzwecken im Zuge unserer Weiterbildung bei der [Developer Akademie](https://developerakademie.com) entstanden.
+
    
