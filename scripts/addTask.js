@@ -15,6 +15,7 @@ const isOverlayMode = getUrlSearchParam('overlay') === '1';
 if (isOverlayMode) document.documentElement.classList.add('add-task-overlay-mode');
 
 const taskForm = document.getElementById('task-form');
+const dueDateInput = taskForm.elements.dueDate;
 const taskSaveButton = document.getElementById('save-task');
 const taskSaveLabel = document.getElementById('save-task-label');
 const clearTaskButton = document.getElementById('clear-task');
@@ -25,6 +26,8 @@ let editingTaskId = getUrlSearchParam('edit');
 let originalTask = null;
 let savingTask = false;
 
+setTaskDateMinimum();
+dueDateInput.addEventListener('focus', setTaskDateMinimum);
 taskForm.addEventListener('input', updateTaskForm);
 taskForm.addEventListener('change', updateTaskForm);
 taskForm.addEventListener('focusout', validateTaskField);
@@ -32,6 +35,11 @@ taskForm.addEventListener('submit', saveTaskForm);
 clearTaskButton.addEventListener('click', cancelOrClearTask);
 bindLogout(document.getElementById('task-logout'), taskSaveNote);
 onAuthStateChanged(auth, handleTaskAuthChange);
+
+/** Disables past days in the date picker. */
+function setTaskDateMinimum() {
+    dueDateInput.min = getLocalDate();
+}
 
 /**
  * Validates the form before saving.

@@ -122,11 +122,11 @@
 }
 
 @supports selector(input::-webkit-datetime-edit) {
-    #task-due-date:invalid:not(:focus)::-webkit-datetime-edit {
+    #task-due-date:invalid:not(:out-of-range):not(:focus)::-webkit-datetime-edit {
         opacity: 0;
     }
 
-    #task-due-date:invalid:not(:focus) + span {
+    #task-due-date:invalid:not(:out-of-range):not(:focus) + span {
         position: absolute;
         top: 50%;
         left: 16px;
