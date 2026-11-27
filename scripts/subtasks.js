@@ -22,6 +22,7 @@ function addSubtask() {
     const text = subtaskInput.value.trim();
     if (!text) return;
     appendSubtask(text);
+    subtaskList.scrollTop = subtaskList.scrollHeight;
     clearSubtaskInput();
 }
 

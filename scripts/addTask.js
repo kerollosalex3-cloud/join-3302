@@ -5,7 +5,7 @@ import { getLocalDate, getUrlSearchParam, setFieldError } from "../script.js";
 import { clearTaskAssignees, loadTaskAssignees, readTaskAssignees, restoreTaskAssignees } from './taskAssignees.js?v=4';
 import { bindLogout } from './pageSession.js';
 import { getTaskErrors } from './taskValidation.js?v=2';
-import { appendSubtask, updateSubtaskButton } from './subtasks.js?v=2';
+import { appendSubtask, updateSubtaskButton } from './subtasks.js?v=3';
 
 const validTaskStatuses = new Set(['todo', 'in-progress', 'await-feedback', 'done']);
 const requestedTaskStatus = getUrlSearchParam('status');
