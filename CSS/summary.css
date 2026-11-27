@@ -7,6 +7,26 @@
     flex: 1;
 }
 
+@media (min-width: 701px) {
+    .app-layout {
+        height: 100dvh;
+    }
+
+    .sidebar {
+        height: auto;
+        min-height: 0;
+    }
+
+    .header {
+        flex-shrink: 0;
+    }
+
+    .summary-main {
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
 .summary-main {
     display: flex;
     align-items: flex-start;
@@ -418,6 +438,18 @@
         grid-column: 2;
         grid-row: 3;
         align-self: center;
+    }
+}
+
+@media (min-width: 701px) and (max-height: 640px) {
+    .summary-main {
+        padding-block: 24px;
+    }
+}
+
+@media (min-width: 701px) and (max-height: 540px) {
+    .sidebar {
+        padding-block: 16px;
     }
 }
 
