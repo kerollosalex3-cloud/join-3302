@@ -10,6 +10,8 @@ const contactList = document.getElementById('task-contact-list');
 const contactOptions = document.getElementById('task-contact-options');
 const contactStatus = document.getElementById('task-contact-status');
 const contactTemplate = document.getElementById('task-contact-template');
+const selectedContacts = document.getElementById('task-selected-contacts');
+const visibleBadgeLimit = 5;
 let contacts = [];
 let contactMessage = 'Loading contacts…';
 let previousAssignees = [];
@@ -30,10 +32,10 @@ function toggleContactList() {
     contactSearch.focus();
 }
 
-/** Marks the contact selection as changed and refreshes its placeholder. */
+/** Marks the contact selection as changed and refreshes its badges. */
 function handleContactOptionsChange() {
     selectionChanged = true;
-    updateContactPlaceholder();
+    renderSelectedContacts();
 }
 
 /**
@@ -56,7 +58,7 @@ function handleOutsideContactPickerClick(event) {
 function openTaskContacts() {
     contactList.hidden = false;
     contactToggle.setAttribute('aria-expanded', 'true');
-    updateContactPlaceholder();
+    contactSearch.placeholder = '';
     filterTaskContacts();
 }
 
@@ -66,7 +68,7 @@ function closeTaskContacts() {
     contactList.hidden = true;
     contactToggle.setAttribute('aria-expanded', 'false');
     contactSearch.value = '';
-    updateContactPlaceholder();
+    contactSearch.placeholder = 'Select contacts to assign';
 }
 
 /**
@@ -165,7 +167,7 @@ function renderTaskAssignees() {
     contactOptions.replaceChildren();
     for (const contact of contacts) contactOptions.append(createContactOption(contact, selected));
     filterTaskContacts();
-    updateContactPlaceholder();
+    renderSelectedContacts();
 }
 
 /**
@@ -179,18 +181,17 @@ function createContactOption(contact, selected) {
     const checkbox = row.querySelector('input');
     checkbox.value = contact.id;
     checkbox.checked = selected.has(contact.id);
-    setContactAvatar(row, contact);
+    setContactAvatar(row.querySelector('.task-contact-avatar'), contact);
     setContactName(row, contact);
     return row;
 }
 
 /**
  * Sets the contact option's avatar and colors.
- * @param {HTMLElement} row Contact option.
+ * @param {HTMLElement} avatar Avatar element.
  * @param {object} contact Contact data.
  */
-function setContactAvatar(row, contact) {
-    const avatar = row.querySelector('.task-contact-avatar');
+function setContactAvatar(avatar, contact) {
     const colors = getAssigneeColors(contact);
     avatar.textContent = getInitials(contact.name);
     avatar.style.backgroundColor = colors.background;
@@ -277,9 +278,27 @@ function createTaskAssignee(contact) {
     };
 }
 
-/** Updates the picker placeholder to reflect the current selection. */
-function updateContactPlaceholder() {
-    const count = (readTaskAssignees() || previousAssignees).length;
-    contactSearch.placeholder = count ? count + ' selected' : 'Select contacts to assign';
-    if (!contactList.hidden) contactSearch.placeholder = '';
+/** Shows selected contacts, with one badge for any extra names. */
+function renderSelectedContacts() {
+    const assignments = readTaskAssignees() || previousAssignees;
+    const contactsWithNames = assignments.filter(contact => contact?.name);
+    const visibleCount = contactsWithNames.length > visibleBadgeLimit
+        ? visibleBadgeLimit - 1 : visibleBadgeLimit;
+    const badges = contactsWithNames.slice(0, visibleCount).map(contact => {
+        const badge = document.createElement('li');
+        badge.className = 'task-contact-avatar';
+        badge.title = contact.name;
+        badge.setAttribute('aria-label', contact.name);
+        setContactAvatar(badge, contact);
+        return badge;
+    });
+    const extraCount = contactsWithNames.length - badges.length;
+    if (extraCount) {
+        const badge = document.createElement('li');
+        badge.className = 'task-contact-avatar task-contact-overflow';
+        badge.textContent = '+' + extraCount;
+        badge.setAttribute('aria-label', extraCount + ' more assigned contacts');
+        badges.push(badge);
+    }
+    selectedContacts.replaceChildren(...badges);
 }

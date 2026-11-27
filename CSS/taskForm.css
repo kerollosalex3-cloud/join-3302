@@ -164,6 +164,24 @@
     font-size: 16px;
 }
 
+.task-selected-contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.task-selected-contacts:empty {
+    display: none;
+}
+
+.task-contact-overflow {
+    background: var(--color-primary);
+    font-size: 14px;
+}
+
 .task-contact-name {
     min-width: 0;
     flex: 1;
