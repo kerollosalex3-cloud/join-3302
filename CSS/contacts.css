@@ -21,6 +21,10 @@
 }
 
 @media (min-width: 901px) {
+    .contacts-page .app-layout {
+        height: 100dvh;
+    }
+
     .contacts-page .sidebar {
         position: sticky;
         top: 0;
@@ -28,12 +32,21 @@
         height: 100dvh;
         min-height: 0;
     }
+
+    .contacts-main {
+        min-height: 0;
+    }
+
+    .contacts-list,
+    .contacts-content {
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+    }
 }
 
 .contacts-main {
     display: flex;
     flex: 1;
-    max-width: 1688px;
     min-width: 0;
 }
 
@@ -257,7 +270,6 @@
 }
 /* end contacts */
 
-.contacts-page .app-layout { max-width: 1920px; }
 .contacts-mobile-legal { display: none; }
 
 /* start responsive */
