@@ -24,6 +24,12 @@ export function getInitials(name, fallback = "G") {
 
 const assigneeColorCount = 12;
 
+/** Reserves one of the five badge slots for the remaining count when needed. */
+export function getAssigneeBadgeGroup(assignees) {
+    const visible = assignees.slice(0, assignees.length > 5 ? 4 : 5);
+    return { visible, remaining: assignees.length - visible.length };
+}
+
 /**
  * Returns stable, readable avatar colors for an assigned contact.
  * @param {Object} assignee Assigned contact.

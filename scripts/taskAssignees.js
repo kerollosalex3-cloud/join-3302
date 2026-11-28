@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { get, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
-import { getAssigneeColors, getInitials } from '../script.js?v=3';
+import { getAssigneeBadgeGroup, getAssigneeColors, getInitials } from '../script.js?v=4';
 import { readContactRecords, readOwnContact } from './contactData.js?v=3';
 
 const contactPicker = document.getElementById('task-assignees');
@@ -11,7 +11,6 @@ const contactOptions = document.getElementById('task-contact-options');
 const contactStatus = document.getElementById('task-contact-status');
 const contactTemplate = document.getElementById('task-contact-template');
 const selectedContacts = document.getElementById('task-selected-contacts');
-const visibleBadgeLimit = 5;
 let contacts = [];
 let contactMessage = 'Loading contacts…';
 let previousAssignees = [];
@@ -281,10 +280,8 @@ function createTaskAssignee(contact) {
 /** Shows selected contacts, with one badge for any extra names. */
 function renderSelectedContacts() {
     const assignments = readTaskAssignees() || previousAssignees;
-    const contactsWithNames = assignments.filter(contact => contact?.name);
-    const visibleCount = contactsWithNames.length > visibleBadgeLimit
-        ? visibleBadgeLimit - 1 : visibleBadgeLimit;
-    const badges = contactsWithNames.slice(0, visibleCount).map(contact => {
+    const { visible, remaining } = getAssigneeBadgeGroup(assignments.filter(contact => contact?.name));
+    const badges = visible.map(contact => {
         const badge = document.createElement('li');
         badge.className = 'task-contact-avatar';
         badge.title = contact.name;
@@ -292,12 +289,11 @@ function renderSelectedContacts() {
         setContactAvatar(badge, contact);
         return badge;
     });
-    const extraCount = contactsWithNames.length - badges.length;
-    if (extraCount) {
+    if (remaining) {
         const badge = document.createElement('li');
         badge.className = 'task-contact-avatar task-contact-overflow';
-        badge.textContent = '+' + extraCount;
-        badge.setAttribute('aria-label', extraCount + ' more assigned contacts');
+        badge.textContent = '+' + remaining;
+        badge.setAttribute('aria-label', remaining + ' more assigned contacts');
         badges.push(badge);
     }
     selectedContacts.replaceChildren(...badges);

@@ -1,4 +1,4 @@
-import { createTaskCard } from "./template.js";
+import { createTaskCard } from "./template.js?v=2";
 import { boardElements } from "./board-elements.js";
 import { bindMoveMenu } from "./boardMoveMenu.js";
 

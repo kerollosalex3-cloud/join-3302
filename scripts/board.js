@@ -7,7 +7,7 @@ import {
     showTaskDetails,
     updateSubtaskDisplay
 } from "./board-dialog.js";
-import { renderTasks } from "./board-render.js";
+import { renderTasks } from "./board-render.js?v=2";
 import {
     applyBoardSearchQuery,
     getActiveSearchQuery,

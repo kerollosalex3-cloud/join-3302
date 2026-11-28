@@ -1,4 +1,4 @@
-import { escapeHtml, getAssigneeColors } from "../script.js";
+import { escapeHtml, getAssigneeBadgeGroup, getAssigneeColors, getInitials } from "../script.js?v=4";
 
 /**
  * Returns the priority icon path based on the priority level.
@@ -48,16 +48,20 @@ function getTaskSubtasksHtml(task) {
  * @returns {string} Assigned-contact markup.
  */
 function getTaskAssigneesHtml(task) {
-    return task.assignedTo && task.assignedTo.length > 0
-        ? `<div class="task-assignees" aria-label="Assigned to ${task.assignedTo.map(a => a.name).join(", ")}">
-            ${task.assignedTo.slice(0, 3).map(assignee => {
-                const colors = getAssigneeColors(assignee);
-                return `<span class="task-assignee" style="background-color: ${colors.background}; color: ${colors.text}" data-name="${escapeHtml(assignee.name)}">
-                    ${escapeHtml(assignee.initials)}
-                </span>`;
-            }).join("")}
-           </div>`
-        : `<div class="task-assignees"></div>`;
+    const assignees = Array.isArray(task.assignedTo) ? task.assignedTo.filter(assignee => assignee?.name) : [];
+    if (!assignees.length) return `<div class="task-assignees"></div>`;
+    const { visible, remaining } = getAssigneeBadgeGroup(assignees);
+    const names = escapeHtml(assignees.map(assignee => assignee.name).join(", "));
+    const badges = visible.map(assignee => {
+        const colors = getAssigneeColors(assignee);
+        return `<span class="task-assignee" style="background-color: ${colors.background}; color: ${colors.text}" data-name="${escapeHtml(assignee.name)}" aria-hidden="true">
+            ${escapeHtml(assignee.initials || getInitials(assignee.name))}
+        </span>`;
+    }).join("");
+    const overflow = remaining
+        ? `<span class="task-assignee task-assignee-overflow" title="${remaining} more assigned contacts" aria-hidden="true">+${remaining}</span>`
+        : "";
+    return `<div class="task-assignees" aria-label="Assigned to ${names}">${badges}${overflow}</div>`;
 }
 
 /**
